@@ -4,8 +4,8 @@ MAINTAINER Steeve Morin <steeve@zen.ly>
 ENV GOPATH /go
 
 RUN apk add --update build-base curl automake autoconf libtool git go zlib-dev && \
-    curl -L https://github.com/google/protobuf/archive/v3.0.0-beta-3.1.tar.gz | tar xvz && \
-    cd /protobuf-3.0.0-beta-3.1 && \
+    curl -L https://github.com/google/protobuf/archive/3.0.0-beta-4.tar.gz | tar xvz && \
+    cd /protobuf-3.0.0-beta-4 && \
         ./autogen.sh && \
         ./configure --prefix=/usr && \
         make && make install && \
