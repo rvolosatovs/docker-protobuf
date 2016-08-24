@@ -1,7 +1,7 @@
 FROM alpine:3.4
 MAINTAINER Steeve Morin <steeve@zen.ly>
 
-ENV GRPC_VERSION 1.0.x
+ENV GRPC_VERSION 1.0.0
 ENV PROTOBUF_VERSION 3.0.0
 ENV GOPATH /go
 
