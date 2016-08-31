@@ -8,7 +8,8 @@ ENV GOPATH /go
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz && \
     cd /protobuf-${PROTOBUF_VERSION} && \
-        ./autogen.sh && \
+        autoreconf -f -i -Wall && \
+        rm -rf autom4te.cache config.h.in~ && \
         ./configure --prefix=/usr && \
         make && make install && \
         rm -rf `pwd` && cd / && \
