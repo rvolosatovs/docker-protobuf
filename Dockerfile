@@ -10,7 +10,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
     cd /protobuf-${PROTOBUF_VERSION} && \
         autoreconf -f -i -Wall && \
         rm -rf autom4te.cache config.h.in~ && \
-        ./configure --prefix=/usr && \
+        ./configure --prefix=/usr --enable-static=no && \
         make && make install && \
         rm -rf `pwd` && cd / && \
     git clone --recursive -b v${GRPC_VERSION} https://github.com/grpc/grpc.git && \
@@ -39,7 +39,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
     mkdir -p /protobuf/gogoproto && \
         curl -L -o /protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del build-base curl automake autoconf libtool git go zlib-dev && \
-    find /usr/lib -name "*.a" -or -name "*.la" -delete && \
+    find /usr/lib -name "*.a" -delete -or -name "*.la" -delete && \
     apk add --no-cache libstdc++
 
 ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
