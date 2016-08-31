@@ -31,7 +31,7 @@ Usage: /usr/bin/protoc [OPTION] PROTO_FILES
 
 Don't forget you need to bind mount your files:
 ```
-$ docker run --rm -v $(pwd) -w $(pwd) znly/protoc --python_out=. myfile.proto
+$ docker run --rm -v $(pwd):$(pwd) -w $(pwd) znly/protoc --python_out=. -I. myfile.proto
 ```
 
 ## Google Well Known Types
@@ -45,4 +45,4 @@ import "google/protobuf/duration.proto";
 ```
 
 ## Image Size
-The current currently sits at ~290mb and one layer. Most the space is spent on Go tools.
+The current currently sits at ~135mb and one layer. Most the space is spent on Go tools.
