@@ -1,9 +1,9 @@
 FROM alpine:3.4
 MAINTAINER Steeve Morin <steeve@zen.ly>
 
-ENV GRPC_VERSION 1.0.0
-ENV PROTOBUF_VERSION 3.0.0
-ENV GOPATH /go
+ENV GRPC_VERSION=1.0.0      \
+    PROTOBUF_VERSION=3.0.0  \
+    GOPATH=/go
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz && \
