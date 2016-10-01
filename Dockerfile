@@ -2,7 +2,7 @@ FROM alpine:3.4
 MAINTAINER Steeve Morin <steeve@zen.ly>
 
 ENV GRPC_VERSION=1.0.0      \
-    PROTOBUF_VERSION=3.0.2  \
+    PROTOBUF_VERSION=3.1.0  \
     GOPATH=/go
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
