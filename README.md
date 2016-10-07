@@ -22,6 +22,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
 - Python
 - Ruby
 - Go
+- Swift
 
 ## Usage
 ```
@@ -45,4 +46,4 @@ import "google/protobuf/duration.proto";
 ```
 
 ## Image Size
-The current image is about ~135mb and one layer. Most the space is spent on Go tools.
+The current image is about ~214mb and one layer. Most the space is spent on Go tools.
