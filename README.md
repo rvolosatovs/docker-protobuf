@@ -45,4 +45,4 @@ import "google/protobuf/duration.proto";
 ```
 
 ## Image Size
-The current currently sits at ~135mb and one layer. Most the space is spent on Go tools.
+The current image is about ~135mb and one layer. Most the space is spent on Go tools.
