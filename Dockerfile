@@ -3,16 +3,21 @@ MAINTAINER Steeve Morin <steeve@zen.ly>
 
 ENV GRPC_VERSION=1.0.0      \
     PROTOBUF_VERSION=3.1.0  \
+    SWIFT_PROTOBUF_VERSION=0.9.24  \
     GOPATH=/go
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev && \
+    curl -L https://github.com/QuentinPerez/docker-alpine-swift-protobuf/releases/download/$SWIFT_PROTOBUF_VERSION/export-lib-$SWIFT_PROTOBUF_VERSION.tar | tar xv -C / && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz && \
+    curl -L https://raw.githubusercontent.com/QuentinPerez/docker-alpine-swift-protobuf/master/ressources/ld_library_path.patch > /ld_library_path.patch && \
     cd /protobuf-${PROTOBUF_VERSION} && \
-        autoreconf -f -i -Wall && \
+        autoreconf -f -i -Wall,no-obsolete && \
+        (cd ./src/google/protobuf/compiler/ && patch < /ld_library_path.patch) && \
         rm -rf autom4te.cache config.h.in~ && \
         ./configure --prefix=/usr --enable-static=no && \
         make && make install && \
         rm -rf `pwd` && cd / && \
+    rm /ld_library_path.patch && \
     git clone --recursive -b v${GRPC_VERSION} https://github.com/grpc/grpc.git && \
     cd /grpc/third_party/protobuf && git checkout v${PROTOBUF_VERSION} && \
     cd /grpc && \
