@@ -45,6 +45,6 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         curl -L -o /protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del build-base curl automake autoconf libtool git go zlib-dev && \
     find /usr/lib -name "*.a" -delete -or -name "*.la" -delete && \
-    apk add --no-cache libstdc++
+    apk add --no-cache libstdc++ make
 
 ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
