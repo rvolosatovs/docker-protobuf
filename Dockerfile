@@ -55,8 +55,8 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         for f in annotations http; do \
             curl -L -o /protobuf/google/api/${f}.proto https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/master/third_party/googleapis/google/api/${f}.proto; \
         done && \
-    mkdir -p /protobuf/gogoproto && \
-        curl -L -o /protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
+    mkdir -p /protobuf/github.com/gogo/protobuf/gogoproto && \
+        curl -L -o /protobuf/github.com/gogo/protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del build-base curl automake autoconf libtool git go zlib-dev && \
     find /usr/lib -name "*.a" -delete -or -name "*.la" -delete && \
     apk add --no-cache libstdc++ make
