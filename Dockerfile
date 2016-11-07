@@ -28,7 +28,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         g++ -I. -lprotoc -lprotobuf -lpthread --std=c++0x -s -o protoc-gen-grpc-java *.cpp && \
         install -c protoc-gen-grpc-java /usr/bin/ && \
         rm -rf /grpc-java-${GRPC_VERSION} && cd / && \
-    go get \
+    go get -ldflags "-w -s" \
         github.com/golang/protobuf/protoc-gen-go \
         github.com/gogo/protobuf/protoc-gen-gofast \
         github.com/gogo/protobuf/protoc-gen-gogo \
