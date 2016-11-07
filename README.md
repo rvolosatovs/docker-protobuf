@@ -47,5 +47,14 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 ```
 
+## Gogo
+`gogo.proto` is embedded in the image and can be included with:
+```protobuf
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+```
+
 ## Image Size
-The current image is about ~230mb and one layer. Most the space is spent on Go tools.
+The current image is about ~130mb and one layer. Most the space is spent on Go tools.
+All the binaries are UPX'ed. Including the Swift stdlib.
