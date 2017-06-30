@@ -1,9 +1,9 @@
 FROM alpine:3.6
 MAINTAINER Steeve Morin <steeve@zen.ly>
 
-ENV GRPC_VERSION=1.4.0-pre1         \
+ENV GRPC_VERSION=1.4.1              \
     GRPC_JAVA_VERSION=1.4.0         \
-    PROTOBUF_VERSION=3.3.1          \
+    PROTOBUF_VERSION=3.3.2          \
     SWIFT_PROTOBUF_VERSION=0.9.24   \
     GOPATH=/go
 
