@@ -37,7 +37,8 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         github.com/gogo/protobuf/protoc-gen-gogofaster \
         github.com/gogo/protobuf/protoc-gen-gogoslick \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
-        github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
+        github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+        github.com/fiorix/protoc-gen-cobra && \
     install -c /go/bin/* /usr/bin/ && \
     rm -rf /go/* && \
     mkdir -p /protobuf/google/protobuf && \
