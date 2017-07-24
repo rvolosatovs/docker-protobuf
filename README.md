@@ -2,10 +2,11 @@
 All inclusive protoc suite, powered by Docker and Alpine Linux.
 
 ## What's included:
-- protobuf 3.3.1
+- protobuf 3.3.2
 - gRPC 1.4.1
 - Google Well Known Types are automatically included (via `google/`)
-- Go related tools compiled with 1.8.1, gRPC support is built-in:
+- Go related tools compiled with 1.8.3, gRPC support is built-in:
+  - github.com/fiorix/protoc-gen-cobra
   - github.com/golang/protobuf/protoc-gen-go
   - github.com/gogo/protobuf/protoc-gen-gofast
   - github.com/gogo/protobuf/protoc-gen-gogo
@@ -16,6 +17,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
   - github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 ## Supported languages
+- C
 - C++
 - C#
 - Java / JavaNano (Android)
@@ -25,6 +27,7 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
 - Ruby
 - Go
 - Swift
+- PHP
 
 ## Usage
 ```
@@ -56,5 +59,5 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 ```
 
 ## Image Size
-The current image is about ~130mb and one layer. Most the space is spent on Go tools.
+The current image is about ~200mb and one layer. Most the space is spent on Go tools.
 All the binaries are UPX'ed. Including the Swift stdlib.
