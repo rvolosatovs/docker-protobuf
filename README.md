@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rvolosatovs/docker-protobuf.svg?branch=master)](https://travis-ci.org/rvolosatovs/docker-protobuf)
+
 # Protocol Buffers + Docker
 All inclusive protoc suite, powered by Docker and Alpine Linux.
 
