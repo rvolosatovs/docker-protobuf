@@ -22,22 +22,22 @@ All inclusive protoc suite, powered by Docker and Alpine Linux.
 - C#
 - Java / JavaNano (Android)
 - JavaScript
+- Go
 - Objective-C
+- PHP
 - Python
 - Ruby
-- Go
 - Swift
-- PHP
 
 ## Usage
 ```
-$ docker run --rm znly/protoc --help
+$ docker run --rm rvolosatovs/protoc --help
 Usage: /usr/bin/protoc [OPTION] PROTO_FILES
 ```
 
 Don't forget you need to bind mount your files:
 ```
-$ docker run --rm -v $(pwd):$(pwd) -w $(pwd) znly/protoc --python_out=. -I. myfile.proto
+$ docker run --rm -v $(pwd):$(pwd) -w $(pwd) rvolosatovs/protoc --python_out=. -I. myfile.proto
 ```
 
 ## Google Well Known Types
