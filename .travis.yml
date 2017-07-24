@@ -1,0 +1,13 @@
+language: go
+
+sudo: required
+services:
+    - docker
+
+install: 
+    - true
+
+script: 
+    - docker build -t rvolosatovs/protoc .
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker push rvolosatovs/protoc
