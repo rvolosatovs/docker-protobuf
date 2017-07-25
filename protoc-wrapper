@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+c_out=""
+includes=()
+outs=()
+args=()
+
+for arg in $@; do
+    case $arg in
+        --c_out=*)
+            c_out=${arg}
+            shift
+            ;;
+        --*_out=*)
+            outs+=(${arg})
+            shift
+            ;;
+        -I*|--proto_path=*)
+            includes+=(${arg})
+            shift
+            ;;
+        *)
+            args+=(${arg})
+            ;;
+    esac
+done
+
+protoc_cmd="protoc ${includes[@]} ${outs[@]} ${args[@]}"
+protoc_c_cmd="protoc-c ${includes[@]} ${c_out} ${args[@]}"
+
+if [ ${c_out} ]; then
+    if [ ${#outs[@]} -eq 0 ]; then
+        # only --c_out specified, no need to call `protoc`
+        exec ${protoc_c_cmd}
+    fi
+    ${protoc_c_cmd} || exit 1
+    exec ${protoc_cmd}
+fi
+exec ${protoc_cmd}
