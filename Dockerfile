@@ -1,5 +1,5 @@
 FROM alpine:3.6
-MAINTAINER Roman Volosatovs <rvolosatovs@thethingsnetwork.net>
+LABEL maintainer="Roman Volosatovs <rvolosatovs@thethingsnetwork.org>"
 
 ENV GRPC_VERSION=1.4.1              \
     GRPC_JAVA_VERSION=1.4.0         \
