@@ -8,6 +8,6 @@ install:
     - true
 
 script: 
-    - docker build -t rvolosatovs/protoc .
+    - docker build -t thethingsindustries/protoc .
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker push rvolosatovs/protoc
+    - docker push thethingsindustries/protoc

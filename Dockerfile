@@ -1,5 +1,5 @@
 FROM alpine:3.6
-MAINTAINER Roman Volosatovs <rvolosatovs@riseup.net>
+MAINTAINER Roman Volosatovs <rvolosatovs@thethingsnetwork.net>
 
 ENV GRPC_VERSION=1.4.1              \
     GRPC_JAVA_VERSION=1.4.0         \
