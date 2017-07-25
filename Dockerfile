@@ -36,19 +36,12 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         make && make install && \
         rm -rf `pwd` && cd / && \
     go get -ldflags "-w -s" \
-        github.com/golang/protobuf/protoc-gen-go \
-        github.com/gogo/protobuf/protoc-gen-gofast \
-        github.com/gogo/protobuf/protoc-gen-gogo \
-        github.com/gogo/protobuf/protoc-gen-gogofast \
-        github.com/gogo/protobuf/protoc-gen-gogofaster \
-        github.com/gogo/protobuf/protoc-gen-gogoslick \
-        github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
-        github.com/fiorix/protoc-gen-cobra && \
+        github.com/TheThingsNetwork/api/util/protoc-gen-gogottn && \
     install -c /go/bin/* /usr/bin/ && \
     rm -rf /go/* && \
     mkdir -p /protobuf/google/protobuf && \
-        for f in any duration descriptor empty struct timestamp wrappers; do \
+        for f in any descriptor duration empty struct timestamp wrappers; do \
             curl -L -o /protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/google/protobuf/master/src/google/protobuf/${f}.proto; \
         done && \
     mkdir -p /protobuf/google/api && \
@@ -57,6 +50,10 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git go zlib-dev
         done && \
     mkdir -p /protobuf/github.com/gogo/protobuf/gogoproto && \
         curl -L -o /protobuf/github.com/gogo/protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
+    mkdir -p /protobuf/github.com/gogo/protobuf/protobuf/google/protobuf && \
+        for f in any descriptor duration empty field_mask struct timestamp wrappers; do \
+            curl -L -o /protobuf/github.com/gogo/protobuf/protobuf/google/protobuf/${f}.proto https://raw.githubusercontent.com/gogo/protobuf/protobuf/google/protobuf/${f}.proto; \
+        done && \
     apk del build-base curl automake autoconf libtool git go zlib-dev && \
     find /usr/lib -name "*.a" -delete -or -name "*.la" -delete && \
     apk add --no-cache libstdc++ make bash
