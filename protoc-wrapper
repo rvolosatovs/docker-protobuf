@@ -24,6 +24,11 @@ for arg in $@; do
     esac
 done
 
+if [ ${#includes[@]} -eq 0 ]; then
+    # replicate protoc behavior
+    includes+=("-I.")
+fi
+
 protoc_cmd="protoc ${includes[@]} ${outs[@]} ${args[@]}"
 protoc_c_cmd="protoc-c ${includes[@]} ${c_out} ${args[@]}"
 
