@@ -4,10 +4,7 @@ sudo: required
 services:
     - docker
 
-install: 
-    - true
-
 script: 
-    - docker build -t thethingsindustries/protoc .
+    - make build
     - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-    - docker push thethingsindustries/protoc
+    - make push
