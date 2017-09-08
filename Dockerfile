@@ -47,8 +47,12 @@ RUN go get -u -v -ldflags '-w -s' \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
     install -c /go/bin/* ${DESTDIR}/usr/bin/
 
-ENV UPX_VERSION=d31947e1f016e87f24f88b944439bbee892f0429
-RUN curl -L https://github.com/upx/upx/archive/${UPX_VERSION}.tar.gz
+ENV UPX_VERSION=96433b4e39f230c935cb35e6e9125c1aec3ae29f
+RUN git clone --depth 1 --recursive -b devel https://github.com/upx/upx.git /upx
+RUN apk add --no-cache ucl-dev
+RUN cd /upx && \
+    make -j2 all
+RUN mv /upx/src/upx.out /out/upx
 
 
 FROM swiftdocker/swift:3.1.1 as swift_builder
@@ -66,15 +70,27 @@ RUN cp grpc-swift/Plugin/protoc-gen-swift* /protoc-gen-swift/
 RUN cp /lib64/ld-linux-x86-64.so.2 \
         $(ldd grpc-swift/Plugin/protoc-gen-swift* | awk '{print $3}' | grep /lib | sort | uniq) \
         /protoc-gen-swift/
+
 RUN find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \; && \
     for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
 
+FROM alpine:3.6 as packer
+RUN apk add --no-cache libstdc++ ucl
+COPY --from=protoc_builder /out/ /out/
+RUN /out/upx --lzma \
+        /out/usr/bin/* \
+        /out/usr/local/bin/*
+RUN rm -rf \
+        /out/usr/bin/protoc \
+        /out/usr/lib/libproto*
+
+
 FROM alpine:3.6
 RUN apk add --no-cache libstdc++
-COPY --from=protoc_builder /out/ /
+COPY --from=packer /out/ /
 COPY --from=swift_builder /protoc-gen-swift /protoc-gen-swift
 RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
         ln -s /protoc-gen-swift/${p} /usr/bin/${p}; \
@@ -91,4 +107,4 @@ RUN apk add --no-cache curl && \
     mkdir -p /protobuf/github.com/gogo/protobuf/gogoproto && \
         curl -L -o /protobuf/github.com/gogo/protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del curl
-ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
+ENTRYPOINT ["/usr/local/bin/protoc", "-I/protobuf"]
