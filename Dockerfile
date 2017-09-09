@@ -47,13 +47,6 @@ RUN go get -u -v -ldflags '-w -s' \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
     install -c /go/bin/* ${DESTDIR}/usr/bin/
 
-ENV UPX_VERSION=96433b4e39f230c935cb35e6e9125c1aec3ae29f
-RUN git clone --depth 1 --recursive -b devel https://github.com/upx/upx.git /upx
-RUN apk add --no-cache ucl-dev
-RUN cd /upx && \
-    make -j2 all
-RUN mv /upx/src/upx.out /out/upx
-
 
 FROM swiftdocker/swift:3.1.1 as swift_builder
 RUN apt-get update && \
@@ -77,10 +70,9 @@ RUN find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-
     done
 
 
-FROM alpine:3.6 as packer
-RUN apk add --no-cache libstdc++ ucl
+FROM znly/upx as packer
 COPY --from=protoc_builder /out/ /out/
-RUN /out/upx --lzma \
+RUN upx --lzma \
         /out/usr/bin/* \
         /out/usr/local/bin/*
 RUN rm -rf \
