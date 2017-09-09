@@ -4,6 +4,7 @@ RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
 ENV GRPC_VERSION=1.6.0              \
     GRPC_JAVA_VERSION=1.6.1         \
     PROTOBUF_VERSION=3.4.0          \
+    PROTOBUF_C_VERSION=1.3.0        \
     DESTDIR=/out
 
 RUN mkdir -p /protobuf && \
@@ -13,6 +14,8 @@ RUN git clone --depth 1 --recursive -b v${GRPC_VERSION} https://github.com/grpc/
     ln -s /protobuf /grpc/third_party/protobuf
 RUN mkdir -p /grpc-java && \
     curl -L https://github.com/grpc/grpc-java/archive/v${GRPC_JAVA_VERSION}.tar.gz | tar xvz --strip-components=1 -C /grpc-java
+RUN mkdir -p /protobuf-c && \
+    curl -L https://github.com/protobuf-c/protobuf-c/releases/download/v${PROTOBUF_C_VERSION}/protobuf-c-${PROTOBUF_C_VERSION}.tar.gz | tar xvz --strip-components=1 -C /protobuf-c
 RUN cd /protobuf && \
     autoreconf -f -i -Wall,no-obsolete && \
     ./configure --prefix=/usr --enable-static=no && \
@@ -26,12 +29,17 @@ RUN cd /grpc-java/compiler/src/java_plugin/cpp && \
         -L/protobuf/src/.libs \
         -lprotoc -lprotobuf -lpthread --std=c++0x -s \
         -o protoc-gen-grpc-java
+RUN cd /protobuf-c && \
+    ./configure --prefix=/usr && \
+    make -j2
 RUN cd /protobuf && \
     make install DESTDIR=${DESTDIR}
 RUN cd /grpc && \
     make install-plugins prefix=${DESTDIR}/usr
 RUN cd /grpc-java/compiler/src/java_plugin/cpp && \
     install -c protoc-gen-grpc-java ${DESTDIR}/usr/bin/
+RUN cd /protobuf-c && \
+    make install DESTDIR=${DESTDIR}
 RUN find ${DESTDIR} -name "*.a" -delete -or -name "*.la" -delete
 
 RUN apk add --no-cache go
