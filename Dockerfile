@@ -45,6 +45,8 @@ RUN go get -u -v -ldflags '-w -s' \
         github.com/gogo/protobuf/protoc-gen-gogoslick \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
+        github.com/johanbrandhorst/protobuf/protoc-gen-gopherjs && \
+        github.com/ckaznocha/protoc-gen-lint && \
     install -c /go/bin/* ${DESTDIR}/usr/bin/
 
 
