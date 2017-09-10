@@ -5,7 +5,7 @@ ENV GRPC_VERSION=1.6.0              \
     GRPC_JAVA_VERSION=1.6.1         \
     PROTOBUF_VERSION=3.4.0          \
     PROTOBUF_C_VERSION=1.3.0        \
-    DESTDIR=/out
+    OUTDIR=/out
 
 RUN mkdir -p /protobuf && \
     curl -L https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar xvz --strip-components=1 -C /protobuf
@@ -33,14 +33,14 @@ RUN cd /protobuf-c && \
     ./configure --prefix=/usr && \
     make -j2
 RUN cd /protobuf && \
-    make install DESTDIR=${DESTDIR}
+    make install DESTDIR=${OUTDIR}
 RUN cd /grpc && \
-    make install-plugins prefix=${DESTDIR}/usr
+    make install-plugins prefix=${OUTDIR}/usr
 RUN cd /grpc-java/compiler/src/java_plugin/cpp && \
-    install -c protoc-gen-grpc-java ${DESTDIR}/usr/bin/
+    install -c protoc-gen-grpc-java ${OUTDIR}/usr/bin/
 RUN cd /protobuf-c && \
-    make install DESTDIR=${DESTDIR}
-RUN find ${DESTDIR} -name "*.a" -delete -or -name "*.la" -delete
+    make install DESTDIR=${OUTDIR}
+RUN find ${OUTDIR} -name "*.a" -delete -or -name "*.la" -delete
 
 RUN apk add --no-cache go
 ENV GOPATH=/go
@@ -55,7 +55,7 @@ RUN go get -u -v -ldflags '-w -s' \
         github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
         github.com/johanbrandhorst/protobuf/protoc-gen-gopherjs && \
         github.com/ckaznocha/protoc-gen-lint && \
-    install -c /go/bin/* ${DESTDIR}/usr/bin/
+    install -c /go/bin/* ${OUTDIR}/usr/bin/
 
 
 FROM swiftdocker/swift:3.1.1 as swift_builder
