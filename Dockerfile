@@ -80,23 +80,38 @@ RUN find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-
     done
 
 
+FROM rust:1.20.0 as rust_builder
+ENV RUST_PROTOBUF_VERSION=1.4.1 \
+    OUTDIR=/out
+RUN mkdir -p ${OUTDIR}
+RUN apt-get update && \
+    apt-get install -y musl-tools
+RUN rustup target add x86_64-unknown-linux-musl
+RUN mkdir -p /rust-protobuf && \
+    curl -L https://github.com/stepancheg/rust-protobuf/archive/v${RUST_PROTOBUF_VERSION}.tar.gz | tar xvz --strip 1 -C /rust-protobuf
+RUN cd /rust-protobuf/protobuf && \
+    RUSTFLAGS='-C linker=musl-gcc' cargo build --target=x86_64-unknown-linux-musl --release
+RUN mkdir -p ${OUTDIR}/usr/bin && \
+    strip /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust && \
+    install -c /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust ${OUTDIR}/usr/bin/
+
+
 FROM znly/upx as packer
 COPY --from=protoc_builder /out/ /out/
 RUN upx --lzma \
-        /out/usr/bin/* \
-        /out/usr/local/bin/*
-RUN rm -rf \
         /out/usr/bin/protoc \
-        /out/usr/lib/libproto*
-
+        /out/usr/bin/grpc_* \
+        /out/usr/bin/protoc-gen-*
 
 FROM alpine:3.6
 RUN apk add --no-cache libstdc++
 COPY --from=packer /out/ /
+COPY --from=rust_builder /out/ /
 COPY --from=swift_builder /protoc-gen-swift /protoc-gen-swift
 RUN for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
         ln -s /protoc-gen-swift/${p} /usr/bin/${p}; \
     done
+
 RUN apk add --no-cache curl && \
     mkdir -p /protobuf/google/protobuf && \
         for f in any duration descriptor empty struct timestamp wrappers; do \
@@ -109,4 +124,5 @@ RUN apk add --no-cache curl && \
     mkdir -p /protobuf/github.com/gogo/protobuf/gogoproto && \
         curl -L -o /protobuf/github.com/gogo/protobuf/gogoproto/gogo.proto https://raw.githubusercontent.com/gogo/protobuf/master/gogoproto/gogo.proto && \
     apk del curl
-ENTRYPOINT ["/usr/local/bin/protoc", "-I/protobuf"]
+
+ENTRYPOINT ["/usr/bin/protoc", "-I/protobuf"]
