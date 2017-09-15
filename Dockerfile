@@ -65,11 +65,10 @@ RUN apk add --no-cache go
 ENV GOPATH=/go \
     PATH=/go/bin/:$PATH
 
-RUN mkdir -p ${GOPATH}/src/github.com/TheThingsNetwork/ttn && \
-    curl -L https://api.github.com/repos/TheThingsNetwork/ttn/tarball/v${TTN_VERSION} | tar xvz -C ${GOPATH}/src/github.com/TheThingsNetwork/ttn --strip-components=1
+COPY ttn ${GOPATH}/src/github.com/TheThingsNetwork/ttn
 RUN cd ${GOPATH}/src/github.com/TheThingsNetwork/ttn && \
     make dev-deps deps && \
-    go install -v -ldflags '-w -s' ./utils/protoc-gen-gogottn
+    go install -v -ldflags '-w -s' github.com/TheThingsNetwork/ttn/cmd/protoc-gen-gogottn
 
 RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 RUN cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \

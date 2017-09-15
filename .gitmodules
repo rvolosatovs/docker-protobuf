@@ -1,0 +1,3 @@
+[submodule "ttn"]
+	path = ttn
+	url = git@github.com:TheThingsIndustries/ttn
