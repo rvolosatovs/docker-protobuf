@@ -65,20 +65,29 @@ RUN cd ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     make build && \
     install -c ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc/protoc-gen-doc ${OUTDIR}/usr/bin/
 
-ENV SWIFT_GRPC_VERSION=0.2.2
 
-RUN mkdir -p /grpc-swift && \
-    curl -L https://github.com/grpc/grpc-swift/archive/${SWIFT_GRPC_VERSION}.tar.gz | tar xvz --strip-components=1 -C /grpc-swift
-RUN cd grpc-swift/Plugin && \
-    make
-RUN mkdir -p /protoc-gen-swift/
-RUN cp grpc-swift/Plugin/protoc-gen-swift* /protoc-gen-swift/
+FROM ubuntu:16.04 as swift_builder
+RUN apt-get update && \
+    apt-get install -y build-essential make tar xz-utils bzip2 gzip sed \
+    libz-dev unzip patchelf curl libedit-dev python2.7 python2.7-dev libxml2 \
+    git libxml2-dev uuid-dev libssl-dev bash patch
+ENV SWIFT_VERSION=4.0 \
+    LLVM_VERSION=5.0.0
+RUN curl -L http://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-linux-x86_64-ubuntu16.04.tar.xz | tar --strip-components 1 -C /usr/local/ -xJv
+RUN curl -L https://swift.org/builds/swift-${SWIFT_VERSION}-release/ubuntu1604/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-ubuntu16.04.tar.gz | tar --strip-components 1 -C / -xz
+ENV SWIFT_PROTOBUF_VERSION=0.9.904
+RUN mkdir -p /swift-protobuf && \
+    curl -L https://github.com/apple/swift-protobuf/archive/${SWIFT_PROTOBUF_VERSION}.tar.gz | tar --strip-components 1 -C /swift-protobuf -xz
+RUN apt-get install -y libcurl4-openssl-dev
+RUN cd /swift-protobuf && \
+    swift build -c release
+RUN mkdir -p /protoc-gen-swift && \
+    cp /swift-protobuf/.build/x86_64-unknown-linux/release/protoc-gen-swift /protoc-gen-swift/
 RUN cp /lib64/ld-linux-x86-64.so.2 \
-        $(ldd grpc-swift/Plugin/protoc-gen-swift* | awk '{print $3}' | grep /lib | sort | uniq) \
+        $(ldd /protoc-gen-swift/protoc-gen-swift | awk '{print $3}' | grep /lib | sort | uniq) \
         /protoc-gen-swift/
-
 RUN find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \; && \
-    for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
+    for p in protoc-gen-swift; do \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
@@ -105,6 +114,7 @@ RUN upx --lzma \
         /out/usr/bin/protoc \
         /out/usr/bin/grpc_* \
         /out/usr/bin/protoc-gen-*
+
 
 FROM alpine:3.6
 RUN apk add --no-cache libstdc++
