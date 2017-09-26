@@ -9,16 +9,4 @@ env:
 
 script: 
     - make build
-    - 'if ![ -n ${TRAVIS_TAG} ]; then
-        docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}";
-        TAG=${TRAVIS_TAG#"v"};
-        docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${TAG};
-        docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${TAG:0:1};
-        docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${TAG:0:3};
-        docker tag ${IMAGE_NAME} ${IMAGE_NAME}:${TAG:0:5};
-        docker push ${IMAGE_NAME};
-        docker push ${IMAGE_NAME}:${TAG};
-        docker push ${IMAGE_NAME}:${TAG:0:1};
-        docker push ${IMAGE_NAME}:${TAG:0:3};
-        docker push ${IMAGE_NAME}:${TAG:0:5};
-      fi'
+    - ./travis-push.sh
