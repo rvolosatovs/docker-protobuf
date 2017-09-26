@@ -23,6 +23,7 @@ All-inclusive protoc suite, powered by Docker and Alpine Linux.
 - PHP
 - Python
 - Ruby
+- Rust
 - Swift
 
 ## Usage
