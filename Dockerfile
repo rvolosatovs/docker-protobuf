@@ -9,6 +9,7 @@ ARG GRPC_RUST_VERSION=0.2.1
 ARG GRPC_SWIFT_VERSION=0.2.3
 ARG GRPC_GATEWAY_VERSION=1.2.2
 ARG PROTOC_GEN_LINT_VERSION=0.1.3
+ARG PROTOC_GEN_GOGOTTN_VERSION=3.0.0
 ARG PROTOC_GEN_DOC_VERSION=1.0.0-rc
 
 FROM alpine:3.6 as protoc_builder
@@ -18,6 +19,7 @@ ARG GRPC_VERSION
 ARG GRPC_JAVA_VERSION
 ARG GRPC_GATEWAY_VERSION
 ARG PROTOC_GEN_LINT_VERSION
+ARG PROTOC_GEN_GOGOTTN_VERSION
 ARG PROTOC_GEN_DOC_VERSION
 ARG GLIDE_VERSION
 
@@ -63,10 +65,10 @@ RUN apk add --no-cache go
 ENV GOPATH=/go \
     PATH=/go/bin/:$PATH
 
-COPY ttn ${GOPATH}/src/github.com/TheThingsNetwork/ttn
-RUN cd ${GOPATH}/src/github.com/TheThingsNetwork/ttn && \
-    make dev-deps deps && \
-    go install -v -ldflags '-w -s' github.com/TheThingsNetwork/ttn/cmd/protoc-gen-gogottn
+RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    curl -L https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn
+RUN cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    go install -v -ldflags '-w -s' .
 
 RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 RUN cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
