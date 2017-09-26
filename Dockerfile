@@ -1,9 +1,10 @@
 ARG LLVM_VERSION=5.0.0
 ARG SWIFT_VERSION=4.0
 ARG TTN_VERSION=2.8.1
+ARG GLIDE_VERSION=0.12.3
 ARG PROTOBUF_C_VERSION=1.3.0
 ARG RUST_PROTOBUF_VERSION=1.4.1
-ARG GRPC_VERSION=1.6.1
+ARG GRPC_VERSION=1.6.2
 ARG GRPC_JAVA_VERSION=1.6.1 
 ARG GRPC_RUST_VERSION=0.2.1
 ARG GRPC_SWIFT_VERSION=0.2.3
@@ -20,6 +21,7 @@ ARG GRPC_GATEWAY_VERSION
 ARG PROTOC_GEN_LINT_VERSION
 ARG PROTOC_GEN_DOC_VERSION
 ARG TTN_VERSION
+ARG GLIDE_VERSION
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
 
@@ -79,7 +81,7 @@ RUN cd ${GOPATH}/src/github.com/ckaznocha/protoc-gen-lint && \
     git checkout v${PROTOC_GEN_LINT_VERSION} && \
     go install -v -ldflags '-w -s' .
 
-RUN curl -L https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-linux-amd64.tar.gz | tar xvz --strip 1 -C /tmp && \
+RUN curl -L https://github.com/Masterminds/glide/releases/download/v${GLIDE_VERSION}/glide-v${GLIDE_VERSION}-linux-amd64.tar.gz | tar xvz --strip 1 -C /tmp && \
     install -c /tmp/glide /usr/bin
 RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     curl -L https://api.github.com/repos/pseudomuto/protoc-gen-doc/tarball/v${PROTOC_GEN_DOC_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc
