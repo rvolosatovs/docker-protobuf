@@ -8,7 +8,6 @@ ARG GRPC_VERSION=1.6.2
 ARG GRPC_JAVA_VERSION=1.6.1 
 ARG GRPC_RUST_VERSION=0.2.1
 ARG GRPC_SWIFT_VERSION=0.2.3
-ARG GRPC_GATEWAY_VERSION=1.2.2
 ARG PROTOC_GEN_LINT_VERSION=0.1.3
 ARG PROTOC_GEN_DOC_VERSION=1.0.0-rc
 
@@ -17,7 +16,6 @@ FROM alpine:3.6 as protoc_builder
 ARG PROTOBUF_C_VERSION
 ARG GRPC_VERSION
 ARG GRPC_JAVA_VERSION
-ARG GRPC_GATEWAY_VERSION
 ARG PROTOC_GEN_LINT_VERSION
 ARG PROTOC_GEN_DOC_VERSION
 ARG TTN_VERSION
@@ -71,10 +69,7 @@ RUN cd ${GOPATH}/src/github.com/TheThingsNetwork/ttn && \
     make dev-deps deps && \
     go install -v -ldflags '-w -s' ./utils/protoc-gen-gogottn
 
-RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-RUN cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    git checkout v${GRPC_GATEWAY_VERSION} && \
-    go install -v -ldflags '-w -s' ./protoc-gen-grpc-gateway
+RUN go get -v -ldflags '-w -s' github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
     
 RUN go get -d github.com/ckaznocha/protoc-gen-lint
 RUN cd ${GOPATH}/src/github.com/ckaznocha/protoc-gen-lint && \
