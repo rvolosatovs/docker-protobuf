@@ -68,6 +68,7 @@ ENV GOPATH=/go \
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     curl -L https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn
 RUN cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    make deps && \
     go install -v -ldflags '-w -s' .
 
 RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
