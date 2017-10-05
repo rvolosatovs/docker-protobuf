@@ -15,7 +15,7 @@ PROTOC_GEN_DOC_VERSION ?= 1.0.0-rc
 IMAGE_NAME ?= thethingsindustries/protoc
 TAG ?= latest
 
-all: build push
+all: build
 
 build:
 	docker build \
