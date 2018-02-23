@@ -12,7 +12,7 @@ ARG PROTOC_GEN_LINT_VERSION
 ARG PROTOC_GEN_GOGOTTN_VERSION
 ARG PROTOC_GEN_DOC_VERSION
 
-FROM alpine:3.6 as protoc_builder
+FROM alpine:3.7 as protoc_builder
 
 ARG PROTOBUF_C_VERSION
 ARG GRPC_VERSION
@@ -97,7 +97,7 @@ RUN apt-get update && \
     git libxml2-dev uuid-dev libssl-dev bash patch
 ARG SWIFT_VERSION
 ARG LLVM_VERSION
-RUN curl -L http://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-linux-x86_64-ubuntu16.04.tar.xz | tar --strip-components 1 -C /usr/local/ -xJv
+RUN curl -L http://releases.llvm.org/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-16.04.tar.xz | tar --strip-components 1 -C /usr/local/ -xJv
 RUN curl -L https://swift.org/builds/swift-${SWIFT_VERSION}-release/ubuntu1604/swift-${SWIFT_VERSION}-RELEASE/swift-${SWIFT_VERSION}-RELEASE-ubuntu16.04.tar.gz | tar --strip-components 1 -C / -xz
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
@@ -117,7 +117,7 @@ RUN find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-
     done
 
     
-FROM rust:1.20.0 as rust_builder
+FROM rust:1.22.1 as rust_builder
 ARG RUST_PROTOBUF_VERSION
 ARG GRPC_RUST_VERSION
 RUN mkdir -p /out
@@ -150,7 +150,7 @@ RUN upx --lzma \
         /out/usr/bin/protoc-gen-*
 
 
-FROM alpine:3.6
+FROM alpine:3.7
 LABEL maintainer="Roman Volosatovs <rvolosatovs@thethingsnetwork.org>"
 COPY --from=packer /out/ /
 COPY --from=rust_builder /out/ /
