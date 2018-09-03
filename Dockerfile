@@ -1,3 +1,4 @@
+ARG ALPINE_VERSION
 ARG GRPC_GATEWAY_VERSION
 ARG GRPC_JAVA_VERSION
 ARG GRPC_RUST_VERSION
@@ -11,7 +12,7 @@ ARG RUST_PROTOBUF_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
 
-FROM alpine:3.7 as protoc_builder
+FROM alpine:${ALPINE_VERSION} as protoc_builder
 
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
 
@@ -140,7 +141,7 @@ RUN upx --lzma \
         /out/usr/bin/protoc-gen-*
 
 
-FROM alpine:3.7
+FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@thethingsnetwork.org>"
 COPY --from=packer /out/ /
 COPY --from=rust_builder /out/ /
