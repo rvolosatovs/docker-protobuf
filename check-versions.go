@@ -11,9 +11,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"golang.org/x/oauth2"
-
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 func main() {
@@ -44,10 +43,10 @@ func main() {
 		"stepancheg":       {"rust-protobuf", "grpc-rust"},
 	} {
 		for _, repo := range repos {
-			rel, _, err := cl.Repositories.GetLatestRelease(context.Background(), owner, repo)
+			rel, _, err := cl.Repositories.GetLatestRelease(ctx, owner, repo)
 			if err != nil {
 				if err, ok := err.(*github.ErrorResponse); ok && err.Response.StatusCode == http.StatusNotFound {
-					tags, _, err := cl.Repositories.ListTags(context.Background(), owner, repo, nil)
+					tags, _, err := cl.Repositories.ListTags(ctx, owner, repo, nil)
 					if err != nil {
 						log.Fatal(err)
 					}
