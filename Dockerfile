@@ -150,5 +150,12 @@ for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
         ln -s /protoc-gen-swift/${p} /usr/bin/${p}; \
     done
 
+RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/grpc_js_plugin
+RUN ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/grpc_objc_plugin
+
+RUN for lang in cpp csharp js objc php python ruby; do ln -s /usr/bin/grpc_${lang}_plugin /usr/bin/protoc-gen-${lang}-grpc; done
+
+RUN ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-swift-grpc
+
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
