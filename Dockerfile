@@ -74,12 +74,9 @@ RUN cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     go install -v -ldflags '-w -s' ./protoc-gen-grpc-gateway
     
 ARG PROTOC_GEN_LINT_VERSION
-RUN curl -Lo https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip
-RUN go get -d github.com/ckaznocha/protoc-gen-lint
-RUN cd ${GOPATH}/src/github.com/ckaznocha/protoc-gen-lint && \
-    git checkout v${PROTOC_GEN_LINT_VERSION} && \
-    go install -v -ldflags '-w -s' .
-
+RUN curl -LO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
+    unzip protoc-gen-lint_linux_amd64.zip && \
+    install protoc-gen-lint ${GOPATH}/bin
 
 ARG PROTOC_GEN_DOC_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
