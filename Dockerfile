@@ -84,7 +84,8 @@ RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     curl -L https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xvz --strip 1 -C ${GOPATH}/bin
 
 RUN install ${GOPATH}/bin/protoc-gen* /out/usr/bin/
-
+RUN install -d ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn/vendor/github.com/gogo/protobuf /out/usr/include/github.com/gogo/protobuf
+RUN install -d ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn/vendor/github.com/golang/protobuf /out/usr/include/github.com/golang/protobuf
 
 FROM swift:${SWIFT_VERSION} as swift_builder
 
