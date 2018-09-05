@@ -63,14 +63,14 @@ ENV GOPATH=/go \
 
 ARG PROTOC_GEN_GOGOTTN_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
-    curl -L https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn
-RUN cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    curl -L https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     make deps && \
     go install -v -ldflags '-w -s' .
 
 ARG GRPC_GATEWAY_VERSION
-RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-RUN cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
+RUN go get -d github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway && \
+    cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     git checkout v${GRPC_GATEWAY_VERSION} && \
     go install -v -ldflags '-w -s' ./protoc-gen-grpc-gateway
     
