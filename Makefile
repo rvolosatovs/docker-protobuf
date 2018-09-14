@@ -12,7 +12,7 @@ PROTOC_GEN_LINT_VERSION ?= 0.2.1
 RUST_PROTOBUF_VERSION ?= 2.0.4
 RUST_VERSION ?= 1.28.0
 SWIFT_VERSION ?= 4.1.3
-UBUNTU_VERSION ?= 18.04
+UPX_VERSION ?= 3.95
 
 IMAGE_NAME ?= thethingsindustries/protoc
 TAG ?= latest
@@ -35,6 +35,7 @@ build:
 	--build-arg RUST_PROTOBUF_VERSION=$(RUST_PROTOBUF_VERSION) \
 	--build-arg RUST_VERSION=$(RUST_VERSION) \
 	--build-arg SWIFT_VERSION=$(SWIFT_VERSION) \
+	--build-arg UPX_VERSION=$(UPX_VERSION) \
 	-t $(IMAGE_NAME):$(TAG) .
 
 push: build

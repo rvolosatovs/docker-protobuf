@@ -12,6 +12,7 @@ ARG PROTOC_GEN_LINT_VERSION
 ARG RUST_PROTOBUF_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
+ARG UPX_VERSION
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
@@ -119,9 +120,16 @@ RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grp
     install -Ds /grpc-rust/target/x86_64-unknown-linux-musl/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 
 
-FROM znly/upx as packer
+FROM alpine:${ALPINE_VERSION} as packer
+RUN apk add --no-cache curl
+ARG UPX_VERSION
+RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz | tar xvJ --strip 1 -C /upx && \
+    install -D /upx/upx /usr/local/bin/upx
+
 COPY --from=protoc_builder /out/ /out/
+COPY --from=rust_builder /out/ /out/
 COPY --from=go_builder /out/ /out/
+COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 RUN upx --lzma \
         /out/usr/bin/protoc \
         /out/usr/bin/grpc_* \
@@ -131,12 +139,9 @@ RUN upx --lzma \
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@thethingsnetwork.org>"
 COPY --from=packer /out/ /
-COPY --from=rust_builder /out/ /
-COPY --from=swift_builder /protoc-gen-swift /protoc-gen-swift
 RUN apk add --no-cache bash libstdc++ && \
-    for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done
-
-RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
+    for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done && \
+    ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
@@ -144,6 +149,5 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift
-
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
