@@ -32,34 +32,41 @@ func main() {
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, "Repository", "\tVersion", "\tRelease page")
-	for owner, repos := range map[string][]string{
-		"grpc":             {"grpc", "grpc-java", "grpc-swift"},
-		"grpc-ecosystem":   {"grpc-gateway"},
-		"protobuf-c":       {"protobuf-c"},
-		"ckaznocha":        {"protoc-gen-lint"},
-		"pseudomuto":       {"protoc-gen-doc"},
-		"TheThingsNetwork": {"ttn"},
-		"Masterminds":      {"glide"},
-		"stepancheg":       {"rust-protobuf", "grpc-rust"},
+	for _, repo := range []struct {
+		owner, name string
+	}{
+		{"apple", "swift"},
+		{"ckaznocha", "protoc-gen-lint"},
+		{"golang", "go"},
+		{"grpc", "grpc"},
+		{"grpc", "grpc-java"},
+		{"grpc", "grpc-swift"},
+		{"grpc-ecosystem", "grpc-gateway"},
+		{"protobuf-c", "protobuf-c"},
+		{"pseudomuto", "protoc-gen-doc"},
+		{"rust-lang", "rust"},
+		{"stepancheg", "grpc-rust"},
+		{"stepancheg", "rust-protobuf"},
+		{"TheThingsIndustries", "protoc-gen-gogottn"},
+		{"TheThingsNetwork", "ttn"},
+		{"upx", "upx"},
 	} {
-		for _, repo := range repos {
-			rel, _, err := cl.Repositories.GetLatestRelease(ctx, owner, repo)
-			if err != nil {
-				if err, ok := err.(*github.ErrorResponse); ok && err.Response.StatusCode == http.StatusNotFound {
-					tags, _, err := cl.Repositories.ListTags(ctx, owner, repo, nil)
-					if err != nil {
-						log.Fatal(err)
-					}
-					if len(tags) == 0 {
-						log.Fatal("%s/%s repo has 0 tags", owner, repo)
-					}
-					fmt.Fprintf(w, "%s/%s\t%s\t%s\n", owner, repo, *tags[0].Name, "n/a")
-					continue
+		rel, _, err := cl.Repositories.GetLatestRelease(ctx, repo.owner, repo.name)
+		if err != nil {
+			if err, ok := err.(*github.ErrorResponse); ok && err.Response.StatusCode == http.StatusNotFound {
+				tags, _, err := cl.Repositories.ListTags(ctx, repo.owner, repo.name, nil)
+				if err != nil {
+					log.Fatal(err)
 				}
-				log.Fatal(err)
+				if len(tags) == 0 {
+					log.Fatal("%s/%s repo has 0 tags", repo.owner, repo.name)
+				}
+				fmt.Fprintf(w, "%s/%s\t%s\t%s\n", repo.owner, repo.name, *tags[0].Name, "n/a")
+				continue
 			}
-			fmt.Fprintf(w, "%s/%s\t%s\t%s\n", owner, repo, *rel.TagName, *rel.HTMLURL)
+			log.Fatal(err)
 		}
+		fmt.Fprintf(w, "%s/%s\t%s\t%s\n", repo.owner, repo.name, *rel.TagName, *rel.HTMLURL)
 	}
 	if err := w.Flush(); err != nil {
 		log.Fatal(err)
