@@ -1,24 +1,30 @@
 [![Build Status](https://travis-ci.org/TheThingsIndustries/docker-protobuf.svg?branch=master)](https://travis-ci.org/TheThingsIndustries/docker-protobuf)
 
 # Protocol Buffers + Docker
-All-inclusive protoc suite, powered by Docker and Alpine Linux.
+A lightweight `protoc` Docker image.
+It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
 
 ## What's included:
-- https://github.com/google/protobuf `protoc`
-- https://github.com/protobuf-c/protobuf-c `protoc-c`
-- https://github.com/grpc/grpc plugin
-- https://github.com/grpc/grpc-swift plugin
-- https://github.com/grpc/grpc-java plugin
-- https://github.com/grpc-ecosystem/grpc-gateway plugin
-- Google well-known type protos(automatically included)
+- https://github.com/ckaznocha/protoc-gen-lint
+- https://github.com/google/protobuf
+- https://github.com/grpc-ecosystem/grpc-gateway
+- https://github.com/grpc/grpc
+- https://github.com/grpc/grpc-java
+- https://github.com/grpc/grpc-swift
+- https://github.com/protobuf-c/protobuf-c
+- https://github.com/pseudomuto/protoc-gen-doc
+- https://github.com/stepancheg/grpc-rust
+- https://github.com/stepancheg/rust-protobuf
+- https://github.com/TheThingsIndustries/protoc-gen-gogottn
+- google/protobuf, gogo/protobuf, grpc-gateway protos (passed to protoc by default)
 
 ## Supported languages
 - C
-- C++
 - C#
+- C++
+- Go
 - Java / JavaNano (Android)
 - JavaScript
-- Go
 - Objective-C
 - PHP
 - Python
@@ -35,7 +41,3 @@ For help try:
 ```
 $ docker run --rm TheThingsIndustries/protoc --help
 ```
-
-## Image Size
-The current image is about ~200mb and one layer. Most the space is spent on Go tools.
-All the binaries are UPX'ed. Including the Swift stdlib.
