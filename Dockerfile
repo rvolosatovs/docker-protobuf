@@ -24,11 +24,11 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
 
 ARG GRPC_JAVA_VERSION
 RUN mkdir -p /grpc-java && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xvz -C /grpc-java --strip-components=1
+    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz -C /grpc-java --strip-components=1
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
-    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xvz -C /protobuf-c --strip-components=1
+    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz -C /protobuf-c --strip-components=1
 
 RUN cd /protobuf && \
     autoreconf -f -i -Wall,no-obsolete && \
@@ -60,14 +60,14 @@ RUN apk add --no-cache build-base curl git
 
 ARG PROTOC_GEN_GOGOTTN_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
-    curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
+    curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     make deps && \
     go install -ldflags '-w -s' .
 
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xvz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
+    curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     go get -ldflags '-w -s' ./protoc-gen-grpc-gateway
     
@@ -77,7 +77,7 @@ RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v$
     mv protoc-gen-lint ${GOPATH}/bin
 
 ARG PROTOC_GEN_DOC_VERSION
-RUN curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xvz --strip 1 -C ${GOPATH}/bin
+RUN curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C ${GOPATH}/bin
 
 RUN for p in ${GOPATH}/bin/protoc-gen*; do install -Ds ${p} /out/usr/bin/${p#"${GOPATH}/bin/"}; done && \
     mkdir -p /out/usr/include/github.com/gogo && mv ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn/vendor/github.com/gogo/protobuf /out/usr/include/github.com/gogo && \
@@ -110,12 +110,12 @@ ENV RUSTFLAGS='-C linker=musl-gcc'
 
 ARG RUST_PROTOBUF_VERSION
 RUN mkdir -p /rust-protobuf && \
-    curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${RUST_PROTOBUF_VERSION} | tar xvz --strip 1 -C /rust-protobuf && \
+    curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${RUST_PROTOBUF_VERSION} | tar xz --strip 1 -C /rust-protobuf && \
     cd /rust-protobuf/protobuf-codegen && cargo build --target=x86_64-unknown-linux-musl --release && \
     install -Ds /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 
 ARG GRPC_RUST_VERSION
-RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xvz --strip 1 -C /grpc-rust && \
+RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust && \
     cd /grpc-rust/grpc-compiler && cargo build --target=x86_64-unknown-linux-musl --release && \
     install -Ds /grpc-rust/target/x86_64-unknown-linux-musl/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 
@@ -123,7 +123,7 @@ RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grp
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
 ARG UPX_VERSION
-RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz | tar xvJ --strip 1 -C /upx && \
+RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz | tar xJ --strip 1 -C /upx && \
     install -D /upx/upx /usr/local/bin/upx
 
 COPY --from=protoc_builder /out/ /out/
