@@ -73,7 +73,7 @@ RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     
 ARG PROTOC_GEN_LINT_VERSION
 RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
-    unzip protoc-gen-lint_linux_amd64.zip && \
+    unzip -q protoc-gen-lint_linux_amd64.zip && \
     mv protoc-gen-lint ${GOPATH}/bin
 
 ARG PROTOC_GEN_DOC_VERSION
