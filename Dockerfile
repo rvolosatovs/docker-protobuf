@@ -69,8 +69,9 @@ ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    go get -ldflags '-w -s' ./protoc-gen-grpc-gateway
-    
+    go get -ldflags '-w -s' ./protoc-gen-grpc-gateway && \
+    go get -ldflags '-w -s' ./protoc-gen-swagger
+
 ARG PROTOC_GEN_LINT_VERSION
 RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
     unzip -q protoc-gen-lint_linux_amd64.zip && \
@@ -102,7 +103,7 @@ RUN mkdir -p /grpc-swift && \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
-    
+
 FROM rust:${RUST_VERSION}-slim as rust_builder
 RUN apt-get update && apt-get install -y musl-tools curl
 RUN rustup target add x86_64-unknown-linux-musl
