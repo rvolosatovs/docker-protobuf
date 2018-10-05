@@ -2,10 +2,10 @@ language: go
 
 sudo: required
 services:
-    - docker
+  - docker
 
 env:
-- IMAGE_NAME=thethingsindustries/protoc
+  - IMAGE_NAME=thethingsindustries/protoc
 
 before_install:
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -13,6 +13,6 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install docker-ce
 
-script: 
-    - make build
-    - ./travis-push.sh
+script:
+  - make build
+  - ./travis-push.sh
