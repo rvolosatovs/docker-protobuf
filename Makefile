@@ -13,6 +13,8 @@ RUST_PROTOBUF_VERSION ?= 2.0.5
 RUST_VERSION ?= 1.29.0
 SWIFT_VERSION ?= 4.2
 UPX_VERSION ?= 3.95
+#only defined, will be used in future
+PROTOC_GEN_GOVALIDATORS_VERSION ?= 0.1
 
 IMAGE_NAME ?= thethingsindustries/protoc
 TAG ?= latest
@@ -36,6 +38,7 @@ build:
 	--build-arg RUST_VERSION=$(RUST_VERSION) \
 	--build-arg SWIFT_VERSION=$(SWIFT_VERSION) \
 	--build-arg UPX_VERSION=$(UPX_VERSION) \
+	--build-arg PROTOC_GEN_GOVALIDATORS_VERSION=$(PROTOC_GEN_GOVALIDATORS_VERSION) \
 	-t $(IMAGE_NAME):$(TAG) .
 
 push: build
