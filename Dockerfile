@@ -66,8 +66,10 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && 
     go install -ldflags '-w -s' .
 
 ARG PROTOC_GEN_GOVALIDATORS_VERSION
-RUN go get -u github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
+RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    curl -sSL https://github.com/mwitkow/go-proto-validators/archive/${PROTOC_GEN_GOVALIDATORS_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators &&\
     cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
+    go get . && \
     go install .
 
 ARG GRPC_GATEWAY_VERSION
