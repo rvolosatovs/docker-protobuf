@@ -65,6 +65,11 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && 
     make deps && \
     go install -ldflags '-w -s' .
 
+ARG PROTOC_GEN_GOVALIDATORS_VERSION
+RUN go get -u github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
+    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
+    go install .
+
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
