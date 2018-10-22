@@ -15,6 +15,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func init() {
+	log.SetFlags(0)
+}
+
 func main() {
 	token := flag.String("token", "", "Github token to use")
 	flag.Parse()
@@ -22,11 +26,10 @@ func main() {
 	ctx := context.Background()
 
 	var tc *http.Client
-	if token != nil && *token != "" {
-		ts := oauth2.StaticTokenSource(
-			&oauth2.Token{AccessToken: *token},
-		)
-		tc = oauth2.NewClient(ctx, ts)
+	if *token != "" {
+		tc = oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{
+			AccessToken: *token,
+		}))
 	}
 	cl := github.NewClient(tc)
 
@@ -42,6 +45,7 @@ func main() {
 		{"grpc", "grpc-java"},
 		{"grpc", "grpc-swift"},
 		{"grpc-ecosystem", "grpc-gateway"},
+		{"mwitkow", "go-proto-validators"},
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
 		{"rust-lang", "rust"},
@@ -59,7 +63,8 @@ func main() {
 					log.Fatal(err)
 				}
 				if len(tags) == 0 {
-					log.Fatal("%s/%s repo has 0 tags", repo.owner, repo.name)
+					log.Printf("%s/%s repo has 0 tags", repo.owner, repo.name)
+					continue
 				}
 				fmt.Fprintf(w, "%s/%s\t%s\t%s\n", repo.owner, repo.name, *tags[0].Name, "n/a")
 				continue
