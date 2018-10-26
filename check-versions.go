@@ -6,6 +6,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,10 @@ import (
 
 func init() {
 	log.SetFlags(0)
+}
+
+func writeRelease(w io.Writer, owner, name, tag, url string) (int, error) {
+	return fmt.Fprintf(w, "%s/%s\t%s\t%s\n", owner, name, tag, url)
 }
 
 func main() {
@@ -35,43 +40,48 @@ func main() {
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 	fmt.Fprintln(w, "Repository", "\tVersion", "\tRelease page")
+
 	for _, repo := range []struct {
 		owner, name string
 	}{
-		{"apple", "swift"},
-		{"ckaznocha", "protoc-gen-lint"},
 		{"golang", "go"},
-		{"grpc", "grpc"},
-		{"grpc", "grpc-java"},
-		{"grpc", "grpc-swift"},
 		{"grpc-ecosystem", "grpc-gateway"},
-		{"mwitkow", "go-proto-validators"},
+		{"grpc", "grpc-java"},
+		{"stepancheg", "grpc-rust"},
+		{"grpc", "grpc-swift"},
+		{"grpc", "grpc"},
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
-		{"rust-lang", "rust"},
-		{"stepancheg", "grpc-rust"},
-		{"stepancheg", "rust-protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
-		{"TheThingsNetwork", "ttn"},
+		{"mwitkow", "go-proto-validators"},
+		{"ckaznocha", "protoc-gen-lint"},
+		{"stepancheg", "rust-protobuf"},
+		{"rust-lang", "rust"},
+		{"apple", "swift"},
 		{"upx", "upx"},
 	} {
+		tag := "n/a"
+		url := "n/a"
+
 		rel, _, err := cl.Repositories.GetLatestRelease(ctx, repo.owner, repo.name)
 		if err != nil {
-			if err, ok := err.(*github.ErrorResponse); ok && err.Response.StatusCode == http.StatusNotFound {
-				tags, _, err := cl.Repositories.ListTags(ctx, repo.owner, repo.name, nil)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if len(tags) == 0 {
-					log.Printf("%s/%s repo has 0 tags", repo.owner, repo.name)
-					continue
-				}
-				fmt.Fprintf(w, "%s/%s\t%s\t%s\n", repo.owner, repo.name, *tags[0].Name, "n/a")
-				continue
+			log.Printf("Failed to query github API for latest release of `%s/%s`: %s, trying tags...", repo.owner, repo.name, err)
+			tags, _, err := cl.Repositories.ListTags(ctx, repo.owner, repo.name, &github.ListOptions{
+				PerPage: 1,
+			})
+			if err != nil {
+				log.Printf("Failed to list tags of `%s/%s` on github: %s", repo.owner, repo.name, err)
+			} else if len(tags) > 0 {
+				tag = *tags[0].Name
 			}
-			log.Fatal(err)
+		} else {
+			tag = *rel.TagName
+			url = *rel.HTMLURL
 		}
-		fmt.Fprintf(w, "%s/%s\t%s\t%s\n", repo.owner, repo.name, *rel.TagName, *rel.HTMLURL)
+
+		if _, err := writeRelease(w, repo.owner, repo.name, tag, url); err != nil {
+			log.Printf("Failed to write release %s(%s) of `%s/%s`: %s", err, tag, *rel.HTMLURL, repo.owner, repo.name)
+		}
 	}
 	if err := w.Flush(); err != nil {
 		log.Fatal(err)
