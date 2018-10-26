@@ -50,6 +50,7 @@ func main() {
 		{"stepancheg", "grpc-rust"},
 		{"grpc", "grpc-swift"},
 		{"grpc", "grpc"},
+		{"grpc", "grpc-web"},
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},

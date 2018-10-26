@@ -40,6 +40,13 @@ RUN mkdir -p /grpc-java && \
         -o protoc-gen-grpc-java && \
     install -Ds protoc-gen-grpc-java /out/usr/bin/protoc-gen-grpc-java
 
+ARG GRPC_WEB_VERSION
+RUN mkdir -p /grpc-web && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz -C /grpc-web --strip-components=1 && \
+    cd /grpc-web && \
+    make install-plugin && \
+    install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
+
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as go_builder
 RUN apk add --no-cache build-base curl git
