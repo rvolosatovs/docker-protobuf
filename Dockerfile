@@ -131,7 +131,7 @@ RUN upx --lzma \
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
-LABEL maintainer="Roman Volosatovs <rvolosatovs@thethingsnetwork.org>"
+LABEL maintainer="Roman Volosatovs <roman@thethingsnetwork.org>"
 COPY --from=packer /out/ /
 RUN apk add --no-cache bash libstdc++ && \
     for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done && \
