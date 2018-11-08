@@ -54,6 +54,7 @@ func main() {
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
 		{"golang", "protobuf"},
+		{"gogo", "protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
 		{"mwitkow", "go-proto-validators"},
 		{"ckaznocha", "protoc-gen-lint"},

@@ -58,6 +58,12 @@ RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
     cd ${GOPATH}/src/github.com/golang/protobuf/protoc-gen-go && \
     go get . 
 
+ARG PROTOC_GEN_GOGO_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf && \
+    curl -sSL https://github.com/gogo/protobuf/archive/v${PROTOC_GEN_GOGO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
+    cd ${GOPATH}/src/github.com/gogo/protobuf/protoc-gen-gogo && \
+    go get . 
+
 ARG PROTOC_GEN_GOGOTTN_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
