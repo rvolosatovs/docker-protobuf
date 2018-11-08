@@ -53,6 +53,7 @@ func main() {
 		{"grpc", "grpc-web"},
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
+		{"golang", "protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
 		{"mwitkow", "go-proto-validators"},
 		{"ckaznocha", "protoc-gen-lint"},
