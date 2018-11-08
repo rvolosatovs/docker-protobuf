@@ -77,13 +77,6 @@ RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
     cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
     go get . 
 
-ARG GRPC_GATEWAY_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    go get -ldflags '-w -s' ./protoc-gen-grpc-gateway && \
-    go get -ldflags '-w -s' ./protoc-gen-swagger
-
 ARG PROTOC_GEN_LINT_VERSION
 RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
     unzip -q protoc-gen-lint_linux_amd64.zip && \
@@ -91,6 +84,13 @@ RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v$
 
 ARG PROTOC_GEN_DOC_VERSION
 RUN curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C ${GOPATH}/bin
+
+ARG GRPC_GATEWAY_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
+    curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
+    cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
+    go get -ldflags '-w -s' ./protoc-gen-grpc-gateway && \
+    go get -ldflags '-w -s' ./protoc-gen-swagger
 
 RUN for p in ${GOPATH}/bin/protoc-gen*; do install -Ds ${p} /out/usr/bin/${p#"${GOPATH}/bin/"}; done && \
     mkdir -p /out/usr/include/github.com/gogo && \
