@@ -75,7 +75,8 @@ ARG PROTOC_GEN_GOVALIDATORS_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
     curl -sSL https://github.com/mwitkow/go-proto-validators/archive/${PROTOC_GEN_GOVALIDATORS_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators &&\
     cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
-    go get . 
+    go get . && \
+    mkdir -p /out/usr/include/github.com/mwitkow && mv ${GOPATH}/src/github.com/mwitkow/go-proto-validators /out/usr/include/github.com/mwitkow
 
 ARG PROTOC_GEN_LINT_VERSION
 RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
