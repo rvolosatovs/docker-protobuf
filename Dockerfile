@@ -55,48 +55,62 @@ RUN apk add --no-cache build-base curl git
 ARG PROTOC_GEN_GO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
     curl -sSL https://github.com/golang/protobuf/archive/v${PROTOC_GEN_GO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
-    cd ${GOPATH}/src/github.com/golang/protobuf/protoc-gen-go && \
-    go get . 
+    cd ${GOPATH}/src/github.com/golang/protobuf && \
+    go build -ldflags '-w -s' -o /golang-protobuf-out/protoc-gen-go ./protoc-gen-go && \
+    install -Ds /golang-protobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go
 
 ARG PROTOC_GEN_GOGO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf && \
     curl -sSL https://github.com/gogo/protobuf/archive/v${PROTOC_GEN_GOGO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
-    cd ${GOPATH}/src/github.com/gogo/protobuf/protoc-gen-gogo && \
-    go get . 
+    cd ${GOPATH}/src/github.com/gogo/protobuf && \
+    go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogo ./protoc-gen-gogo && \
+    install -Ds /gogo-protobuf-out/protoc-gen-gogo /out/usr/bin/protoc-gen-gogo && \
+    mkdir -p /out/usr/include/github.com/gogo/protobuf/protobuf/google/protobuf && \
+    install -D $(find ./protobuf/google/protobuf -name '*.proto') -t /out/usr/include/github.com/gogo/protobuf/protobuf/google/protobuf && \
+    install -D ./gogoproto/gogo.proto /out/usr/include/github.com/gogo/protobuf/gogoproto/gogo.proto
 
 ARG PROTOC_GEN_GOGOTTN_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     make deps && \
-    go install -ldflags '-w -s' .
+    go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
+    install -Ds /protoc-gen-gogottn-out/protoc-gen-gogottn /out/usr/bin/protoc-gen-gogottn
 
 ARG PROTOC_GEN_GOVALIDATORS_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
     curl -sSL https://github.com/mwitkow/go-proto-validators/archive/${PROTOC_GEN_GOVALIDATORS_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators &&\
-    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
-    go get . && \
-    mkdir -p /out/usr/include/github.com/mwitkow && mv ${GOPATH}/src/github.com/mwitkow/go-proto-validators /out/usr/include/github.com/mwitkow
+    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    go build -ldflags '-w -s' -o /go-proto-validators-out/protoc-gen-govalidators ./protoc-gen-govalidators && \
+    install -Ds /go-proto-validators-out/protoc-gen-govalidators /out/usr/bin/protoc-gen-govalidators && \
+    install -D ./validator.proto /out/usr/include/github.com/mwitkow/go-proto-validators/validator.proto
 
 ARG PROTOC_GEN_LINT_VERSION
-RUN curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
-    unzip -q protoc-gen-lint_linux_amd64.zip && \
-    mv protoc-gen-lint ${GOPATH}/bin
+RUN cd / && \
+    curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
+    mkdir -p /protoc-gen-lint-out && \
+    cd /protoc-gen-lint-out && \
+    unzip -q /protoc-gen-lint_linux_amd64.zip && \
+    install -Ds /protoc-gen-lint-out/protoc-gen-lint /out/usr/bin/protoc-gen-lint
 
 ARG PROTOC_GEN_DOC_VERSION
-RUN curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C ${GOPATH}/bin
+RUN mkdir -p /protoc-gen-doc-out && \
+    curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C /protoc-gen-doc-out && \
+    install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
 
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
-    go get -ldflags '-w -s' ./protoc-gen-grpc-gateway && \
-    go get -ldflags '-w -s' ./protoc-gen-swagger
-
-RUN for p in ${GOPATH}/bin/protoc-gen*; do install -Ds ${p} /out/usr/bin/${p#"${GOPATH}/bin/"}; done && \
-    mkdir -p /out/usr/include/github.com/gogo && \
-    mv ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn/vendor/github.com/gogo/protobuf /out/usr/include/github.com/gogo && \
-    mv ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google /out/usr/include/
+    dep ensure && \
+    go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-grpc-gateway ./protoc-gen-grpc-gateway && \
+    go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-swagger ./protoc-gen-swagger && \
+    install -Ds /grpc-gateway-out/protoc-gen-grpc-gateway /out/usr/bin/protoc-gen-grpc-gateway && \
+    install -Ds /grpc-gateway-out/protoc-gen-swagger /out/usr/bin/protoc-gen-swagger && \
+    mkdir -p /out/usr/include/google/api && \
+    install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api && \
+    mkdir -p /out/usr/include/google/rpc && \
+    install -D $(find ./third_party/googleapis/google/rpc -name '*.proto') -t /out/usr/include/google/rpc
 
 
 FROM rust:${RUST_VERSION}-slim as rust_builder
