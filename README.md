@@ -19,6 +19,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - https://github.com/pseudomuto/protoc-gen-doc
 - https://github.com/stepancheg/grpc-rust
 - https://github.com/stepancheg/rust-protobuf
+- https://github.com/TheThingsIndustries/protoc-gen-fieldmask
 - https://github.com/TheThingsIndustries/protoc-gen-gogottn
 
 ## Supported languages
