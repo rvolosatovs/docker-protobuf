@@ -2,7 +2,7 @@
 set -xe
 
 if [ ${TRAVIS_TAG} ]; then
-    docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     TAG=${TRAVIS_TAG#"v"}
     [[ ${TAG} == 3* ]] && docker push ${IMAGE_NAME}:latest
     for name in ${IMAGE_NAME}:${TAG} ${IMAGE_NAME}:${TAG%-*} ${IMAGE_NAME}:${TAG%.*-*} ${IMAGE_NAME}:${TAG%.*.*-*}; do
