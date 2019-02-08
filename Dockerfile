@@ -53,6 +53,19 @@ FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as go_builder
 RUN apk add --no-cache build-base curl git
 RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.0/install.sh | sh
 
+ARG PROTOC_GEN_DOC_VERSION
+RUN mkdir -p /protoc-gen-doc-out && \
+    curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C /protoc-gen-doc-out && \
+    install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
+
+ARG PROTOC_GEN_FIELDMASK_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
+    curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-fieldmask/tarball/v${PROTOC_GEN_FIELDMASK_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
+    cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
+    dep ensure && \
+    go build -ldflags '-w -s' -o /protoc-gen-fieldmask-out/protoc-gen-fieldmask . && \
+    install -Ds /protoc-gen-fieldmask-out/protoc-gen-fieldmask /out/usr/bin/protoc-gen-fieldmask
+
 ARG PROTOC_GEN_GO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
     curl -sSL https://github.com/golang/protobuf/archive/v${PROTOC_GEN_GO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
@@ -74,17 +87,8 @@ ARG PROTOC_GEN_GOGOTTN_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-gogottn/tarball/v${PROTOC_GEN_GOGOTTN_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
     cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && \
-    GO111MODULE=on make deps && \
-    go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
+    GO111MODULE=on go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
     install -Ds /protoc-gen-gogottn-out/protoc-gen-gogottn /out/usr/bin/protoc-gen-gogottn
-
-ARG PROTOC_GEN_FIELDMASK_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
-    curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-fieldmask/tarball/v${PROTOC_GEN_FIELDMASK_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
-    cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask && \
-    dep ensure && \
-    go build -ldflags '-w -s' -o /protoc-gen-fieldmask-out/protoc-gen-fieldmask . && \
-    install -Ds /protoc-gen-fieldmask-out/protoc-gen-fieldmask /out/usr/bin/protoc-gen-fieldmask
 
 ARG PROTOC_GEN_GOVALIDATORS_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
@@ -102,10 +106,12 @@ RUN cd / && \
     unzip -q /protoc-gen-lint_linux_amd64.zip && \
     install -Ds /protoc-gen-lint-out/protoc-gen-lint /out/usr/bin/protoc-gen-lint
 
-ARG PROTOC_GEN_DOC_VERSION
-RUN mkdir -p /protoc-gen-doc-out && \
-    curl -sSL https://github.com/pseudomuto/protoc-gen-doc/releases/download/v${PROTOC_GEN_DOC_VERSION}/protoc-gen-doc-${PROTOC_GEN_DOC_VERSION}.linux-amd64.go1.10.tar.gz | tar xz --strip 1 -C /protoc-gen-doc-out && \
-    install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
+ARG PROTOC_GEN_VALIDATE_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
+    curl -sSL https://api.github.com/repos/lyft/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
+    cd ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
+    go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate . && \
+    install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate
 
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \

@@ -14,6 +14,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - https://github.com/grpc/grpc-java
 - https://github.com/grpc/grpc-swift
 - https://github.com/grpc/grpc-web
+- https://github.com/lyft/protoc-gen-validate
 - https://github.com/mwitkow/go-proto-validators
 - https://github.com/protobuf-c/protobuf-c
 - https://github.com/pseudomuto/protoc-gen-doc

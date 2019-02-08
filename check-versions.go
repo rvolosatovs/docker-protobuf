@@ -59,6 +59,7 @@ func main() {
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
 		{"mwitkow", "go-proto-validators"},
 		{"ckaznocha", "protoc-gen-lint"},
+		{"lyft", "protoc-gen-validate"},
 		{"stepancheg", "rust-protobuf"},
 		{"rust-lang", "rust"},
 		{"apple", "swift"},
