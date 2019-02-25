@@ -110,7 +110,8 @@ RUN mkdir -p ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
     curl -sSL https://api.github.com/repos/lyft/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
     cd ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
     go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate . && \
-    install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate
+    install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate && \
+    install -D ./validate/validate.proto /out/usr/include/github.com/lyft/protoc-gen-validate/validate/validate.proto
 
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
