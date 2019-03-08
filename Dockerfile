@@ -89,14 +89,6 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && 
     go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
     install -Ds /protoc-gen-gogottn-out/protoc-gen-gogottn /out/usr/bin/protoc-gen-gogottn
 
-ARG PROTOC_GEN_GOVALIDATORS_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
-    curl -sSL https://github.com/mwitkow/go-proto-validators/archive/${PROTOC_GEN_GOVALIDATORS_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators &&\
-    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
-    go build -ldflags '-w -s' -o /go-proto-validators-out/protoc-gen-govalidators ./protoc-gen-govalidators && \
-    install -Ds /go-proto-validators-out/protoc-gen-govalidators /out/usr/bin/protoc-gen-govalidators && \
-    install -D ./validator.proto /out/usr/include/github.com/mwitkow/go-proto-validators/validator.proto
-
 ARG PROTOC_GEN_LINT_VERSION
 RUN cd / && \
     curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
