@@ -23,7 +23,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
-    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz -C /protobuf-c --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
@@ -31,7 +31,7 @@ RUN mkdir -p /protobuf-c && \
 
 ARG GRPC_JAVA_VERSION
 RUN mkdir -p /grpc-java && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz -C /grpc-java --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz --strip 1 -C /grpc-java && \
     cd /grpc-java && \
     g++ \
         -I. -I/protobuf/src \
@@ -43,7 +43,7 @@ RUN mkdir -p /grpc-java && \
 
 ARG GRPC_WEB_VERSION
 RUN mkdir -p /grpc-web && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz -C /grpc-web --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web && \
     cd /grpc-web && \
     make install-plugin && \
     install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
@@ -144,7 +144,7 @@ RUN apt-get update && \
 
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar --strip-components 1 -C /grpc-swift -xz && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
     cd /grpc-swift && make && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
     install -Ds /grpc-swift/protoc-gen-swiftgrpc /protoc-gen-swift/protoc-gen-swiftgrpc && \
