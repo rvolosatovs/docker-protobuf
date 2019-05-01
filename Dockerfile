@@ -55,7 +55,7 @@ ENV GO111MODULE=on
 
 ARG PROTOC_GEN_DOC_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
-    curl -sSL https://github.com/TheThingsIndustries/protoc-gen-doc/archive/v${PROTOC_GEN_DOC_VERSION}.tar.gz | tar xz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
+    curl -sSL https://api.github.com/repos/pseudomuto/protoc-gen-doc/tarball/v${PROTOC_GEN_DOC_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     cd ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     go build -ldflags '-w -s' -o /protoc-gen-doc-out/protoc-gen-doc ./cmd/protoc-gen-doc && \
     install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
