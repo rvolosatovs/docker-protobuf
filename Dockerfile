@@ -69,14 +69,14 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask &
 
 ARG PROTOC_GEN_GO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
-    curl -sSL https://github.com/golang/protobuf/archive/v${PROTOC_GEN_GO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
+    curl -sSL https://api.github.com/repos/golang/protobuf/tarball/v${PROTOC_GEN_GO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
     cd ${GOPATH}/src/github.com/golang/protobuf && \
     go build -ldflags '-w -s' -o /golang-protobuf-out/protoc-gen-go ./protoc-gen-go && \
     install -Ds /golang-protobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go
 
 ARG PROTOC_GEN_GOGO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf && \
-    curl -sSL https://github.com/gogo/protobuf/archive/v${PROTOC_GEN_GOGO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
+    curl -sSL https://api.github.com/repos/gogo/protobuf/tarball/v${PROTOC_GEN_GOGO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
     cd ${GOPATH}/src/github.com/gogo/protobuf && \
     go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogo ./protoc-gen-gogo && \
     install -Ds /gogo-protobuf-out/protoc-gen-gogo /out/usr/bin/protoc-gen-gogo && \
