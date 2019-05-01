@@ -140,7 +140,7 @@ RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grp
 
 FROM swift:${SWIFT_VERSION} as swift_builder
 RUN apt-get update && \
-    apt-get install -y unzip patchelf libnghttp2-dev
+    apt-get install -y unzip patchelf libnghttp2-dev curl libssl-dev
 
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
