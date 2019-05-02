@@ -23,7 +23,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
-    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz -C /protobuf-c --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
@@ -31,7 +31,7 @@ RUN mkdir -p /protobuf-c && \
 
 ARG GRPC_JAVA_VERSION
 RUN mkdir -p /grpc-java && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz -C /grpc-java --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz --strip 1 -C /grpc-java && \
     cd /grpc-java && \
     g++ \
         -I. -I/protobuf/src \
@@ -43,7 +43,7 @@ RUN mkdir -p /grpc-java && \
 
 ARG GRPC_WEB_VERSION
 RUN mkdir -p /grpc-web && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz -C /grpc-web --strip-components=1 && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web && \
     cd /grpc-web && \
     make install-plugin && \
     install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
@@ -55,7 +55,7 @@ ENV GO111MODULE=on
 
 ARG PROTOC_GEN_DOC_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
-    curl -sSL https://github.com/TheThingsIndustries/protoc-gen-doc/archive/v${PROTOC_GEN_DOC_VERSION}.tar.gz | tar xz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
+    curl -sSL https://api.github.com/repos/pseudomuto/protoc-gen-doc/tarball/v${PROTOC_GEN_DOC_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     cd ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
     go build -ldflags '-w -s' -o /protoc-gen-doc-out/protoc-gen-doc ./cmd/protoc-gen-doc && \
     install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
@@ -69,14 +69,14 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask &
 
 ARG PROTOC_GEN_GO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
-    curl -sSL https://github.com/golang/protobuf/archive/v${PROTOC_GEN_GO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
+    curl -sSL https://api.github.com/repos/golang/protobuf/tarball/v${PROTOC_GEN_GO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
     cd ${GOPATH}/src/github.com/golang/protobuf && \
     go build -ldflags '-w -s' -o /golang-protobuf-out/protoc-gen-go ./protoc-gen-go && \
     install -Ds /golang-protobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go
 
 ARG PROTOC_GEN_GOGO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf && \
-    curl -sSL https://github.com/gogo/protobuf/archive/v${PROTOC_GEN_GOGO_VERSION}.tar.gz | tar -xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
+    curl -sSL https://api.github.com/repos/gogo/protobuf/tarball/v${PROTOC_GEN_GOGO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf &&\
     cd ${GOPATH}/src/github.com/gogo/protobuf && \
     go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogo ./protoc-gen-gogo && \
     install -Ds /gogo-protobuf-out/protoc-gen-gogo /out/usr/bin/protoc-gen-gogo && \
@@ -140,11 +140,11 @@ RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grp
 
 FROM swift:${SWIFT_VERSION} as swift_builder
 RUN apt-get update && \
-    apt-get install -y unzip patchelf libnghttp2-dev
+    apt-get install -y unzip patchelf libnghttp2-dev curl libssl-dev zlib1g-dev
 
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
-    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar --strip-components 1 -C /grpc-swift -xz && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
     cd /grpc-swift && make && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
     install -Ds /grpc-swift/protoc-gen-swiftgrpc /protoc-gen-swift/protoc-gen-swiftgrpc && \
