@@ -19,5 +19,3 @@ script:
 deploy:
   provider: script
   script: bash travis-push.sh
-  on:
-    tags: true
