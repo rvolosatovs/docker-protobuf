@@ -19,3 +19,5 @@ script:
 deploy:
   provider: script
   script: bash travis-push.sh
+  on:
+    all_branches: true
