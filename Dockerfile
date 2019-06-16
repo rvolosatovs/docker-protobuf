@@ -169,7 +169,6 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 RUN upx --lzma \
-        /out/usr/bin/protoc \
         /out/usr/bin/grpc_* \
         /out/usr/bin/protoc-gen-*
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
