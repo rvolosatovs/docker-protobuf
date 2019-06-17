@@ -23,7 +23,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
-    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
+    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
@@ -100,12 +100,12 @@ RUN cd / && \
     install -Ds /protoc-gen-lint-out/protoc-gen-lint /out/usr/bin/protoc-gen-lint
 
 ARG PROTOC_GEN_VALIDATE_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
-    curl -sSL https://api.github.com/repos/lyft/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
-    cd ${GOPATH}/src/github.com/lyft/protoc-gen-validate && \
+RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
+    curl -sSL https://api.github.com/repos/envoyproxy/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
+    cd ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
     go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate . && \
     install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate && \
-    install -D ./validate/validate.proto /out/usr/include/github.com/lyft/protoc-gen-validate/validate/validate.proto
+    install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
 
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
@@ -169,7 +169,6 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 RUN upx --lzma \
-        /out/usr/bin/protoc \
         /out/usr/bin/grpc_* \
         /out/usr/bin/protoc-gen-*
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
