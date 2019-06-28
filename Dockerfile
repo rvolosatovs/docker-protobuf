@@ -23,7 +23,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
-    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
+    curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
