@@ -6,6 +6,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 
 ## What's included:
 - https://github.com/ckaznocha/protoc-gen-lint
+- https://github.com/envoyproxy/protoc-gen-validate
 - https://github.com/gogo/protobuf
 - https://github.com/golang/protobuf
 - https://github.com/google/protobuf
@@ -14,7 +15,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - https://github.com/grpc/grpc-java
 - https://github.com/grpc/grpc-swift
 - https://github.com/grpc/grpc-web
-- https://github.com/lyft/protoc-gen-validate
 - https://github.com/protobuf-c/protobuf-c
 - https://github.com/pseudomuto/protoc-gen-doc
 - https://github.com/stepancheg/grpc-rust
