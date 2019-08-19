@@ -54,9 +54,9 @@ RUN apk add --no-cache build-base curl git
 ENV GO111MODULE=on
 
 ARG PROTOC_GEN_DOC_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
-    curl -sSL https://api.github.com/repos/pseudomuto/protoc-gen-doc/tarball/v${PROTOC_GEN_DOC_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
-    cd ${GOPATH}/src/github.com/pseudomuto/protoc-gen-doc && \
+RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-doc && \
+    curl -sSL https://api.github.com/repos/TheThingsIndustries/protoc-gen-doc/tarball/v${PROTOC_GEN_DOC_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-doc && \
+    cd ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-doc && \
     go build -ldflags '-w -s' -o /protoc-gen-doc-out/protoc-gen-doc ./cmd/protoc-gen-doc && \
     install -Ds /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
 
