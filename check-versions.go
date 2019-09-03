@@ -58,7 +58,7 @@ func main() {
 		{"gogo", "protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
 		{"ckaznocha", "protoc-gen-lint"},
-		{"lyft", "protoc-gen-validate"},
+		{"envoyproxy", "protoc-gen-validate"},
 		{"stepancheg", "rust-protobuf"},
 		{"rust-lang", "rust"},
 		{"apple", "swift"},
