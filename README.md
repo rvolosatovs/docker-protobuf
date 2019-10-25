@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TheThingsIndustries/docker-protobuf.svg?branch=master)](https://travis-ci.org/TheThingsIndustries/docker-protobuf)
+![](https://github.com/TheThingsIndustries/docker-protobuf/workflows/Docker%20Image/badge.svg)
 
 # Protocol Buffers + Docker
 A lightweight `protoc` Docker image.
