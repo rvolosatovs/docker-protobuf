@@ -3,7 +3,7 @@ docker build \
 --build-arg ALPINE_VERSION="${ALPINE_VERSION:-"3.10"}" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.13.3"}" \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"1.11.3"}" \
---build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.24.0"}" \
+--build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.24.1"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.6.1"}" \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"0.10.0"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.24.3"}" \
