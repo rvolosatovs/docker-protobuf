@@ -4,7 +4,7 @@ ARG RUST_VERSION
 ARG SWIFT_VERSION
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
-RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev
+RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers
 
 RUN mkdir -p /out
 
