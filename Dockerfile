@@ -1,4 +1,5 @@
 ARG ALPINE_VERSION
+ARG DART_VERSION
 ARG GO_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
@@ -168,6 +169,14 @@ RUN mkdir -p /grpc-swift && \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
+FROM google/dart:${DART_VERSION} as dart_builder
+RUN apt-get update && apt-get install -y musl-tools curl
+
+ARG DART_PROTOBUF_VERSION
+RUN mkdir -p /dart-protobuf && \
+    curl -sSL https://api.github.com/repos/dart-lang/protobuf/tarball/protobuf-${DART_PROTOBUF_VERSION} | tar xz --strip 1 -C /dart-protobuf && \
+    cd /dart-protobuf/protoc_plugin && pub install && dart2native bin/protoc_plugin.dart -o bin/protoc-gen-dart-native && \
+    install -Ds /dart-protobuf/protoc_plugin/bin/protoc-gen-dart-native /out/usr/bin/protoc-gen-dart
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
