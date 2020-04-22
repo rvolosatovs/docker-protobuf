@@ -1,16 +1,11 @@
 name: Docker Image
-on: 
+
+on:
   push:
-    tags:
-      - '**'
-    branches:
-      - master
+    branches: [ master ]
+    
   pull_request:
-    paths: 
-      - .github/workflows/dockerimage.yml
-      - build.sh
-      - Dockerfile
-      - protoc-wrapper
+    branches: [ master ]
           
 jobs:
   build:
