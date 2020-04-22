@@ -1,8 +1,26 @@
-ARG ALPINE_VERSION
-ARG DART_VERSION
-ARG GO_VERSION
-ARG RUST_VERSION
-ARG SWIFT_VERSION
+ARG ALPINE_VERSION=3.11
+ARG DART_VERSION=2.7.2
+ARG DART_PROTOBUF_VERSION=1.0.1
+ARG GO_VERSION=1.14.0
+ARG GRPC_GATEWAY_VERSION=1.14.3
+ARG GRPC_JAVA_VERSION=1.28.0
+ARG GRPC_RUST_VERSION=0.6.2
+ARG GRPC_SWIFT_VERSION=0.10.0
+ARG GRPC_VERSION=1.27.3
+ARG GRPC_WEB_VERSION=1.0.7
+ARG PROTOBUF_C_VERSION=1.3.3
+ARG PROTOC_GEN_DOC_VERSION=1.3.1
+ARG PROTOC_GEN_FIELDMASK_VERSION=0.4.0
+ARG PROTOC_GEN_GO_VERSION=1.3.5
+ARG PROTOC_GEN_GOGO_VERSION=1.3.1
+ARG PROTOC_GEN_GOGOTTN_VERSION=3.0.14
+ARG PROTOC_GEN_GQL_VERSION=0.7.3
+ARG PROTOC_GEN_LINT_VERSION=0.2.1
+ARG PROTOC_GEN_VALIDATE_VERSION=0.3.0-java
+ARG RUST_PROTOBUF_VERSION=2.10.2
+ARG RUST_VERSION=1.42.0
+ARG SWIFT_VERSION=5.1.5
+ARG UPX_VERSION=3.96
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers
@@ -15,7 +33,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
     cd /protobuf && \
     ./autogen.sh && \
     ./configure --prefix=/usr --enable-static=no && \
-    make && \
+    make -j $(nproc) && \
     make check && \
     make install && \
     make install DESTDIR=/out && \
@@ -28,7 +46,7 @@ RUN mkdir -p /protobuf-c && \
     cd /protobuf-c && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
-    make && make install DESTDIR=/out
+    make -j $(nproc) && make install DESTDIR=/out
 
 ARG GRPC_JAVA_VERSION
 RUN mkdir -p /grpc-java && \
