@@ -1,10 +1,9 @@
 jobs:
   build-and-push:
-    machine:
-      docker_layer_caching: true
-      resource_class: large
-
+    executor: docker/docker
     steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
       - checkout
       - docker/check
       - docker/build:
@@ -12,6 +11,7 @@ jobs:
       - docker/push:
           digest-path: /tmp/digest.txt
           image: goodmoney/protoc
+          tag: latest
 orbs:
   docker: circleci/docker@1.0.1
 version: 2.1
