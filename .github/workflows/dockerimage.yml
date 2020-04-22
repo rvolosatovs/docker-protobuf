@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Build the Docker image
-      run: ./build.sh -t build
     - name: Push to GitHub Packages
       uses: docker/build-push-action@v1
       with:
