@@ -207,7 +207,7 @@ COPY --from=protoc_builder /out/ /out/
 COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
-COPY --from=dart_builder /protoc-gen-dart /out/protoc-gen-dart
+COPY --from=dart_builder /out/ /out/
 RUN upx --lzma \
         /out/usr/bin/grpc_* \
         /out/usr/bin/protoc-gen-*
