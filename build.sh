@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 docker build \
 --build-arg ALPINE_VERSION="${ALPINE_VERSION:-"3.11"}" \
+--build-arg DART_PROTOBUF_VERSION="${DART_PROTOBUF_VERSION:-"1.0.1"}" \
+--build-arg DART_VERSION="${DART_VERSION:-"2.7.2"}" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.14.2"}" \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"1.14.4"}" \
 --build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.29.0"}" \
