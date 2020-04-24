@@ -23,39 +23,55 @@ ARG SWIFT_VERSION=5.1.5
 ARG UPX_VERSION=3.96
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
-RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers
+RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers cmake ninja go
 
 RUN mkdir -p /out
 
 ARG GRPC_VERSION
 RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/grpc.git /grpc && \
     ln -s /grpc/third_party/protobuf /protobuf && \
-    cd /protobuf && \
-    ./autogen.sh && \
-    ./configure --prefix=/usr --enable-static=no && \
-    make -j $(nproc) && \
-    make check && \
-    make install && \
-    make install DESTDIR=/out && \
     cd /grpc && \
-    make install-plugins prefix=/out/usr
+    mkdir -p "cmake/build" && \
+    cd "cmake/build" && \
+    cmake  \
+    -GNinja \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DgRPC_INSTALL=ON \
+    -DgRPC_BUILD_TESTS=OFF \
+    ../.. && \
+    cmake --build . --target plugins && \
+    cmake --build . --target install && \
+    DESTDIR=/out cmake --build . --target install 
+#    cd /protobuf && \
+#    ./autogen.sh && \
+#    ./configure --prefix=/usr --enable-static=no && \
+#    make && \
+#    make check && \
+#    make install && \
+#    make install DESTDIR=/out && \
+#    cd /grpc && \
+#    make install-plugins prefix=/out/usr
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
     curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
+    export LD_LIBRARY_PATH=/usr/lib:/usr/lib64 && \
+    export PKG_CONFIG_PATH=/usr/lib64/pkgconfig && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
-    make -j $(nproc) && make install DESTDIR=/out
+    make && make install DESTDIR=/out
 
 ARG GRPC_JAVA_VERSION
 RUN mkdir -p /grpc-java && \
     curl -sSL https://api.github.com/repos/grpc/grpc-java/tarball/v${GRPC_JAVA_VERSION} | tar xz --strip 1 -C /grpc-java && \
     cd /grpc-java && \
     g++ \
-        -I. -I/protobuf/src \
+        -I. -I/usr/include \
         compiler/src/java_plugin/cpp/*.cpp \
-        -L/protobuf/src/.libs \
+        -L/usr/lib64 \
         -lprotoc -lprotobuf -lpthread --std=c++0x -s \
         -o protoc-gen-grpc-java && \
     install -Ds protoc-gen-grpc-java /out/usr/bin/protoc-gen-grpc-java
@@ -193,8 +209,8 @@ RUN apt-get update && apt-get install -y musl-tools curl
 ARG DART_PROTOBUF_VERSION
 RUN mkdir -p /dart-protobuf && \
     curl -sSL https://api.github.com/repos/dart-lang/protobuf/tarball/protobuf-${DART_PROTOBUF_VERSION} | tar xz --strip 1 -C /dart-protobuf && \
-    cd /dart-protobuf/protoc_plugin && pub install && dart2native bin/protoc_plugin.dart -o bin/protoc-gen-dart-native && \
-    install -Ds /dart-protobuf/protoc_plugin/bin/protoc-gen-dart-native /out/usr/bin/protoc-gen-dart
+    cd /dart-protobuf/protoc_plugin && pub install && dart2native --verbose bin/protoc_plugin.dart -o protoc_plugin && \
+    install -Ds /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
@@ -208,15 +224,16 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=dart_builder /out/ /out/
-RUN upx --lzma \
-        /out/usr/bin/grpc_* \
-        /out/usr/bin/protoc-gen-*
+RUN upx --lzma $(find /out/usr/bin/ -type f -size +40k -name 'grpc_*' -or -name 'protoc-gen-*')
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <roman@thethingsnetwork.org>"
 COPY --from=packer /out/ /
 RUN apk add --no-cache bash libstdc++ && \
+    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+    wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk && \
+    apk add glibc-2.31-r0.apk && \
     for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done && \
     ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
@@ -226,5 +243,6 @@ RUN apk add --no-cache bash libstdc++ && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift
+
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
