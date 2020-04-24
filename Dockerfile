@@ -210,7 +210,7 @@ ARG DART_PROTOBUF_VERSION
 RUN mkdir -p /dart-protobuf && \
     curl -sSL https://api.github.com/repos/dart-lang/protobuf/tarball/protobuf-${DART_PROTOBUF_VERSION} | tar xz --strip 1 -C /dart-protobuf && \
     cd /dart-protobuf/protoc_plugin && pub install && dart2native --verbose bin/protoc_plugin.dart -o protoc_plugin && \
-    install -Ds /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
+    install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
@@ -224,7 +224,7 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=dart_builder /out/ /out/
-RUN upx --lzma $(find /out/usr/bin/ -type f -size +40k -name 'grpc_*' -or -name 'protoc-gen-*')
+RUN upx --lzma $(find /out/usr/bin/ -type f -size +40k -name 'grpc_*' -or -name 'protoc-gen-*' -not -name 'protoc-gen-dart')
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
