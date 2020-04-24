@@ -46,23 +46,14 @@ func main() {
 	}{
 		{"golang", "go"},
 		{"grpc-ecosystem", "grpc-gateway"},
-		{"grpc", "grpc-java"},
-		{"stepancheg", "grpc-rust"},
-		{"grpc", "grpc-swift"},
 		{"grpc", "grpc"},
-		{"grpc", "grpc-web"},
 		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
 		{"TheThingsIndustries", "protoc-gen-fieldmask"},
 		{"golang", "protobuf"},
 		{"gogo", "protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
-		{"danielvladco", "go-proto-gql"},
-		{"ckaznocha", "protoc-gen-lint"},
 		{"envoyproxy", "protoc-gen-validate"},
-		{"stepancheg", "rust-protobuf"},
-		{"rust-lang", "rust"},
-		{"apple", "swift"},
 		{"upx", "upx"},
 	} {
 		tag := "n/a"
