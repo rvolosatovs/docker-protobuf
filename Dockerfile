@@ -196,7 +196,16 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=dart_builder /out/ /out/
-RUN upx --lzma $(find /out/usr/bin/ -type f -name 'grpc_*' -or -name 'protoc-gen-*' -not -name 'protoc-gen-dart')
+RUN upx --lzma $(find /out/usr/bin/ \
+        -type f -name 'grpc_*' \
+        -not -name 'grpc_csharp_plugin' \
+        -not -name 'grpc_node_plugin' \
+        -not -name 'grpc_php_plugin' \
+        -not -name 'grpc_ruby_plugin' \
+        -not -name 'grpc_python_plugin' \
+        -or -name 'protoc-gen-*' \
+        -not -name 'protoc-gen-dart' \
+    )
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
