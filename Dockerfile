@@ -1,58 +1,30 @@
-ARG ALPINE_VERSION=3.11
-ARG DART_VERSION=2.7.2
-ARG DART_PROTOBUF_VERSION=1.0.1
-ARG GO_VERSION=1.14.0
-ARG GRPC_GATEWAY_VERSION=1.14.3
-ARG GRPC_JAVA_VERSION=1.28.0
-ARG GRPC_RUST_VERSION=0.6.2
-ARG GRPC_SWIFT_VERSION=0.10.0
-ARG GRPC_VERSION=1.27.3
-ARG GRPC_WEB_VERSION=1.0.7
-ARG PROTOBUF_C_VERSION=1.3.3
-ARG PROTOC_GEN_DOC_VERSION=1.3.1
-ARG PROTOC_GEN_FIELDMASK_VERSION=0.4.0
-ARG PROTOC_GEN_GO_VERSION=1.3.5
-ARG PROTOC_GEN_GOGO_VERSION=1.3.1
-ARG PROTOC_GEN_GOGOTTN_VERSION=3.0.14
-ARG PROTOC_GEN_GQL_VERSION=0.7.3
-ARG PROTOC_GEN_LINT_VERSION=0.2.1
-ARG PROTOC_GEN_VALIDATE_VERSION=0.3.0-java
-ARG RUST_PROTOBUF_VERSION=2.10.2
-ARG RUST_VERSION=1.42.0
-ARG SWIFT_VERSION=5.1.5
-ARG UPX_VERSION=3.96
+ARG ALPINE_VERSION
+ARG DART_VERSION
+ARG GO_VERSION
+ARG RUST_VERSION
+ARG SWIFT_VERSION
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
-RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers cmake ninja go
+RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers cmake ninja
 
 RUN mkdir -p /out
 
 ARG GRPC_VERSION
 RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/grpc.git /grpc && \
     ln -s /grpc/third_party/protobuf /protobuf && \
-    cd /grpc && \
-    mkdir -p "cmake/build" && \
-    cd "cmake/build" && \
-    cmake  \
-    -GNinja \
-    -DBUILD_SHARED_LIBS=ON \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DgRPC_INSTALL=ON \
-    -DgRPC_BUILD_TESTS=OFF \
-    ../.. && \
+    mkdir -p "/grpc/cmake/build" && \
+    cd "/grpc/cmake/build" && \
+    cmake \
+        -GNinja \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DgRPC_INSTALL=ON \
+        -DgRPC_BUILD_TESTS=OFF \
+        ../.. && \
     cmake --build . --target plugins && \
     cmake --build . --target install && \
     DESTDIR=/out cmake --build . --target install 
-#    cd /protobuf && \
-#    ./autogen.sh && \
-#    ./configure --prefix=/usr --enable-static=no && \
-#    make && \
-#    make check && \
-#    make install && \
-#    make install DESTDIR=/out && \
-#    cd /grpc && \
-#    make install-plugins prefix=/out/usr
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
@@ -224,7 +196,7 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=dart_builder /out/ /out/
-RUN upx --lzma $(find /out/usr/bin/ -type f -size +40k -name 'grpc_*' -or -name 'protoc-gen-*' -not -name 'protoc-gen-dart')
+RUN upx --lzma $(find /out/usr/bin/ -type f -name 'grpc_*' -or -name 'protoc-gen-*' -not -name 'protoc-gen-dart')
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
@@ -243,6 +215,5 @@ RUN apk add --no-cache bash libstdc++ && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift
-
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
