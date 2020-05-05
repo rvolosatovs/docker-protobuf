@@ -98,7 +98,15 @@ RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${U
 
 COPY --from=protoc_builder /out/ /out/
 COPY --from=go_builder /out/ /out/
-RUN upx --lzma $(find /out/usr/bin/ -type f -name 'grpc_*' -or -name 'protoc-gen-*')
+RUN upx --lzma $(find /out/usr/bin/ \
+        -type f -name 'grpc_*' \
+        -and -not -name 'grpc_csharp_plugin' \
+        -and -not -name 'grpc_node_plugin' \
+        -and -not -name 'grpc_php_plugin' \
+        -and -not -name 'grpc_ruby_plugin' \
+        -and -not -name 'grpc_python_plugin' \
+        -or -name 'protoc-gen-*' \
+    )
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_VERSION}
