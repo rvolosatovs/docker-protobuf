@@ -7,6 +7,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 ## What's included:
 - https://github.com/ckaznocha/protoc-gen-lint
 - https://github.com/danielvladco/go-proto-gql
+- https://github.com/dart-lang/protobuf
 - https://github.com/envoyproxy/protoc-gen-validate
 - https://github.com/gogo/protobuf
 - https://github.com/golang/protobuf
@@ -27,6 +28,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - C
 - C#
 - C++
+- Dart
 - Go
 - Java / JavaNano (Android)
 - JavaScript
