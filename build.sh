@@ -5,7 +5,7 @@ docker build \
 --build-arg DART_VERSION="${DART_VERSION:-"2.7.2"}" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.14.3"}" \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"1.14.6"}" \
---build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.30.0"}" \
+--build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.29.0"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.8.1"}" \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"0.11.0"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.28.2"}" \
