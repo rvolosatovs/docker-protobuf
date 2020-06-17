@@ -225,4 +225,5 @@ RUN apk add --no-cache bash libstdc++ && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift
 COPY protoc-wrapper /usr/bin/protoc-wrapper
+ENV LD_LIBRARY_PATH='/usr/lib:/usr/lib64:/usr/lib/local'
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
