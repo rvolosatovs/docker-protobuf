@@ -12,8 +12,8 @@ RUN mkdir -p /out
 ARG GRPC_VERSION
 RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/grpc.git /grpc && \
     ln -s /grpc/third_party/protobuf /protobuf && \
-    mkdir -p "/grpc/cmake/build" && \
-    cd "/grpc/cmake/build" && \
+    mkdir -p /grpc/cmake/build && \
+    cd /grpc/cmake/build && \
     cmake \
         -GNinja \
         -DBUILD_SHARED_LIBS=ON \
