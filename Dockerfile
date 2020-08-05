@@ -65,6 +65,13 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && 
     go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
     install -Ds /protoc-gen-gogottn-out/protoc-gen-gogottn /out/usr/bin/protoc-gen-gogottn
 
+ARG PROTOC_GEN_HUGODATA_VERSION
+RUN mkdir -p ${GOPATH}/src/htdvisser.dev/exp/protoc-gen-hugodata && \
+    curl -sSL https://api.github.com/repos/htdvisser/exp/tarball/protoc-gen-hugodata/v${PROTOC_GEN_HUGODATA_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/htdvisser.dev/exp && \
+    cd ${GOPATH}/src/htdvisser.dev/exp/protoc-gen-hugodata && \
+    go build -ldflags '-w -s' -o /protoc-gen-hugodata-out/protoc-gen-hugodata . && \
+    install -Ds /protoc-gen-hugodata-out/protoc-gen-hugodata /out/usr/bin/protoc-gen-hugodata
+
 ARG PROTOC_GEN_VALIDATE_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
     curl -sSL https://api.github.com/repos/envoyproxy/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
