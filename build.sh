@@ -4,7 +4,7 @@ docker build \
 --build-arg DART_PROTOBUF_VERSION="${DART_PROTOBUF_VERSION:-"1.0.1"}" \
 --build-arg DART_VERSION="${DART_VERSION:-"2.7.2"}" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.15.3"}" \
---build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"2.0.1"}" \
+--build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"1.15.2"}" \
 --build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.33.0"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.8.2"}" \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"0.11.0"}" \
