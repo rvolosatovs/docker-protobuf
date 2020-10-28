@@ -21,6 +21,6 @@ docker build \
 --build-arg PROTOC_GEN_VALIDATE_VERSION="${PROTOC_GEN_VALIDATE_VERSION:-"0.4.1"}" \
 --build-arg RUST_PROTOBUF_VERSION="${RUST_PROTOBUF_VERSION:-"2.18.0"}" \
 --build-arg RUST_VERSION="${RUST_VERSION:-"1.47.0"}" \
---build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.3"}" \
+--build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.1.5"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
 ${@} .
