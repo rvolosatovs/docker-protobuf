@@ -3,6 +3,7 @@ ARG DART_VERSION
 ARG GO_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
+ARG NODE_VERSION
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers cmake ninja
@@ -214,9 +215,13 @@ RUN upx --lzma $(find /out/usr/bin/ \
     )
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
-FROM alpine:${ALPINE_VERSION}
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
+
+ARG TS_PROTOC_GEN_VERSION
 LABEL maintainer="Roman Volosatovs <roman@thethingsnetwork.org>"
 COPY --from=packer /out/ /
+RUN npm install -g ts-protoc-gen@${TS_PROTOC_GEN_VERSION} && npm cache clean --force
 RUN apk add --no-cache bash libstdc++ && \
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
     wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk && \
@@ -229,7 +234,8 @@ RUN apk add --no-cache bash libstdc++ && \
     ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
-    ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift
+    ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift && \
+    ln -s /usr/local/lib/node_modules/ts-protoc-gen/bin/protoc-gen-ts /usr/bin/protoc-gen-ts
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENV LD_LIBRARY_PATH='/usr/lib:/usr/lib64:/usr/lib/local'
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]

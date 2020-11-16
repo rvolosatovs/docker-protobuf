@@ -23,6 +23,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - https://github.com/stepancheg/rust-protobuf
 - https://github.com/TheThingsIndustries/protoc-gen-fieldmask
 - https://github.com/TheThingsIndustries/protoc-gen-gogottn
+- https://github.com/improbable-eng/ts-protoc-gen
 
 ## Supported languages
 - C
@@ -38,6 +39,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - Ruby
 - Rust
 - Swift
+- Typescript
 
 ## Usage
 ```
