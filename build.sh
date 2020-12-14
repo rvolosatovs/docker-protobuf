@@ -23,4 +23,6 @@ docker build \
 --build-arg RUST_VERSION="${RUST_VERSION:-"1.47.0"}" \
 --build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.1.5"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
+--build-arg NODE_VERSION="${NODE_VERSION:-"14.15.0"}" \
+--build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.13.0"}" \
 ${@} .
