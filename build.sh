@@ -10,6 +10,7 @@ docker build \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"0.11.0"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.33.2"}" \
 --build-arg GRPC_WEB_VERSION="${GRPC_WEB_VERSION:-"1.2.1"}" \
+--build-arg NODE_VERSION="${NODE_VERSION:-"14.15.0"}" \
 --build-arg PROTOBUF_C_VERSION="${PROTOBUF_C_VERSION:-"1.3.3"}" \
 --build-arg PROTOC_GEN_DOC_VERSION="${PROTOC_GEN_DOC_VERSION:-"1.3.2"}" \
 --build-arg PROTOC_GEN_FIELDMASK_VERSION="${PROTOC_GEN_FIELDMASK_VERSION:-"0.4.5"}" \
@@ -22,7 +23,6 @@ docker build \
 --build-arg RUST_PROTOBUF_VERSION="${RUST_PROTOBUF_VERSION:-"2.18.0"}" \
 --build-arg RUST_VERSION="${RUST_VERSION:-"1.47.0"}" \
 --build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.1.5"}" \
---build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
---build-arg NODE_VERSION="${NODE_VERSION:-"14.15.0"}" \
 --build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.13.0"}" \
+--build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
 ${@} .
