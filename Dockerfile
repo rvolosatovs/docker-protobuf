@@ -109,11 +109,9 @@ RUN mkdir -p ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
     curl -sSL https://api.github.com/repos/danielvladco/go-proto-gql/tarball/v${PROTOC_GEN_GQL_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
     cd ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
     go build -ldflags '-w -s' -o /go-proto-gql-out/protoc-gen-gql ./protoc-gen-gql && \
-    go build -ldflags '-w -s' -o /go-proto-gql-out/protoc-gen-gogqlgen ./protoc-gen-gogqlgen && \
-    go build -ldflags '-w -s' -o /go-proto-gql-out/protoc-gen-gqlgencfg ./protoc-gen-gqlgencfg && \
+    go build -ldflags '-w -s' -o /go-proto-gql-out/protoc-gen-gogql ./protoc-gen-gogql && \
     install -Ds /go-proto-gql-out/protoc-gen-gql /out/usr/bin/protoc-gen-gql && \
-    install -Ds /go-proto-gql-out/protoc-gen-gogqlgen /out/usr/bin/protoc-gen-gogqlgen && \
-    install -Ds /go-proto-gql-out/protoc-gen-gqlgencfg /out/usr/bin/protoc-gen-gqlgencfg
+    install -Ds /go-proto-gql-out/protoc-gen-gogql /out/usr/bin/protoc-gen-gogql
 
 ARG PROTOC_GEN_LINT_VERSION
 RUN cd / && \
