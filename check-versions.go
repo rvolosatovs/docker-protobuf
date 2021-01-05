@@ -58,6 +58,7 @@ func main() {
 		{"golang", "protobuf"},
 		{"gogo", "protobuf"},
 		{"TheThingsIndustries", "protoc-gen-gogottn"},
+		{"mwitkow", "go-proto-validators"},
 		{"danielvladco", "go-proto-gql"},
 		{"ckaznocha", "protoc-gen-lint"},
 		{"envoyproxy", "protoc-gen-validate"},
