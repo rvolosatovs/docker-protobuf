@@ -111,6 +111,15 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-gogottn && 
     go build -ldflags '-w -s' -o /protoc-gen-gogottn-out/protoc-gen-gogottn . && \
     install -Ds /protoc-gen-gogottn-out/protoc-gen-gogottn /out/usr/bin/protoc-gen-gogottn
 
+ARG PROTOC_GEN_GOVALIDATORS_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    curl -sSL https://api.github.com/repos/mwitkow/go-proto-validators/tarball/v${PROTOC_GEN_GOVALIDATORS_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    mkdir /go-proto-validators-out && \
+    go build -ldflags '-w -s' -o /go-proto-validators-out ./... && \
+    install -Ds /go-proto-validators-out/protoc-gen-govalidators /out/usr/bin/protoc-gen-govalidators && \
+    install -D ./validator.proto /out/usr/include/github.com/mwitkow/go-proto-validators/validator.proto
+
 ARG PROTOC_GEN_GQL_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
     curl -sSL https://api.github.com/repos/danielvladco/go-proto-gql/tarball/v${PROTOC_GEN_GQL_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
@@ -136,15 +145,6 @@ RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
     install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate && \
     install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
 
-ARG GO_PROTO_VALIDATORS_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
-    curl -sSL https://api.github.com/repos/mwitkow/go-proto-validators/tarball/v${GO_PROTO_VALIDATORS_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
-    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
-    mkdir /go-proto-validators-out && \
-    go build -ldflags '-w -s' -o /go-proto-validators-out ./... && \
-    install -Ds /go-proto-validators-out/protoc-gen-govalidators /out/usr/bin/protoc-gen-govalidators && \
-    install -D ./validator.proto /out/usr/include/github.com/mwitkow/go-proto-validators/validator.proto
-
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
@@ -159,6 +159,7 @@ RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api && \
     mkdir -p /out/usr/include/google/rpc && \
     install -D $(find ./third_party/googleapis/google/rpc -name '*.proto') -t /out/usr/include/google/rpc
+
 
 FROM rust:${RUST_VERSION}-slim as rust_builder
 RUN apt-get update && apt-get install -y musl-tools curl
@@ -195,6 +196,7 @@ RUN mkdir -p /grpc-swift && \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
+
 FROM google/dart:${DART_VERSION} as dart_builder
 RUN apt-get update && apt-get install -y musl-tools curl
 
@@ -203,6 +205,7 @@ RUN mkdir -p /dart-protobuf && \
     curl -sSL https://api.github.com/repos/dart-lang/protobuf/tarball/protobuf-${DART_PROTOBUF_VERSION} | tar xz --strip 1 -C /dart-protobuf && \
     cd /dart-protobuf/protoc_plugin && pub install && dart2native --verbose bin/protoc_plugin.dart -o protoc_plugin && \
     install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
+
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
