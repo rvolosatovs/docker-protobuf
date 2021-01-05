@@ -74,6 +74,13 @@ RUN mkdir -p ${GOPATH}/src/github.com/TheThingsIndustries/protoc-gen-fieldmask &
     go build -ldflags '-w -s' -o /protoc-gen-fieldmask-out/protoc-gen-fieldmask . && \
     install -Ds /protoc-gen-fieldmask-out/protoc-gen-fieldmask /out/usr/bin/protoc-gen-fieldmask
 
+ARG PROTOC_GEN_GO_GRPC_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/grpc/grpc-go && \
+    curl -sSL https://api.github.com/repos/grpc/grpc-go/tarball/v${PROTOC_GEN_GO_GRPC_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc/grpc-go &&\
+    cd ${GOPATH}/src/github.com/grpc/grpc-go/cmd/protoc-gen-go-grpc && \
+    go build -ldflags '-w -s' -o /golang-protobuf-out/protoc-gen-go-grpc . && \
+    install -Ds /golang-protobuf-out/protoc-gen-go-grpc /out/usr/bin/protoc-gen-go-grpc
+
 ARG PROTOC_GEN_GO_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/golang/protobuf && \
     curl -sSL https://api.github.com/repos/golang/protobuf/tarball/v${PROTOC_GEN_GO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/golang/protobuf &&\
@@ -129,21 +136,29 @@ RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
     install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate && \
     install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
 
+ARG GO_PROTO_VALIDATORS_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    curl -sSL https://api.github.com/repos/mwitkow/go-proto-validators/tarball/v${GO_PROTO_VALIDATORS_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    cd ${GOPATH}/src/github.com/mwitkow/go-proto-validators && \
+    mkdir /go-proto-validators-out && \
+    go build -ldflags '-w -s' -o /go-proto-validators-out ./... && \
+    install -Ds /go-proto-validators-out/protoc-gen-govalidators /out/usr/bin/protoc-gen-govalidators && \
+    install -D ./validator.proto /out/usr/include/github.com/mwitkow/go-proto-validators/validator.proto
+
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     cd ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-grpc-gateway ./protoc-gen-grpc-gateway && \
-    go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-swagger ./protoc-gen-swagger && \
+    go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-openapiv2 ./protoc-gen-openapiv2 && \
     install -Ds /grpc-gateway-out/protoc-gen-grpc-gateway /out/usr/bin/protoc-gen-grpc-gateway && \
-    install -Ds /grpc-gateway-out/protoc-gen-swagger /out/usr/bin/protoc-gen-swagger && \
-    mkdir -p /out/usr/include/protoc-gen-swagger/options && \
-    install -D $(find ./protoc-gen-swagger/options -name '*.proto') -t /out/usr/include/protoc-gen-swagger/options && \
+    install -Ds /grpc-gateway-out/protoc-gen-openapiv2 /out/usr/bin/protoc-gen-openapiv2 && \
+    mkdir -p /out/usr/include/protoc-gen-openapiv2/options && \
+    install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options && \
     mkdir -p /out/usr/include/google/api && \
     install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api && \
     mkdir -p /out/usr/include/google/rpc && \
     install -D $(find ./third_party/googleapis/google/rpc -name '*.proto') -t /out/usr/include/google/rpc
-
 
 FROM rust:${RUST_VERSION}-slim as rust_builder
 RUN apt-get update && apt-get install -y musl-tools curl
