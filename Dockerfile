@@ -145,6 +145,8 @@ RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate && \
     install -Ds /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate && \
     install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
 
+ARG GOOGLE_API_VERSION
+ARG GRPC_GATEWAY_API_DEPS
 ARG GRPC_GATEWAY_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
@@ -155,11 +157,12 @@ RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     install -Ds /grpc-gateway-out/protoc-gen-openapiv2 /out/usr/bin/protoc-gen-openapiv2 && \
     mkdir -p /out/usr/include/protoc-gen-openapiv2/options && \
     install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options && \
+    mkdir -p ./third_party/googleapis/google/api && \
+    for item in ${GRPC_GATEWAY_API_DEPS}; do \
+        curl -sSLo ./third_party/googleapis/google/api/${item} https://raw.githubusercontent.com/googleapis/googleapis/${GOOGLE_API_VERSION}/google/${item}; \
+    done; \
     mkdir -p /out/usr/include/google/api && \
-    install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api && \
-    mkdir -p /out/usr/include/google/rpc && \
-    install -D $(find ./third_party/googleapis/google/rpc -name '*.proto') -t /out/usr/include/google/rpc
-
+    install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api
 
 FROM rust:${RUST_VERSION}-slim as rust_builder
 RUN apt-get update && apt-get install -y musl-tools curl
