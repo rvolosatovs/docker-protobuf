@@ -162,10 +162,8 @@ RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
 
 
 FROM rust:${RUST_VERSION}-alpine as rust_builder
-# RUN apt-get update && apt-get install -y musl-tools curl
 RUN apk add --no-cache curl
 RUN rustup target add x86_64-unknown-linux-musl
-# ENV RUSTFLAGS='-C linker=musl-gcc'
 
 ARG RUST_PROTOBUF_VERSION
 RUN mkdir -p /rust-protobuf && \
