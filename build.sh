@@ -5,7 +5,6 @@ docker build \
 --build-arg DART_VERSION="${DART_VERSION:-"2.10.4"}" \
 --build-arg GOOGLE_API_VERSION="d9b32e92fa57c37e5af0dc03badfe741170c5849" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.15.6"}" \
---build-arg GRPC_GATEWAY_API_DEPS="api/annotations.proto api/field_behavior.proto api/http.proto  api/httpbody.proto" \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"2.3.0"}" \
 --build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.36.0"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.8.2"}" \

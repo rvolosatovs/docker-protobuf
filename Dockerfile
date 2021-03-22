@@ -156,14 +156,16 @@ RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway && \
     install -Ds /grpc-gateway-out/protoc-gen-grpc-gateway /out/usr/bin/protoc-gen-grpc-gateway && \
     install -Ds /grpc-gateway-out/protoc-gen-openapiv2 /out/usr/bin/protoc-gen-openapiv2 && \
     mkdir -p /out/usr/include/protoc-gen-openapiv2/options && \
-    install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options && \
-    mkdir -p ./third_party/googleapis/google/api && \
-    for item in ${GRPC_GATEWAY_API_DEPS}; do \
-        curl -sSLo ./third_party/googleapis/google/api/${item} https://raw.githubusercontent.com/googleapis/googleapis/${GOOGLE_API_VERSION}/google/${item}; \
-    done; \
-    mkdir -p /out/usr/include/google/api && \
-    install -D $(find ./third_party/googleapis/google/api -name '*.proto') -t /out/usr/include/google/api
+    install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options
 
+ARG GOOGLE_API_VERSION
+RUN mkdir -p ${GOPATH}/src/github.com/googleapis/googleapis && \
+    curl -sSL https://api.github.com/repos/googleapis/googleapis/tarball/${GOOGLE_API_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/googleapis/googleapis && \
+    cd ${GOPATH}/src/github.com/googleapis/googleapis && \
+    install -D ./google/api/annotations.proto /out/usr/include/google/api && \
+    install -D ./google/api/field_behavior.proto /out/usr/include/google/api && \
+    install -D ./google/api/http.proto /out/usr/include/google/api && \
+    install -D ./google/api/httpbody.proto /out/usr/include/google/api
 
 
 FROM rust:${RUST_VERSION}-alpine as rust_builder
