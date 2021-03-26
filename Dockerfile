@@ -160,10 +160,10 @@ ARG GOOGLE_API_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/googleapis/googleapis && \
     curl -sSL https://api.github.com/repos/googleapis/googleapis/tarball/${GOOGLE_API_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/googleapis/googleapis && \
     cd ${GOPATH}/src/github.com/googleapis/googleapis && \
-    install -D ./google/api/annotations.proto /out/usr/include/google/api && \
-    install -D ./google/api/field_behavior.proto /out/usr/include/google/api && \
-    install -D ./google/api/http.proto /out/usr/include/google/api && \
-    install -D ./google/api/httpbody.proto /out/usr/include/google/api
+    install -D ./google/api/annotations.proto /out/usr/include/google/api/annotations.proto && \
+    install -D ./google/api/field_behavior.proto /out/usr/include/google/api/field_behavior.proto && \
+    install -D ./google/api/http.proto /out/usr/include/google/api/http.proto && \
+    install -D ./google/api/httpbody.proto /out/usr/include/google/api/httpbody.proto
 
 
 FROM rust:${RUST_VERSION}-alpine as rust_builder
