@@ -8,7 +8,7 @@ docker build \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"2.3.0"}" \
 --build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.36.0"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.8.2"}" \
---build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"0.9.2"}" \
+--build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"1.0.0"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.36.4"}" \
 --build-arg GRPC_WEB_VERSION="${GRPC_WEB_VERSION:-"1.2.1"}" \
 --build-arg NODE_VERSION="${NODE_VERSION:-"14.15.4"}" \
@@ -25,7 +25,7 @@ docker build \
 --build-arg PROTOC_GEN_VALIDATE_VERSION="${PROTOC_GEN_VALIDATE_VERSION:-"0.5.0"}" \
 --build-arg RUST_PROTOBUF_VERSION="${RUST_PROTOBUF_VERSION:-"2.22.1"}" \
 --build-arg RUST_VERSION="${RUST_VERSION:-"1.50.0"}" \
---build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.1.5"}" \
+--build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.2.5"}" \
 --build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.14.0"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
 ${@} .
