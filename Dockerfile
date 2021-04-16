@@ -189,7 +189,7 @@ RUN apt-get update && \
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
     curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
-    cd /grpc-swift && make && \
+    cd /grpc-swift && make && make plugins && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
     install -Ds /grpc-swift/protoc-gen-grpc-swift /protoc-gen-swift/protoc-gen-grpc-swift && \
     cp /lib64/ld-linux-x86-64.so.2 \
