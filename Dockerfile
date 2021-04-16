@@ -189,14 +189,14 @@ RUN apt-get update && \
 ARG GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift && \
     curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
-    cd /grpc-swift && make && \
+    cd /grpc-swift && make && make plugins && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
-    install -Ds /grpc-swift/protoc-gen-swiftgrpc /protoc-gen-swift/protoc-gen-swiftgrpc && \
+    install -Ds /grpc-swift/protoc-gen-grpc-swift /protoc-gen-swift/protoc-gen-grpc-swift && \
     cp /lib64/ld-linux-x86-64.so.2 \
-        $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swiftgrpc | awk '{print $3}' | grep /lib | sort | uniq) \
+        $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
         /protoc-gen-swift/ && \
     find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \; && \
-    for p in protoc-gen-swift protoc-gen-swiftgrpc; do \
+    for p in protoc-gen-swift protoc-gen-grpc-swift; do \
         patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
     done
 
