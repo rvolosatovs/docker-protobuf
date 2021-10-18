@@ -167,11 +167,12 @@ RUN mkdir -p ${GOPATH}/src/github.com/googleapis/googleapis && \
 
 ARG JSONSCHEMA_VERSION
 RUN mkdir -p ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
-    curl -sSL https://api.github.com/repos/chrusty/protoc-gen-jsonschema/tarball/v${JSONSCHEMA_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
+    curl -sSL https://api.github.com/repos/chrusty/protoc-gen-jsonschema/tarball/${JSONSCHEMA_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
     cd ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
     go build -ldflags '-w -s' -o /protoc-gen-jsonschema/protoc-gen-jsonschema . && \
     install -Ds /protoc-gen-jsonschema/protoc-gen-jsonschema /out/usr/bin/protoc-gen-jsonschema && \
     install -D ./options.proto /out/usr/include/github.com/chrusty/protoc-gen-jsonschema/options.proto
+
 
 FROM rust:${RUST_VERSION}-alpine as rust_builder
 RUN apk add --no-cache curl
