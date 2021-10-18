@@ -28,5 +28,5 @@ docker build \
 --build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.2.5"}" \
 --build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.14.0"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
---build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION-"1.3.1"}" \
+--build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.1"}" \
 ${@} .
