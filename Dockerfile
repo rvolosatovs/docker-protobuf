@@ -239,7 +239,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
 
 ARG TS_PROTOC_GEN_VERSION
-LABEL maintainer="Roman Volosatovs <roman@thethingsnetwork.org>"
+LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=packer /out/ /
 RUN npm install -g ts-protoc-gen@${TS_PROTOC_GEN_VERSION} && npm cache clean --force
 RUN apk add --no-cache bash libstdc++ && \

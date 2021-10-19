@@ -1,6 +1,6 @@
 go 1.13
 
-module github.com/TheThingsIndustries/docker-protobuf
+module github.com/rvolosatovs/docker-protobuf
 
 require (
 	github.com/golang/protobuf v1.4.3 // indirect
