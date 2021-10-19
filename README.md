@@ -1,5 +1,7 @@
 ![](https://github.com/rvolosatovs/docker-protobuf/workflows/Docker%20Image/badge.svg)
 
+> NOTE: The repository was moved from `TheThingsIndustries/docker-protobuf` to `rvolosatovs/docker-protobuf`. Built Docker images now reside at `rvolosatovs/protoc` starting at version `3.2.0`.
+
 # Protocol Buffers + Docker
 An all-inclusive `protoc` Docker image.
 It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
