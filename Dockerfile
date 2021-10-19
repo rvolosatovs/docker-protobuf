@@ -25,7 +25,7 @@ RUN git clone --recursive --depth=1 -b v${GRPC_VERSION} https://github.com/grpc/
         ../.. && \
     cmake --build . --target plugins && \
     cmake --build . --target install && \
-    DESTDIR=/out cmake --build . --target install 
+    DESTDIR=/out cmake --build . --target install
 
 ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
