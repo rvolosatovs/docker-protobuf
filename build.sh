@@ -27,4 +27,5 @@ docker build \
 --build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.14.0"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
 --build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.1"}" \
+--build-arg GOTEMPLATE_VERSION="${GOTEMPLATE_VERSION:-"1.11.2"}" \
 ${@} .
