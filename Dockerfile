@@ -233,7 +233,6 @@ RUN upx --lzma $(find /out/usr/bin/ \
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
-
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION}
 
 ARG TS_PROTOC_GEN_VERSION
