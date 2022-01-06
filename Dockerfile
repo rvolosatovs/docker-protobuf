@@ -206,7 +206,6 @@ RUN mkdir -p /dart-protobuf && \
     install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
 
 FROM moul/protoc-gen-gotemplate:v${GOTEMPLATE_VERSION} as protoc_gotemplate
-RUN ls -la /go/bin/protoc-gen-gotemplate
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
