@@ -161,6 +161,7 @@ RUN mkdir -p ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
     install -Ds /protoc-gen-jsonschema/protoc-gen-jsonschema /out/usr/bin/protoc-gen-jsonschema && \
     install -D ./options.proto /out/usr/include/github.com/chrusty/protoc-gen-jsonschema/options.proto
 
+
 FROM rust:${RUST_VERSION}-alpine as rust_builder
 RUN apk add --no-cache curl
 RUN rustup target add x86_64-unknown-linux-musl
