@@ -4,6 +4,7 @@ ARG GO_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
 ARG NODE_VERSION
+ARG GOTEMPLATE_VERSION
 
 FROM alpine:${ALPINE_VERSION} as protoc_builder
 RUN apk add --no-cache build-base curl automake autoconf libtool git zlib-dev linux-headers cmake ninja
@@ -205,6 +206,7 @@ RUN mkdir -p /dart-protobuf && \
     cd /dart-protobuf/protoc_plugin && pub install && dart2native --verbose bin/protoc_plugin.dart -o protoc_plugin && \
     install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
 
+FROM moul/protoc-gen-gotemplate:v${GOTEMPLATE_VERSION} as protoc_gotemplate
 
 FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
@@ -218,6 +220,7 @@ COPY --from=go_builder /out/ /out/
 COPY --from=rust_builder /out/ /out/
 COPY --from=swift_builder /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=dart_builder /out/ /out/
+COPY --from=protoc_gotemplate /go/bin/protoc-gen-gotemplate /out/usr/bin/
 RUN upx --lzma $(find /out/usr/bin/ \
         -type f -name 'grpc_*' \
         -not -name 'grpc_csharp_plugin' \
