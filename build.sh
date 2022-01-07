@@ -5,12 +5,14 @@ docker build \
 --build-arg DART_VERSION="${DART_VERSION:-"2.13.4"}" \
 --build-arg GO_VERSION="${GO_VERSION:-"1.17.5"}" \
 --build-arg GOOGLE_API_VERSION="d9b32e92fa57c37e5af0dc03badfe741170c5849" \
+--build-arg GOTEMPLATE_VERSION="${GOTEMPLATE_VERSION:-"1.11.2"}" \
 --build-arg GRPC_GATEWAY_VERSION="${GRPC_GATEWAY_VERSION:-"2.7.2"}" \
 --build-arg GRPC_JAVA_VERSION="${GRPC_JAVA_VERSION:-"1.43.1"}" \
 --build-arg GRPC_RUST_VERSION="${GRPC_RUST_VERSION:-"0.8.3"}" \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"1.6.1"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.43.0"}" \
 --build-arg GRPC_WEB_VERSION="${GRPC_WEB_VERSION:-"1.3.0"}" \
+--build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.5"}" \
 --build-arg NODE_VERSION="${NODE_VERSION:-"17.3.0"}" \
 --build-arg PROTOBUF_C_VERSION="${PROTOBUF_C_VERSION:-"1.4.0"}" \
 --build-arg PROTOC_GEN_DOC_VERSION="${PROTOC_GEN_DOC_VERSION:-"1.5.0"}" \
@@ -26,6 +28,4 @@ docker build \
 --build-arg SWIFT_VERSION="${SWIFT_VERSION:-"5.5.2"}" \
 --build-arg TS_PROTOC_GEN_VERSION="${TS_PROTOC_GEN_VERSION:-"0.15.0"}" \
 --build-arg UPX_VERSION="${UPX_VERSION:-"3.96"}" \
---build-arg GOTEMPLATE_VERSION="${GOTEMPLATE_VERSION:-"1.11.2"}" \
---build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.5"}" \
 ${@} .
