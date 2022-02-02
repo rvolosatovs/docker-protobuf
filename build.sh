@@ -12,7 +12,7 @@ docker build \
 --build-arg GRPC_SWIFT_VERSION="${GRPC_SWIFT_VERSION:-"1.6.1"}" \
 --build-arg GRPC_VERSION="${GRPC_VERSION:-"1.43.0"}" \
 --build-arg GRPC_WEB_VERSION="${GRPC_WEB_VERSION:-"1.3.0"}" \
---build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.5"}" \
+--build-arg JSONSCHEMA_VERSION="${JSONSCHEMA_VERSION:-"1.3.6"}" \
 --build-arg NODE_VERSION="${NODE_VERSION:-"17.3.0"}" \
 --build-arg PROTOBUF_C_VERSION="${PROTOBUF_C_VERSION:-"1.4.0"}" \
 --build-arg PROTOC_GEN_DOC_VERSION="${PROTOC_GEN_DOC_VERSION:-"1.5.0"}" \
