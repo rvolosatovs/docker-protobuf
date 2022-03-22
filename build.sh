@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+set -a
 
-set -ex
-
+. ./deps.list
 docker buildx build --platform linux/amd64,linux/arm64 \
-$(while IFS= read -r line; do echo "--build-arg $line " | tr -d "\n"; done < <(grep -v '^ *#' < deps.list)) \
-${@} .
+    $(for v in $(cut -d '=' -f 1 < deps.list); do printf "%s " "--build-arg $v=$(printenv ${v})"; done) \
+    ${@} .
