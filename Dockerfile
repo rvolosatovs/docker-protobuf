@@ -201,24 +201,31 @@ RUN apt-get update && \
 
 ARG GRPC_SWIFT_VERSION
 ARG TARGETARCH
-RUN case ${TARGETARCH} in \
-         "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-linux-x86-64.so.2  ;; \
-         "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-linux-aarch64.so.1 ;; \
-         *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
+RUN mkdir -p /grpc-swift && \
+    # Skip arm64 build due to https://forums.swift.org/t/build-crash-when-building-in-qemu-using-new-swift-5-6-arm64-image/56090/
+    # TODO: Remove this conditional once fixed
+    if [ "${TARGETARCH}" = "arm64" ] ; \
+    then \
+      echo "Skipping arm64 build due to error in Swift toolchain" && \
+      mkdir -p /protoc-gen-swift && \
+      return 0; \
+    fi; \
+    case ${TARGETARCH} in \
+      "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-linux-x86-64.so.2  ;; \
+      "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-linux-aarch64.so.1 ;; \
+      *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
     esac && \
-    mkdir -p /grpc-swift && \
     curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
     cd /grpc-swift && make && make plugins && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
     install -Ds /grpc-swift/protoc-gen-grpc-swift /protoc-gen-swift/protoc-gen-grpc-swift && \
     cp ${SWIFT_LIB_DIR}/${SWIFT_LINKER} \
-        $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
-        /protoc-gen-swift/ && \
+      $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
+      /protoc-gen-swift/ && \
     find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \; && \
     for p in protoc-gen-swift protoc-gen-grpc-swift; do \
-        patchelf --set-interpreter /protoc-gen-swift/${SWIFT_LINKER} /protoc-gen-swift/${p}; \
+      patchelf --set-interpreter /protoc-gen-swift/${SWIFT_LINKER} /protoc-gen-swift/${p}; \
     done
-
 
 FROM dart:${DART_VERSION} as dart_builder
 RUN apt-get update && apt-get install -y musl-tools curl
@@ -270,7 +277,8 @@ RUN apk add --no-cache bash libstdc++ && \
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
     wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk && \
     apk add glibc-2.31-r0.apk && \
-    for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swiftgrpc /usr/bin/protoc-gen-swiftgrpc; fi && \
     ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
