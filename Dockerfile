@@ -32,8 +32,8 @@ ARG PROTOBUF_C_VERSION
 RUN mkdir -p /protobuf-c && \
     curl -sSL https://api.github.com/repos/protobuf-c/protobuf-c/tarball/v${PROTOBUF_C_VERSION} | tar xz --strip 1 -C /protobuf-c && \
     cd /protobuf-c && \
-    export LD_LIBRARY_PATH=/usr/lib:/usr/lib64 && \
-    export PKG_CONFIG_PATH=/usr/lib64/pkgconfig && \
+    export LD_LIBRARY_PATH=/usr/lib && \
+    export PKG_CONFIG_PATH=/usr/lib/pkgconfig && \
     ./autogen.sh && \
     ./configure --prefix=/usr && \
     make && make install DESTDIR=/out
@@ -45,7 +45,7 @@ RUN mkdir -p /grpc-java && \
     g++ \
         -I. -I/usr/include \
         compiler/src/java_plugin/cpp/*.cpp \
-        -L/usr/lib64 \
+        -L/usr/lib \
         -lprotoc -lprotobuf -lpthread --std=c++0x -s \
         -o protoc-gen-grpc-java && \
     install -Ds protoc-gen-grpc-java /out/usr/bin/protoc-gen-grpc-java
@@ -117,11 +117,12 @@ RUN mkdir -p ${GOPATH}/src/github.com/danielvladco/go-proto-gql && \
     install -Ds /go-proto-gql-out/protoc-gen-gogql /out/usr/bin/protoc-gen-gogql
 
 ARG PROTOC_GEN_LINT_VERSION
+ARG TARGETARCH
 RUN cd / && \
-    curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_amd64.zip && \
+    curl -sSLO https://github.com/ckaznocha/protoc-gen-lint/releases/download/v${PROTOC_GEN_LINT_VERSION}/protoc-gen-lint_linux_${TARGETARCH}.zip && \
     mkdir -p /protoc-gen-lint-out && \
     cd /protoc-gen-lint-out && \
-    unzip -q /protoc-gen-lint_linux_amd64.zip && \
+    unzip -q /protoc-gen-lint_linux_${TARGETARCH}.zip && \
     install -Ds /protoc-gen-lint-out/protoc-gen-lint /out/usr/bin/protoc-gen-lint
 
 ARG PROTOC_GEN_VALIDATE_VERSION
@@ -163,47 +164,76 @@ RUN mkdir -p ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema && \
 
 
 FROM rust:${RUST_VERSION}-alpine as rust_builder
+ARG TARGETARCH
 RUN apk add --no-cache curl
-RUN rustup target add x86_64-unknown-linux-musl
+RUN case ${TARGETARCH} in \
+         "amd64")  RUST_TARGET=x86_64-unknown-linux-musl  ;; \
+         "arm64")  RUST_TARGET=aarch64-unknown-linux-musl ;; \
+         *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
+    esac && \
+    rustup target add ${RUST_TARGET}
 
 ARG RUST_PROTOBUF_VERSION
-RUN mkdir -p /rust-protobuf && \
+RUN case ${TARGETARCH} in \
+         "amd64")  RUST_TARGET=x86_64-unknown-linux-musl  ;; \
+         "arm64")  RUST_TARGET=aarch64-unknown-linux-musl ;; \
+         *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
+    esac && \
+    mkdir -p /rust-protobuf && \
     curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${RUST_PROTOBUF_VERSION} | tar xz --strip 1 -C /rust-protobuf && \
-    cd /rust-protobuf/protobuf-codegen && cargo build --target=x86_64-unknown-linux-musl --release && \
-    install -Ds /rust-protobuf/target/x86_64-unknown-linux-musl/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
+    cd /rust-protobuf/protobuf-codegen && cargo build --target=${RUST_TARGET} --release && \
+    install -Ds /rust-protobuf/target/${RUST_TARGET}/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 
 ARG GRPC_RUST_VERSION
-RUN mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust && \
-    cd /grpc-rust/grpc-compiler && cargo build --target=x86_64-unknown-linux-musl --release && \
-    install -Ds /grpc-rust/target/x86_64-unknown-linux-musl/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
+RUN case ${TARGETARCH} in \
+         "amd64")  RUST_TARGET=x86_64-unknown-linux-musl  ;; \
+         "arm64")  RUST_TARGET=aarch64-unknown-linux-musl ;; \
+         *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
+    esac && \
+    mkdir -p /grpc-rust && curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust && \
+    cd /grpc-rust/grpc-compiler && cargo build --target=${RUST_TARGET} --release && \
+    install -Ds /grpc-rust/target/${RUST_TARGET}/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 
 
 FROM swift:${SWIFT_VERSION} as swift_builder
 RUN apt-get update && \
-    apt-get install -y unzip patchelf libnghttp2-dev curl libssl-dev zlib1g-dev
+    apt-get install -y unzip patchelf libnghttp2-dev curl libssl-dev zlib1g-dev build-essential
 
 ARG GRPC_SWIFT_VERSION
+ARG TARGETARCH
 RUN mkdir -p /grpc-swift && \
+    # Skip arm64 build due to https://forums.swift.org/t/build-crash-when-building-in-qemu-using-new-swift-5-6-arm64-image/56090/
+    # TODO: Remove this conditional once fixed
+    if [ "${TARGETARCH}" = "arm64" ] ; \
+    then \
+      echo "Skipping arm64 build due to error in Swift toolchain" && \
+      mkdir -p /protoc-gen-swift && \
+      return 0; \
+    fi; \
+    case ${TARGETARCH} in \
+      "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-linux-x86-64.so.2  ;; \
+      "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-linux-aarch64.so.1 ;; \
+      *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;; \
+    esac && \
     curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift && \
     cd /grpc-swift && make && make plugins && \
     install -Ds /grpc-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift && \
     install -Ds /grpc-swift/protoc-gen-grpc-swift /protoc-gen-swift/protoc-gen-grpc-swift && \
-    cp /lib64/ld-linux-x86-64.so.2 \
-        $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
-        /protoc-gen-swift/ && \
+    cp ${SWIFT_LIB_DIR}/${SWIFT_LINKER} \
+      $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
+      /protoc-gen-swift/ && \
     find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \; && \
     for p in protoc-gen-swift protoc-gen-grpc-swift; do \
-        patchelf --set-interpreter /protoc-gen-swift/ld-linux-x86-64.so.2 /protoc-gen-swift/${p}; \
+      patchelf --set-interpreter /protoc-gen-swift/${SWIFT_LINKER} /protoc-gen-swift/${p}; \
     done
 
-
-FROM google/dart:${DART_VERSION} as dart_builder
+FROM dart:${DART_VERSION} as dart_builder
 RUN apt-get update && apt-get install -y musl-tools curl
 
 ARG DART_PROTOBUF_VERSION
 RUN mkdir -p /dart-protobuf && \
     curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protobuf-v${DART_PROTOBUF_VERSION} | tar xz --strip 1 -C /dart-protobuf && \
-    cd /dart-protobuf/protoc_plugin && pub install && dart2native --verbose bin/protoc_plugin.dart -o protoc_plugin && \
+    cd /dart-protobuf/protoc_plugin && pub install && dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin && \
     install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
 
 FROM moul/protoc-gen-gotemplate:v${GOTEMPLATE_VERSION} as protoc_gotemplate
@@ -212,7 +242,8 @@ FROM alpine:${ALPINE_VERSION} as packer
 RUN apk add --no-cache curl
 
 ARG UPX_VERSION
-RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-amd64_linux.tar.xz | tar xJ --strip 1 -C /upx && \
+ARG TARGETARCH
+RUN mkdir -p /upx && curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${TARGETARCH}_linux.tar.xz | tar xJ --strip 1 -C /upx && \
     install -D /upx/upx /usr/local/bin/upx
 
 COPY --from=protoc_builder /out/ /out/
@@ -228,8 +259,10 @@ RUN upx --lzma $(find /out/usr/bin/ \
         -not -name 'grpc_php_plugin' \
         -not -name 'grpc_ruby_plugin' \
         -not -name 'grpc_python_plugin' \
+        -not -name 'grpc_objective_c_plugin' \
         -or -name 'protoc-gen-*' \
         -not -name 'protoc-gen-dart' \
+        -not -name 'protoc-gen-grpc-java' \
     )
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
@@ -244,7 +277,8 @@ RUN apk add --no-cache bash libstdc++ && \
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
     wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk && \
     apk add glibc-2.31-r0.apk && \
-    for p in protoc-gen-swift protoc-gen-swiftgrpc; do ln -s /protoc-gen-swift/${p} /usr/bin/${p}; done && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swiftgrpc /usr/bin/protoc-gen-swiftgrpc; fi && \
     ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
