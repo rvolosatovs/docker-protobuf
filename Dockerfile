@@ -277,16 +277,16 @@ RUN apk add --no-cache bash libstdc++ && \
     wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
     wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.31-r0/glibc-2.31-r0.apk && \
     apk add glibc-2.31-r0.apk && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift; fi && \
     if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi && \
-    if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swiftgrpc /usr/bin/protoc-gen-swiftgrpc; fi && \
     ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
-    ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
+    ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
     ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
-    ln -s /usr/bin/protoc-gen-swiftgrpc /usr/bin/protoc-gen-grpc-swift && \
+    ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust && \
     ln -s /usr/local/lib/node_modules/ts-protoc-gen/bin/protoc-gen-ts /usr/bin/protoc-gen-ts
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 ENV LD_LIBRARY_PATH='/usr/lib:/usr/lib64:/usr/lib/local'
