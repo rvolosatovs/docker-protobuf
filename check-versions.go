@@ -44,15 +44,11 @@ func main() {
 	for _, repo := range []struct {
 		owner, name string
 	}{
-		{"google", "protobuf.dart"},
 		{"golang", "go"},
 		{"grpc-ecosystem", "grpc-gateway"},
-		{"grpc", "grpc-java"},
 		{"stepancheg", "grpc-rust"},
 		{"grpc", "grpc-swift"},
-		{"grpc", "grpc"},
 		{"grpc", "grpc-web"},
-		{"protobuf-c", "protobuf-c"},
 		{"pseudomuto", "protoc-gen-doc"},
 		{"grpc", "grpc-go"},
 		{"protocolbuffers", "protobuf-go"},
