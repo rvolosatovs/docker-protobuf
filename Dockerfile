@@ -309,7 +309,6 @@ COPY --from=grpc_swift /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=grpc_gateway /out/ /out/
 COPY --from=grpc_rust /out/ /out/
 COPY --from=grpc_web /out/ /out/
-COPY --from=protoc_gen_dart /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
@@ -320,26 +319,26 @@ COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
-COPY --from=protoc_gen_ts /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 RUN upx --lzma $(find /out/usr/bin/ \
         -type f -name 'grpc_*' \
         -or -name 'protoc-gen-*' \
-        -not -name 'protoc-gen-dart' \
-        -not -name 'protoc-gen-ts' \
     )
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
 FROM alpine:${ALPINE_VERSION}
-
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
+COPY --from=protoc_gen_dart /runtime/ /
+COPY --from=protoc_gen_dart /out/ /out/
+COPY --from=protoc_gen_ts /out/ /out/
 RUN apk add --no-cache \
         bash\
         gcompat \
         grpc \
         libstdc++ \
+        nodejs \
         protobuf \
         protobuf-c-compiler
 ARG TARGETARCH
