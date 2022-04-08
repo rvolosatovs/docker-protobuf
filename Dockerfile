@@ -10,19 +10,6 @@ ARG PROTOC_GEN_GOTEMPLATE_VERSION
 FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
 
 
-FROM alpine:${ALPINE_VERSION} as grpc_web
-RUN apk add --no-cache \
-        build-base \
-        curl \
-        protobuf-dev
-RUN mkdir -p /grpc-web
-ARG GRPC_WEB_VERSION
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
-WORKDIR /grpc-web
-RUN make -j$(nproc) install-plugin
-RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
-
-
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as go_host
 COPY --from=xx / /
 WORKDIR /
@@ -170,7 +157,20 @@ RUN install -D ./options.proto /out/usr/include/github.com/chrusty/protoc-gen-js
 RUN xx-verify /out/usr/bin/protoc-gen-jsonschema
 
 
-FROM rust:${RUST_VERSION}-alpine as rust_target
+FROM alpine:${ALPINE_VERSION} as grpc_web
+RUN apk add --no-cache \
+        build-base \
+        curl \
+        protobuf-dev
+RUN mkdir -p /grpc-web
+ARG GRPC_WEB_VERSION
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
+WORKDIR /grpc-web
+RUN make -j$(nproc) install-plugin
+RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
+
+
+FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as rust_target
 COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
@@ -242,23 +242,6 @@ RUN <<EOF
 EOF
 
 
-FROM dart:${DART_VERSION} as protoc_gen_dart
-RUN apt-get update
-RUN apt-get install -y \
-        binutils
-ARG TARGETARCH
-RUN <<EOF
-    mkdir -p /out
-    # TODO: Remove this conditional once fixed
-    if [ "${TARGETARCH}" = "arm64" ]; then
-      echo "Skipping arm64 build due to error in plugin installation"
-      exit 0
-    fi
-    dart pub global activate protoc_plugin
-    install -D ${HOME}/.pub-cache/bin/protoc-gen-dart /out/usr/bin/protoc-gen-dart
-EOF
-
-
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} as alpine_host
 COPY --from=xx / /
 WORKDIR /
@@ -290,10 +273,27 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
+FROM dart:${DART_VERSION} as protoc_gen_dart
+RUN apt-get update
+RUN apt-get install -y curl
+RUN mkdir -p /dart-protobuf
+ARG PROTOC_GEN_DART_VERSION
+RUN curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-v${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
+WORKDIR /dart-protobuf/protoc_plugin 
+RUN pub install
+RUN dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin
+RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
+
+
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} as protoc_gen_ts
 ARG PROTOC_GEN_TS_VERSION
-RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
-RUN install -D /usr/local/lib/node_modules/ts-protoc-gen/bin/protoc-gen-ts /out/usr/bin/protoc-gen-ts
+RUN npm install -g pkg ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
+RUN pkg \
+        --compress Brotli \
+        --targets node${NODE_VERSION}-alpine \
+        -o protoc-gen-ts \
+        /usr/local/lib/node_modules/ts-protoc-gen
+RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
 
 
 FROM moul/protoc-gen-gotemplate:v${PROTOC_GEN_GOTEMPLATE_VERSION} as protoc_gen_gotemplate
@@ -330,15 +330,13 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
-COPY --from=protoc_gen_dart /runtime/ /
-COPY --from=protoc_gen_dart /out/ /out/
-COPY --from=protoc_gen_ts /out/ /out/
+COPY --from=protoc_gen_dart /out/ /
+COPY --from=protoc_gen_ts /out/ /
 RUN apk add --no-cache \
         bash\
         gcompat \
         grpc \
         libstdc++ \
-        nodejs \
         protobuf \
         protobuf-c-compiler
 ARG TARGETARCH
