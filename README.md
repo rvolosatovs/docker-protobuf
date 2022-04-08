@@ -9,7 +9,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 ## What's included:
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
-- [dart-lang/protobuf](https://github.com/dart-lang/protobuf) (not on `arm64`)
+- [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
 - [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [gogo/protobuf](https://github.com/gogo/protobuf)
