@@ -362,7 +362,7 @@ RUN protoc-wrapper \
         --c_out=/test \
         #--dart_out=/test \
         --go_out=/test \
-        #--gotemplate_out=/test \
+        --gotemplate_out=/test \
         --govalidators_out=/test \
         --gql_out=/test \
         --grpc-cpp_out=/test \
