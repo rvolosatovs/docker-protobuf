@@ -302,8 +302,8 @@ FROM moul/protoc-gen-gotemplate:v${PROTOC_GEN_GOTEMPLATE_VERSION} as protoc_gen_
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx 
 ARG BUILDARCH BUILDOS UPX_VERSION
-RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx
-RUN install -D /upx/upx /usr/local/bin/upx
+RUN if ! [ "${TARGETARCH}" = "arm64" ]; then curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx; fi
+RUN if ! [ "${TARGETARCH}" = "arm64" ]; then install -D /upx/upx /usr/local/bin/upx; fi
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_swift /protoc-gen-swift /out/protoc-gen-swift
 COPY --from=grpc_gateway /out/ /out/
@@ -320,10 +320,15 @@ COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
-RUN upx --lzma $(find /out/usr/bin/ \
-        -type f -name 'grpc_*' \
-        -or -name 'protoc-gen-*' \
-    )
+ARG TARGETARCH
+RUN <<EOF
+    if ! [ "${TARGETARCH}" = "arm64" ]; then
+        upx --lzma $(find /out/usr/bin/ -type f \
+            -name 'protoc-gen-*' -or \
+            -name 'grpc_*' \
+        )
+    fi
+EOF
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
@@ -334,13 +339,14 @@ COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_ts /out/ /
 RUN apk add --no-cache \
         bash\
-        gcompat \
         grpc \
-        libstdc++ \
         protobuf \
+        protobuf-dev \
         protobuf-c-compiler
-ARG TARGETARCH
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then apk add --no-cache grpc-java; fi
+RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk
+RUN apk add glibc-2.35-r0.apk
+RUN rm -f glibc-2.35-r0.apk
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
@@ -348,9 +354,53 @@ RUN ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc
 RUN ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php
 RUN ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python
 RUN ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby
+RUN ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go
 RUN ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
+COPY protoc-wrapper /usr/bin/protoc-wrapper
+RUN mkdir -p /test
+RUN protoc-wrapper \
+        --c_out=/test \
+        #--dart_out=/test \
+        --go_out=/test \
+        #--gotemplate_out=/test \
+        --govalidators_out=/test \
+        --gql_out=/test \
+        --grpc-cpp_out=/test \
+        --grpc-csharp_out=/test \
+        --grpc-go_out=/test \
+        --grpc-js_out=/test \
+        --grpc-objc_out=/test \
+        --grpc-php_out=/test \
+        --grpc-python_out=/test \
+        --grpc-ruby_out=/test \
+        --grpc-rust_out=/test \
+        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
+        --js_out=import_style=commonjs:/test \
+        --jsonschema_out=/test \
+        --lint_out=/test \
+        --php_out=/test \
+        --python_out=/test \
+        --ruby_out=/test \
+        --rust_out=/test \
+        --ts_out=/test \
+        --validate_out=lang=go:/test \
+        google/protobuf/any.proto
+RUN protoc-wrapper \
+        --gogo_out=/test \
+        google/protobuf/any.proto
+ARG TARGETARCH
+RUN if ! [ "${TARGETARCH}" = "arm64" ]; then apk add --no-cache grpc-java; fi
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift; fi
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi
-COPY protoc-wrapper /usr/bin/protoc-wrapper
-ENV LD_LIBRARY_PATH='/usr/lib:/usr/lib64:/usr/lib/local'
+RUN <<EOF
+    if ! [ "${TARGETARCH}" = "arm64" ]; then
+        protoc-wrapper \
+            --java_out=/test \
+            --grpc-java_out=/test \
+            --grpc-swift_out=/test \
+            --swift_out=/test \
+            google/protobuf/any.proto
+    fi
+EOF
+RUN rm -rf /test
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
