@@ -4,7 +4,6 @@ ARG GO_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
 ARG NODE_VERSION
-ARG PROTOC_GEN_GOTEMPLATE_VERSION
 
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
@@ -17,6 +16,24 @@ RUN mkdir -p /out
 RUN apk add --no-cache \
         build-base \
         curl
+
+
+FROM --platform=$BUILDPLATFORM go_host as grpc_gateway
+RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
+ARG GRPC_GATEWAY_VERSION
+RUN curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
+WORKDIR ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-grpc-gateway ./protoc-gen-grpc-gateway
+RUN go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-openapiv2 ./protoc-gen-openapiv2
+RUN install -D /grpc-gateway-out/protoc-gen-grpc-gateway /out/usr/bin/protoc-gen-grpc-gateway
+RUN install -D /grpc-gateway-out/protoc-gen-openapiv2 /out/usr/bin/protoc-gen-openapiv2
+RUN mkdir -p /out/usr/include/protoc-gen-openapiv2/options
+RUN install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options
+RUN xx-verify /out/usr/bin/protoc-gen-grpc-gateway
+RUN xx-verify /out/usr/bin/protoc-gen-openapiv2
 
 
 FROM --platform=$BUILDPLATFORM go_host as protoc_gen_doc
@@ -80,6 +97,19 @@ RUN install -D ./gogoproto/gogo.proto /out/usr/include/github.com/gogo/protobuf/
 RUN xx-verify /out/usr/bin/protoc-gen-gogo
 
 
+FROM --platform=$BUILDPLATFORM go_host as protoc_gen_gotemplate
+RUN mkdir -p ${GOPATH}/src/github.com/moul/protoc-gen-gotemplate
+ARG PROTOC_GEN_GOTEMPLATE_VERSION
+RUN curl -sSL https://api.github.com/repos/moul/protoc-gen-gotemplate/tarball/v${PROTOC_GEN_GOTEMPLATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/moul/protoc-gen-gotemplate
+WORKDIR ${GOPATH}/src/github.com/moul/protoc-gen-gotemplate
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /protoc-gen-gotemplate-out/protoc-gen-gotemplate .
+RUN install -D /protoc-gen-gotemplate-out/protoc-gen-gotemplate /out/usr/bin/protoc-gen-gotemplate
+RUN xx-verify /out/usr/bin/protoc-gen-gotemplate
+
+
 FROM --platform=$BUILDPLATFORM go_host as protoc_gen_govalidators
 RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators
 ARG PROTOC_GEN_GOVALIDATORS_VERSION
@@ -123,24 +153,6 @@ RUN go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate .
 RUN install -D /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate
 RUN install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
 RUN xx-verify /out/usr/bin/protoc-gen-validate
-
-
-FROM --platform=$BUILDPLATFORM go_host as grpc_gateway
-RUN mkdir -p ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
-ARG GRPC_GATEWAY_VERSION
-RUN curl -sSL https://api.github.com/repos/grpc-ecosystem/grpc-gateway/tarball/v${GRPC_GATEWAY_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
-WORKDIR ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway
-RUN go mod download
-ARG TARGETPLATFORM
-RUN xx-go --wrap
-RUN go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-grpc-gateway ./protoc-gen-grpc-gateway
-RUN go build -ldflags '-w -s' -o /grpc-gateway-out/protoc-gen-openapiv2 ./protoc-gen-openapiv2
-RUN install -D /grpc-gateway-out/protoc-gen-grpc-gateway /out/usr/bin/protoc-gen-grpc-gateway
-RUN install -D /grpc-gateway-out/protoc-gen-openapiv2 /out/usr/bin/protoc-gen-openapiv2
-RUN mkdir -p /out/usr/include/protoc-gen-openapiv2/options
-RUN install -D $(find ./protoc-gen-openapiv2/options -name '*.proto') -t /out/usr/include/protoc-gen-openapiv2/options
-RUN xx-verify /out/usr/bin/protoc-gen-grpc-gateway
-RUN xx-verify /out/usr/bin/protoc-gen-openapiv2
 
 
 FROM --platform=$BUILDPLATFORM go_host as protoc_gen_jsonschema
@@ -296,9 +308,6 @@ RUN pkg \
 RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
 
 
-FROM moul/protoc-gen-gotemplate:v${PROTOC_GEN_GOTEMPLATE_VERSION} as protoc_gen_gotemplate
-
-
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx 
 ARG BUILDARCH BUILDOS UPX_VERSION
@@ -313,7 +322,7 @@ COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
 COPY --from=protoc_gen_gogo /out/ /out/
-COPY --from=protoc_gen_gotemplate /go/bin/protoc-gen-gotemplate /out/usr/bin/
+COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
