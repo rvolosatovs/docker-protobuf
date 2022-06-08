@@ -29,6 +29,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [stepancheg/rust-protobuf](https://github.com/stepancheg/rust-protobuf)
 - [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
 - [moul/protoc-gen-gotemplate](https://github.com/moul/protoc-gen-gotemplate)
+- [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
 
 ## Supported languages
 - C
