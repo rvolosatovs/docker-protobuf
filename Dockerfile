@@ -112,6 +112,22 @@ RUN install -D /protoc-gen-gotemplate-out/protoc-gen-gotemplate /out/usr/bin/pro
 RUN xx-verify /out/usr/bin/protoc-gen-gotemplate
 
 
+FROM --platform=$BUILDPLATFORM go_host as protoc_gen_gorm
+RUN mkdir -p ${GOPATH}/src/github.com/infobloxopen/protoc-gen-gorm
+ARG PROTOC_GEN_GORM_VERSION
+RUN curl -sSL https://api.github.com/repos/infobloxopen/protoc-gen-gorm/tarball/v${PROTOC_GEN_GORM_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/infobloxopen/protoc-gen-gorm
+WORKDIR ${GOPATH}/src/github.com/infobloxopen/protoc-gen-gorm
+RUN mkdir /protoc-gen-gorm-out
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /protoc-gen-gorm-out ./...
+RUN install -D /protoc-gen-gorm-out/protoc-gen-gorm /out/usr/bin/protoc-gen-gorm
+RUN install -D ./proto/options/gorm.proto /out/usr/include/github.com/infobloxopen/protoc-gen-gorm/options/gorm.proto
+RUN install -D ./proto/types/types.proto /out/usr/include/github.com/infobloxopen/protoc-gen-gorm/types/types.proto
+RUN xx-verify /out/usr/bin/protoc-gen-gorm
+
+
 FROM --platform=$BUILDPLATFORM go_host as protoc_gen_govalidators
 RUN mkdir -p ${GOPATH}/src/github.com/mwitkow/go-proto-validators
 ARG PROTOC_GEN_GOVALIDATORS_VERSION
@@ -335,6 +351,7 @@ COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
 COPY --from=protoc_gen_gogo /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
+COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
@@ -382,6 +399,7 @@ RUN protoc-wrapper \
         --dart_out=/test \
         --go_out=/test \
         --gotemplate_out=/test \
+        --gorm_out=/test \
         --govalidators_out=/test \
         --gql_out=/test \
         --grpc-cpp_out=/test \
