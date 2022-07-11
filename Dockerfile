@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.4
 
 ARG ALPINE_VERSION
+ARG DART_VERSION
 ARG GO_VERSION
 ARG NODE_VERSION
 ARG RUST_VERSION
@@ -307,6 +308,18 @@ RUN pkg \
 RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
 
 
+FROM dart:${DART_VERSION} as protoc_gen_dart
+RUN apt-get update
+RUN apt-get install -y curl
+RUN mkdir -p /dart-protobuf
+ARG PROTOC_GEN_DART_VERSION
+RUN curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-v${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
+WORKDIR /dart-protobuf/protoc_plugin 
+RUN pub install
+RUN dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin
+RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
+
+
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx
 ARG BUILDARCH BUILDOS UPX_VERSION
@@ -344,6 +357,7 @@ FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
+COPY --from=protoc_gen_dart /out/ /
 RUN apk add --no-cache \
         bash\
         grpc \
@@ -368,6 +382,7 @@ COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test
 RUN protoc-wrapper \
         --c_out=/test \
+        --dart_out=/test \
         --go_out=/test \
         --gotemplate_out=/test \
         --govalidators_out=/test \

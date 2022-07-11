@@ -10,6 +10,8 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
 - [bufbuild/protoc-gen-validate](https://github.com/bufbuild/protoc-gen-validate)
+- [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
+- [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [gogo/protobuf](https://github.com/gogo/protobuf)
 - [golang/protobuf](https://github.com/protocolbuffers/protobuf-go)
@@ -32,6 +34,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - C
 - C#
 - C++
+- Dart
 - Go
 - Java / JavaNano (Android)
 - JavaScript
