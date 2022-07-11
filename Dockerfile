@@ -284,6 +284,17 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} as protoc_gen_ts
+ARG PROTOC_GEN_TS_VERSION
+RUN npm install -g pkg ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
+RUN pkg \
+        --compress Brotli \
+        --targets node${NODE_VERSION}-alpine \
+        -o protoc-gen-ts \
+        /usr/local/lib/node_modules/ts-protoc-gen
+RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
+
+
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx 
 ARG BUILDARCH BUILDOS UPX_VERSION
@@ -320,6 +331,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
+COPY --from=protoc_gen_ts /out/ /
 RUN apk add --no-cache \
         bash\
         grpc \
@@ -364,6 +376,7 @@ RUN protoc-wrapper \
         --python_out=/test \
         --ruby_out=/test \
         --rust_out=/test \
+        --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
 RUN protoc-wrapper \
