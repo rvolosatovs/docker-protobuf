@@ -1,5 +1,4 @@
 ARG ALPINE_VERSION
-ARG DART_VERSION
 ARG GO_VERSION
 ARG RUST_VERSION
 ARG SWIFT_VERSION
@@ -285,29 +284,6 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
-FROM dart:${DART_VERSION} as protoc_gen_dart
-RUN apt-get update
-RUN apt-get install -y curl
-RUN mkdir -p /dart-protobuf
-ARG PROTOC_GEN_DART_VERSION
-RUN curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-v${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
-WORKDIR /dart-protobuf/protoc_plugin 
-RUN pub install
-RUN dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin
-RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
-
-
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} as protoc_gen_ts
-ARG PROTOC_GEN_TS_VERSION
-RUN npm install -g pkg ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
-RUN pkg \
-        --compress Brotli \
-        --targets node${NODE_VERSION}-alpine \
-        -o protoc-gen-ts \
-        /usr/local/lib/node_modules/ts-protoc-gen
-RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
-
-
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx 
 ARG BUILDARCH BUILDOS UPX_VERSION
@@ -344,8 +320,6 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
-COPY --from=protoc_gen_dart /out/ /
-COPY --from=protoc_gen_ts /out/ /
 RUN apk add --no-cache \
         bash\
         grpc \
@@ -369,7 +343,6 @@ COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test
 RUN protoc-wrapper \
         --c_out=/test \
-        #--dart_out=/test \
         --go_out=/test \
         --gotemplate_out=/test \
         --govalidators_out=/test \
@@ -391,7 +364,6 @@ RUN protoc-wrapper \
         --python_out=/test \
         --ruby_out=/test \
         --rust_out=/test \
-        --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
 RUN protoc-wrapper \
