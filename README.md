@@ -20,7 +20,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [grpc/grpc-java](https://github.com/grpc/grpc-java) (not on `arm64`)
 - [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, see https://github.com/rvolosatovs/docker-protobuf/issues/77 for potential issues)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
-- [improbable-eng/ts-protoc-gen](https://github.com/improbable-eng/ts-protoc-gen)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
@@ -41,7 +40,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - Ruby
 - Rust
 - Swift
-- Typescript
 
 ## Usage
 ```
