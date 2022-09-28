@@ -9,7 +9,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 ## What's included:
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
-- [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
 - [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [gogo/protobuf](https://github.com/gogo/protobuf)
@@ -21,7 +20,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [grpc/grpc-java](https://github.com/grpc/grpc-java) (not on `arm64`)
 - [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, see https://github.com/rvolosatovs/docker-protobuf/issues/77 for potential issues)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
-- [improbable-eng/ts-protoc-gen](https://github.com/improbable-eng/ts-protoc-gen)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
@@ -33,7 +31,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - C
 - C#
 - C++
-- Dart
 - Go
 - Java / JavaNano (Android)
 - JavaScript
@@ -43,7 +40,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - Ruby
 - Rust
 - Swift
-- Typescript
 
 ## Usage
 ```
