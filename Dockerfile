@@ -323,6 +323,7 @@ COPY --from=upx /out/ /
 RUN apk add --no-cache \
         bash\
         grpc \
+        grpc-java \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler
@@ -350,6 +351,7 @@ RUN protoc-wrapper \
         --grpc-cpp_out=/test \
         --grpc-csharp_out=/test \
         --grpc-go_out=/test \
+        --grpc-java_out=/test \
         --grpc-js_out=/test \
         --grpc-objc_out=/test \
         --grpc-php_out=/test \
@@ -357,6 +359,7 @@ RUN protoc-wrapper \
         --grpc-ruby_out=/test \
         --grpc-rust_out=/test \
         --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
+        --java_out=/test \
         --js_out=import_style=commonjs:/test \
         --jsonschema_out=/test \
         --lint_out=/test \
@@ -370,14 +373,11 @@ RUN protoc-wrapper \
         --gogo_out=/test \
         google/protobuf/any.proto
 ARG TARGETARCH
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then apk add --no-cache grpc-java; fi
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift; fi
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi
 RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then
         protoc-wrapper \
-            --java_out=/test \
-            --grpc-java_out=/test \
             --grpc-swift_out=/test \
             --swift_out=/test \
             google/protobuf/any.proto
