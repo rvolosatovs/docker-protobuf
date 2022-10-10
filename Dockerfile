@@ -142,15 +142,15 @@ RUN xx-verify /out/usr/bin/protoc-gen-gogql
 
 FROM --platform=$BUILDPLATFORM go_host as protoc_gen_validate
 ARG PROTOC_GEN_VALIDATE_VERSION
-RUN mkdir -p ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate
-RUN curl -sSL https://api.github.com/repos/envoyproxy/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate
-WORKDIR ${GOPATH}/src/github.com/envoyproxy/protoc-gen-validate
+RUN mkdir -p ${GOPATH}/src/github.com/bufbuild/protoc-gen-validate
+RUN curl -sSL https://api.github.com/repos/bufbuild/protoc-gen-validate/tarball/v${PROTOC_GEN_VALIDATE_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/bufbuild/protoc-gen-validate
+WORKDIR ${GOPATH}/src/github.com/bufbuild/protoc-gen-validate
 RUN go mod download
 ARG TARGETPLATFORM
 RUN xx-go --wrap
 RUN go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate .
 RUN install -D /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate
-RUN install -D ./validate/validate.proto /out/usr/include/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto
+RUN install -D ./validate/validate.proto /out/usr/include/github.com/bufbuild/protoc-gen-validate/validate/validate.proto
 RUN xx-verify /out/usr/bin/protoc-gen-validate
 
 
