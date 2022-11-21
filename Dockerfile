@@ -328,7 +328,7 @@ RUN apk add --no-cache \
         protobuf-c-compiler
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
 RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk
-RUN apk add glibc-2.35-r0.apk
+RUN apk add --force-overwrite glibc-2.35-r0.apk
 RUN rm -f glibc-2.35-r0.apk
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
