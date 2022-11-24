@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.4
+
 ARG ALPINE_VERSION
 ARG GO_VERSION
 ARG RUST_VERSION
@@ -294,7 +296,7 @@ RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
 FROM --platform=$BUILDPLATFORM alpine_host as upx
-RUN mkdir -p /upx 
+RUN mkdir -p /upx
 ARG BUILDARCH BUILDOS UPX_VERSION
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx; fi
 RUN if ! [ "${TARGETARCH}" = "arm64" ]; then install -D /upx/upx /usr/local/bin/upx; fi
