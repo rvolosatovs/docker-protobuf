@@ -60,6 +60,7 @@ func main() {
 		{"stepancheg", "rust-protobuf"},
 		{"rust-lang", "rust"},
 		{"apple", "swift"},
+		{"improbable-eng", "ts-protoc-gen"},
 		{"upx", "upx"},
 	} {
 		tag := "n/a"
