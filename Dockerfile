@@ -201,7 +201,7 @@ RUN --mount=type=cache,target=/root/.cargo/git/db \
     --mount=type=cache,target=/root/.cargo/registry/index \
     cargo fetch
 ARG TARGETPLATFORM
-RUN xx-cargo build --release
+RUN xx-cargo --config profile.release.strip=true build --release
 RUN install -D /rust-protobuf/target/$(xx-cargo --print-target)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 RUN xx-verify /out/usr/bin/protoc-gen-rust
 
@@ -216,7 +216,7 @@ RUN --mount=type=cache,target=/root/.cargo/git/db \
     --mount=type=cache,target=/root/.cargo/registry/index \
     cargo fetch
 ARG TARGETPLATFORM
-RUN xx-cargo build --release
+RUN xx-cargo --config profile.release.strip=true build --release
 RUN install -D /grpc-rust/target/$(xx-cargo --print-target)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
