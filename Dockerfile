@@ -198,8 +198,7 @@ RUN curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${P
 WORKDIR /rust-protobuf/protobuf-codegen
 ARG TARGETPLATFORM
 RUN xx-cargo build --release
-RUN ls -lha /rust-protobuf/target/release
-RUN install -Ds /rust-protobuf/target/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
+RUN install -Ds /rust-protobuf/target/$(xx-cargo --print-target)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 RUN xx-verify /out/usr/bin/protoc-gen-rust
 
 
@@ -210,7 +209,7 @@ RUN curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_
 WORKDIR /grpc-rust/grpc-compiler
 ARG TARGETPLATFORM
 RUN xx-cargo build --release
-RUN install -Ds /grpc-rust/target/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
+RUN install -Ds /grpc-rust/target/$(xx-cargo --print-target)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
