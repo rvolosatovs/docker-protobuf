@@ -4,7 +4,7 @@ ARG RUST_VERSION
 ARG SWIFT_VERSION
 
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:master AS xx
 
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as go_host
@@ -180,34 +180,44 @@ RUN make -j$(nproc) install-plugin
 RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
-FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as rust_target
+FROM --platform=$BUILDPLATFORM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as rust_target
 COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
 RUN apk add --no-cache \
         build-base \
-        curl
+        clang \
+        curl \
+        lld
 
 
-FROM rust_target as protoc_gen_rust
+FROM --platform=$BUILDPLATFORM rust_target as protoc_gen_rust
 RUN mkdir -p /rust-protobuf
 ARG PROTOC_GEN_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${PROTOC_GEN_RUST_VERSION} | tar xz --strip 1 -C /rust-protobuf
 WORKDIR /rust-protobuf/protobuf-codegen
-RUN cargo build --release
-RUN install -Ds /rust-protobuf/target/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
+RUN --mount=type=cache,target=/root/.cargo/git/db \
+    --mount=type=cache,target=/root/.cargo/registry/cache \
+    --mount=type=cache,target=/root/.cargo/registry/index \
+    cargo fetch
 ARG TARGETPLATFORM
+RUN xx-cargo --config profile.release.strip=true build --release
+RUN install -D /rust-protobuf/target/$(xx-cargo --print-target)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 RUN xx-verify /out/usr/bin/protoc-gen-rust
 
 
-FROM rust_target as grpc_rust
+FROM --platform=$BUILDPLATFORM rust_target as grpc_rust
 RUN mkdir -p /grpc-rust
 ARG GRPC_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust
 WORKDIR /grpc-rust/grpc-compiler
-RUN cargo build --release
-RUN install -Ds /grpc-rust/target/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
+RUN --mount=type=cache,target=/root/.cargo/git/db \
+    --mount=type=cache,target=/root/.cargo/registry/cache \
+    --mount=type=cache,target=/root/.cargo/registry/index \
+    cargo fetch
 ARG TARGETPLATFORM
+RUN xx-cargo --config profile.release.strip=true build --release
+RUN install -D /grpc-rust/target/$(xx-cargo --print-target)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
@@ -328,7 +338,7 @@ RUN apk add --no-cache \
         protobuf-c-compiler
 RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
 RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk
-RUN apk add glibc-2.35-r0.apk
+RUN apk add --force-overwrite glibc-2.35-r0.apk
 RUN rm -f glibc-2.35-r0.apk
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
