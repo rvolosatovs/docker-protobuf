@@ -4,7 +4,7 @@ ARG RUST_VERSION
 ARG SWIFT_VERSION
 
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:master AS xx
 
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} as go_host
@@ -180,34 +180,37 @@ RUN make -j$(nproc) install-plugin
 RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
-FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as rust_target
+FROM --platform=$BUILDPLATFORM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} as rust_target
 COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
 RUN apk add --no-cache \
         build-base \
-        curl
+        clang \
+        curl \
+        lld
 
 
-FROM rust_target as protoc_gen_rust
+FROM --platform=$BUILDPLATFORM rust_target as protoc_gen_rust
 RUN mkdir -p /rust-protobuf
 ARG PROTOC_GEN_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${PROTOC_GEN_RUST_VERSION} | tar xz --strip 1 -C /rust-protobuf
 WORKDIR /rust-protobuf/protobuf-codegen
-RUN cargo build --release
-RUN install -Ds /rust-protobuf/target/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 ARG TARGETPLATFORM
+RUN xx-cargo build --release
+RUN ls -lha /rust-protobuf/target/release
+RUN install -Ds /rust-protobuf/target/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 RUN xx-verify /out/usr/bin/protoc-gen-rust
 
 
-FROM rust_target as grpc_rust
+FROM --platform=$BUILDPLATFORM rust_target as grpc_rust
 RUN mkdir -p /grpc-rust
 ARG GRPC_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust
 WORKDIR /grpc-rust/grpc-compiler
-RUN cargo build --release
-RUN install -Ds /grpc-rust/target/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 ARG TARGETPLATFORM
+RUN xx-cargo build --release
+RUN install -Ds /grpc-rust/target/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
