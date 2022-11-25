@@ -196,6 +196,10 @@ RUN mkdir -p /rust-protobuf
 ARG PROTOC_GEN_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/rust-protobuf/tarball/v${PROTOC_GEN_RUST_VERSION} | tar xz --strip 1 -C /rust-protobuf
 WORKDIR /rust-protobuf/protobuf-codegen
+RUN --mount=type=cache,target=/root/.cargo/git/db \
+    --mount=type=cache,target=/root/.cargo/registry/cache \
+    --mount=type=cache,target=/root/.cargo/registry/index \
+    cargo fetch
 ARG TARGETPLATFORM
 RUN xx-cargo build --release
 RUN install -Ds /rust-protobuf/target/$(xx-cargo --print-target)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
@@ -207,6 +211,10 @@ RUN mkdir -p /grpc-rust
 ARG GRPC_RUST_VERSION
 RUN curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/v${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust
 WORKDIR /grpc-rust/grpc-compiler
+RUN --mount=type=cache,target=/root/.cargo/git/db \
+    --mount=type=cache,target=/root/.cargo/registry/cache \
+    --mount=type=cache,target=/root/.cargo/registry/index \
+    cargo fetch
 ARG TARGETPLATFORM
 RUN xx-cargo build --release
 RUN install -Ds /grpc-rust/target/$(xx-cargo --print-target)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
