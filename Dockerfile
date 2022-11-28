@@ -359,7 +359,7 @@ COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 RUN apk add --no-cache \
-        bash\
+        bash \
         grpc \
         grpc-java \
         protobuf \
