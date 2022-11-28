@@ -7,12 +7,12 @@ An all-inclusive `protoc` Docker image.
 It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
 
 ## What's included:
+- [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
 - [bufbuild/protoc-gen-validate](https://github.com/bufbuild/protoc-gen-validate)
 - [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
 - [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
-- [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [gogo/protobuf](https://github.com/gogo/protobuf)
 - [golang/protobuf](https://github.com/protocolbuffers/protobuf-go)
 - [google/protobuf](https://github.com/google/protobuf)
@@ -23,13 +23,13 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, see https://github.com/rvolosatovs/docker-protobuf/issues/77 for potential issues)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
 - [improbable-eng/ts-protoc-gen](https://github.com/improbable-eng/ts-protoc-gen)
+- [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
+- [moul/protoc-gen-gotemplate](https://github.com/moul/protoc-gen-gotemplate)
+- [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
 - [stepancheg/rust-protobuf](https://github.com/stepancheg/rust-protobuf)
-- [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
-- [moul/protoc-gen-gotemplate](https://github.com/moul/protoc-gen-gotemplate)
-- [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
 
 ## Supported languages
 - C
