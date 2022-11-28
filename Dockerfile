@@ -358,6 +358,7 @@ LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
+COPY --from=protoc_gen_dart /runtime/ /
 RUN apk add --no-cache \
         bash \
         grpc \
@@ -365,11 +366,6 @@ RUN apk add --no-cache \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-RUN wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r0/glibc-2.35-r0.apk
-RUN apk add --force-overwrite glibc-2.35-r0.apk
-RUN mkdir /lib64 && ln -s /lib/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-RUN rm -f glibc-2.35-r0.apk
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
