@@ -18,7 +18,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [grpc/grpc](https://github.com/grpc/grpc)
 - [grpc/grpc-go](https://github.com/grpc/grpc-go)
 - [grpc/grpc-java](https://github.com/grpc/grpc-java)
-- [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, see https://github.com/rvolosatovs/docker-protobuf/issues/77 for potential issues)
+- [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, tracking issue: https://github.com/rvolosatovs/docker-protobuf/issues/89)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
 - [improbable-eng/ts-protoc-gen](https://github.com/improbable-eng/ts-protoc-gen)
 - [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
