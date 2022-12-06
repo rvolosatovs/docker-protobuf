@@ -64,15 +64,15 @@ jobs:
         cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64
         build-args: |
-          ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-          DART_VERSION=${{ env.DART_VERSION }}
-          GO_VERSION=${{ env.GO_VERSION }}
+          ALPINE_IMAGE_VERSION=${{ env.ALPINE_IMAGE_VERSION }}
+          DART_IMAGE_VERSION=${{ env.DART_IMAGE_VERSION }}
+          GO_IMAGE_VERSION=${{ env.GO_IMAGE_VERSION }}
           GOOGLE_API_VERSION=${{ env.GOOGLE_API_VERSION }}
           GRPC_GATEWAY_VERSION=${{ env.GRPC_GATEWAY_VERSION }}
           GRPC_RUST_VERSION=${{ env.GRPC_RUST_VERSION }}
           GRPC_SWIFT_VERSION=${{ env.GRPC_SWIFT_VERSION }}
           GRPC_WEB_VERSION=${{ env.GRPC_WEB_VERSION }}
-          NODE_VERSION=${{ env.NODE_VERSION }}
+          NODE_IMAGE_VERSION=${{ env.NODE_IMAGE_VERSION }}
           PROTOC_GEN_DART_VERSION=${{ env.PROTOC_GEN_DART_VERSION }}
           PROTOC_GEN_DOC_VERSION=${{ env.PROTOC_GEN_DOC_VERSION }}
           PROTOC_GEN_GO_GRPC_VERSION=${{ env.PROTOC_GEN_GO_GRPC_VERSION }}
@@ -87,6 +87,6 @@ jobs:
           PROTOC_GEN_RUST_VERSION=${{ env.PROTOC_GEN_RUST_VERSION }}
           PROTOC_GEN_TS_VERSION=${{ env.PROTOC_GEN_TS_VERSION }}
           PROTOC_GEN_VALIDATE_VERSION=${{ env.PROTOC_GEN_VALIDATE_VERSION }}
-          RUST_VERSION=${{ env.RUST_VERSION }}
-          SWIFT_VERSION=${{ env.SWIFT_VERSION }}
+          RUST_IMAGE_VERSION=${{ env.RUST_IMAGE_VERSION }}
+          SWIFT_IMAGE_VERSION=${{ env.SWIFT_IMAGE_VERSION }}
           UPX_VERSION=${{ env.UPX_VERSION }}
