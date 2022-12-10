@@ -314,11 +314,12 @@ RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
 FROM node:${NODE_IMAGE_VERSION} as protoc_gen_ts
+ARG NODE_IMAGE_VERSION
 ARG PROTOC_GEN_TS_VERSION
 RUN npm install -g pkg ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 RUN pkg \
         --compress Brotli \
-        --targets node${NODE_VERSION}-alpine \
+        --targets node${NODE_IMAGE_VERSION%%.*}-alpine \
         -o protoc-gen-ts \
         /usr/local/lib/node_modules/ts-protoc-gen
 RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
