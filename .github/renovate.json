@@ -54,9 +54,10 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
-      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
+      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine3.16\\n"],
       "depNameTemplate": "node",
-      "datasourceTemplate": "docker"
+      "datasourceTemplate": "node",
+      "versioningTemplate": "node"
     },
     {
       "fileMatch": ["^deps\\.list$"],
