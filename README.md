@@ -5,21 +5,21 @@ An all-inclusive `protoc` Docker image.
 It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
 
 ## What's included:
+- [bufbuild/protoc-gen-validate](https://github.com/bufbuild/protoc-gen-validate)
 - [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
-- [bufbuild/protoc-gen-validate](https://github.com/bufbuild/protoc-gen-validate)
 - [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
 - [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)
 - [gogo/protobuf](https://github.com/gogo/protobuf)
 - [golang/protobuf](https://github.com/protocolbuffers/protobuf-go)
 - [google/protobuf](https://github.com/google/protobuf)
 - [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
-- [grpc/grpc](https://github.com/grpc/grpc)
 - [grpc/grpc-go](https://github.com/grpc/grpc-go)
 - [grpc/grpc-java](https://github.com/grpc/grpc-java)
 - [grpc/grpc-swift](https://github.com/grpc/grpc-swift) (not on `arm64`, tracking issue: https://github.com/rvolosatovs/docker-protobuf/issues/89)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
+- [grpc/grpc](https://github.com/grpc/grpc)
 - [improbable-eng/ts-protoc-gen](https://github.com/improbable-eng/ts-protoc-gen)
 - [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
 - [moul/protoc-gen-gotemplate](https://github.com/moul/protoc-gen-gotemplate)
