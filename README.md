@@ -26,6 +26,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
+- [scalapb/scalapb](https://github.com/scalapb/scalapb)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
 - [stepancheg/rust-protobuf](https://github.com/stepancheg/rust-protobuf)
 
@@ -42,6 +43,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - Python
 - Ruby
 - Rust
+- Scala
 - Swift
 - Typescript
 
