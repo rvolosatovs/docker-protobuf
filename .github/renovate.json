@@ -141,6 +141,12 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["PROTOC_GEN_SCALA_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "scalapb/ScalaPB",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_TS_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "ts-protoc-gen",
       "datasourceTemplate": "npm"
