@@ -176,6 +176,13 @@
       "matchStrings": ["UPX_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "upx/upx",
       "datasourceTemplate": "github-releases"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["XX_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "tonistiigi/xx",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
     }
   ]
 }
