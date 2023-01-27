@@ -92,3 +92,4 @@ jobs:
           SCALA_SBT_IMAGE_VERSION=${{ env.SCALA_SBT_IMAGE_VERSION }}
           SWIFT_IMAGE_VERSION=${{ env.SWIFT_IMAGE_VERSION }}
           UPX_VERSION=${{ env.UPX_VERSION }}
+          XX_IMAGE_VERSION=${{ env.XX_IMAGE_VERSION }}

@@ -7,9 +7,10 @@ ARG NODE_IMAGE_VERSION
 ARG RUST_IMAGE_VERSION
 ARG SCALA_SBT_IMAGE_VERSION
 ARG SWIFT_IMAGE_VERSION
+ARG XX_IMAGE_VERSION
 
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:master AS xx
+FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_IMAGE_VERSION} AS xx
 
 
 FROM --platform=$BUILDPLATFORM golang:${GO_IMAGE_VERSION} as go_host
@@ -223,7 +224,7 @@ RUN --mount=type=cache,target=/root/.cargo/git/db \
     cargo fetch
 ARG TARGETPLATFORM
 RUN xx-cargo --config profile.release.strip=true build --release
-RUN install -D /rust-protobuf/target/$(xx-cargo --print-target)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
+RUN install -D /rust-protobuf/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
 RUN xx-verify /out/usr/bin/protoc-gen-rust
 
 
@@ -238,7 +239,7 @@ RUN --mount=type=cache,target=/root/.cargo/git/db \
     cargo fetch
 ARG TARGETPLATFORM
 RUN xx-cargo --config profile.release.strip=true build --release
-RUN install -D /grpc-rust/target/$(xx-cargo --print-target)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
+RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
