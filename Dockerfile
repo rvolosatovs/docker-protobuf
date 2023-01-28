@@ -387,10 +387,6 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_IMAGE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
-COPY --from=upx /out/ /
-COPY --from=protoc_gen_ts /out/ /
-COPY --from=protoc_gen_dart /out/ /
-COPY --from=protoc_gen_dart /runtime/ /
 RUN apk add --no-cache \
         bash \
         grpc \
@@ -398,6 +394,10 @@ RUN apk add --no-cache \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler
+COPY --from=upx /out/ /
+COPY --from=protoc_gen_ts /out/ /
+COPY --from=protoc_gen_dart /out/ /
+COPY --from=protoc_gen_dart /runtime/ /
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
