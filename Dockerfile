@@ -391,6 +391,7 @@ RUN apk add --no-cache \
         bash \
         grpc \
         grpc-java \
+        grpc-plugins \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler

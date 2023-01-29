@@ -61,7 +61,7 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
-      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine3.16\\n"],
+      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine3.17\\n"],
       "depNameTemplate": "node",
       "datasourceTemplate": "node",
       "versioningTemplate": "node"
