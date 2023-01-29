@@ -315,6 +315,42 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
+FROM alpine:${ALPINE_IMAGE_VERSION} as protoc_gen_js
+COPY --from=xx / /
+RUN mkdir -p /out
+RUN apk add --no-cache \
+    bash \
+    build-base \
+    curl \
+    linux-headers \
+    openjdk11-jdk \
+    python3 \
+    unzip \
+    zip
+
+# Build Bazel
+# TODO: Remove when Bazel 5.2.0+ is available in Alpine
+# https://github.com/bazelbuild/bazel/pull/14391
+ARG BAZEL_VERSION=6.0.0
+RUN mkdir -p /tmp/bazel-release
+WORKDIR /tmp/bazel-release
+RUN curl -sSLO https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-dist.zip && unzip -q bazel-${BAZEL_VERSION}-dist.zip
+RUN env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --curses=no" bash ./compile.sh
+RUN install -D output/bazel /usr/local/bin/bazel
+
+# Build protoc-gen-js
+# TODO: Remove when protoc-gen-js is available in Alpine
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
+RUN mkdir -p /protoc_gen_js
+ARG PROTOC_GEN_JS_VERSION
+RUN curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
+WORKDIR /protoc_gen_js
+RUN bazel build plugin_files
+RUN install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
+ARG TARGETPLATFORM
+RUN xx-verify /out/usr/bin/protoc-gen-js
+
+
 FROM node:${NODE_IMAGE_VERSION} as protoc_gen_ts
 ARG NODE_IMAGE_VERSION
 ARG PROTOC_GEN_TS_VERSION
@@ -368,6 +404,7 @@ COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
+COPY --from=protoc_gen_js /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
