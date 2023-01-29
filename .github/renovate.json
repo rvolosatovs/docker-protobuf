@@ -123,6 +123,12 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["PROTOC_GEN_JS_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "protocolbuffers/protobuf-javascript",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_JSONSCHEMA_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "chrusty/protoc-gen-jsonschema",
       "datasourceTemplate": "github-releases"
