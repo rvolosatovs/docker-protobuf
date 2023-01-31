@@ -181,7 +181,8 @@
       "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["UPX_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "upx/upx",
-      "datasourceTemplate": "github-releases"
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.*)$"
     },
     {
       "fileMatch": ["^deps\\.list$"],
