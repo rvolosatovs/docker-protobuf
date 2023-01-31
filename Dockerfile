@@ -389,8 +389,8 @@ RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-ge
 FROM --platform=$BUILDPLATFORM alpine_host as upx
 RUN mkdir -p /upx
 ARG BUILDARCH BUILDOS UPX_VERSION
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx; fi
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then install -D /upx/upx /usr/local/bin/upx; fi
+RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx
+RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
 COPY --from=grpc_rust /out/ /out/
@@ -411,14 +411,9 @@ COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 ARG TARGETARCH
-RUN <<EOF
-    if ! [ "${TARGETARCH}" = "arm64" ]; then
-        upx --lzma $(find /out/usr/bin/ -type f \
+RUN upx --lzma $(find /out/usr/bin/ -type f \
             -name 'protoc-gen-*' -or \
-            -name 'grpc_*' \
-        )
-    fi
-EOF
+            -name 'grpc_*')
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
