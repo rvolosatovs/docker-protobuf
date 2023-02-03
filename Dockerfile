@@ -319,14 +319,14 @@ FROM alpine:${ALPINE_IMAGE_VERSION} as protoc_gen_js
 COPY --from=xx / /
 RUN mkdir -p /out
 RUN apk add --no-cache \
-    bash \
-    build-base \
-    curl \
-    linux-headers \
-    openjdk11-jdk \
-    python3 \
-    unzip \
-    zip
+        bash \
+        build-base \
+        curl \
+        linux-headers \
+        openjdk11-jdk \
+        python3 \
+        unzip \
+        zip
 
 # Build Bazel
 # TODO: Remove when Bazel 5.2.0+ is available in Alpine
@@ -425,12 +425,12 @@ RUN apk add --no-cache \
         grpc-java \
         grpc-plugins \
         protobuf \
-        protobuf-dev \
-        protobuf-c-compiler
+        protobuf-c-compiler \
+        protobuf-dev
 COPY --from=upx /out/ /
-COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
+COPY --from=protoc_gen_ts /out/ /
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
