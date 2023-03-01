@@ -414,9 +414,10 @@ COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 ARG TARGETARCH
-RUN upx --lzma $(find /out/usr/bin/ -type f \
-            -name 'protoc-gen-*' -or \
-            -name 'grpc_*')
+RUN find /out/usr/bin/ -type f \
+            -name 'protoc-gen-*' | \
+            xargs -P $(nproc) -I{} \
+            upx --lzma {}
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
