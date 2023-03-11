@@ -328,27 +328,27 @@ RUN apk add --no-cache \
     unzip \
     zip
 
-# Build Bazel
-# TODO: Remove when Bazel 5.2.0+ is available in Alpine
-# https://github.com/bazelbuild/bazel/pull/14391
-ARG BAZEL_VERSION=6.0.0
-RUN mkdir -p /tmp/bazel-release
-WORKDIR /tmp/bazel-release
-RUN curl -sSLO https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-dist.zip && unzip -q bazel-${BAZEL_VERSION}-dist.zip
-RUN env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --curses=no" bash ./compile.sh
-RUN install -D output/bazel /usr/local/bin/bazel
-
-# Build protoc-gen-js
-# TODO: Remove when protoc-gen-js is available in Alpine
-# https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
-RUN mkdir -p /protoc_gen_js
+ARG TARGETARCH
 ARG PROTOC_GEN_JS_VERSION
-RUN curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
-WORKDIR /protoc_gen_js
-RUN bazel build plugin_files
-RUN install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
-ARG TARGETPLATFORM
-RUN xx-verify /out/usr/bin/protoc-gen-js
+ARG BAZEL_VERSION=6.1.0
+RUN <<EOF
+    # Skip arm64 build due to https://github.com/bazelbuild/bazel/issues/17220
+    # TODO: Remove this conditional once fixed
+    if [ "${TARGETARCH}" = "arm64" ]; then
+      echo "Skipping arm64 build due to error in Bazel toolchain"
+      exit 0
+    fi
+    apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/ bazel6
+    # Build protoc-gen-js
+    # TODO: Remove when protoc-gen-js is available in Alpine
+    # https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
+    mkdir -p /protoc_gen_js
+    cd /protoc_gen_js
+    curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
+    bazel build plugin_files
+    install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
+    xx-verify /out/usr/bin/protoc-gen-js
+EOF
 
 
 FROM node:${NODE_IMAGE_VERSION} as protoc_gen_ts
@@ -462,7 +462,6 @@ RUN protoc-wrapper \
         --grpc-rust_out=/test \
         --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
         --java_out=/test \
-        --js_out=import_style=commonjs:/test \
         --jsonschema_out=/test \
         --lint_out=/test \
         --php_out=/test \
@@ -483,6 +482,7 @@ RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then
         protoc-wrapper \
             --grpc-swift_out=/test \
+            --js_out=import_style=commonjs:/test \
             --swift_out=/test \
             google/protobuf/any.proto
     fi
