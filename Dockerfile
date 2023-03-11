@@ -380,7 +380,10 @@ RUN apt-get install -y curl
 RUN mkdir -p /dart-protobuf
 ARG PROTOC_GEN_DART_VERSION
 RUN curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
-WORKDIR /dart-protobuf/protoc_plugin 
+WORKDIR /dart-protobuf/protoc_plugin
+# Use Dart mirror to work around connectivity problems to default host when building in QEMU
+# https://stackoverflow.com/questions/70729747
+ARG PUB_HOSTED_URL=https://pub.flutter-io.cn
 RUN dart pub get
 RUN dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin
 RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
