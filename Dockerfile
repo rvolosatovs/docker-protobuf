@@ -315,18 +315,33 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} as protoc_gen_pbandk
+RUN apk add --no-cache \
+        curl \
+        git \
+        openjdk8 \
+        openjdk11
+ARG PROTOC_GEN_PBANDK_VERSION
+RUN mkdir -p /pbandk
+RUN git clone https://github.com/strophy/pbandk.git
+# RUN curl -sSL https://api.github.com/repos/streem/pbandk/tarball/v${PROTOC_GEN_PBANDK_VERSION} | tar xz --strip 1 -C /pbandk
+WORKDIR /pbandk
+RUN ./gradlew :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
+RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-${PROTOC_GEN_PBANDK_VERSION}-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
+
+
 FROM alpine:${ALPINE_IMAGE_VERSION} as protoc_gen_js
 COPY --from=xx / /
 RUN mkdir -p /out
 RUN apk add --no-cache \
-    bash \
-    build-base \
-    curl \
-    linux-headers \
-    openjdk11-jdk \
-    python3 \
-    unzip \
-    zip
+        bash \
+        build-base \
+        curl \
+        linux-headers \
+        openjdk11-jdk \
+        python3 \
+        unzip \
+        zip
 
 ARG TARGETARCH
 ARG PROTOC_GEN_JS_VERSION
@@ -429,12 +444,13 @@ RUN apk add --no-cache \
         grpc-java \
         grpc-plugins \
         protobuf \
-        protobuf-dev \
-        protobuf-c-compiler
+        protobuf-c-compiler \
+        protobuf-dev
 COPY --from=upx /out/ /
-COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
+COPY --from=protoc_gen_pbandk /out/ /
+COPY --from=protoc_gen_ts /out/ /
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
@@ -468,6 +484,7 @@ RUN protoc-wrapper \
         --java_out=/test \
         --jsonschema_out=/test \
         --lint_out=/test \
+        --pbandk_out=/test \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
