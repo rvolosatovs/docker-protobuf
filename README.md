@@ -24,6 +24,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [infobloxopen/protoc-gen-gorm](https://github.com/infobloxopen/protoc-gen-gorm)
 - [moul/protoc-gen-gotemplate](https://github.com/moul/protoc-gen-gotemplate)
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
+- [nanopb/nanopb](https://github.com/nanopb/nanopb)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
 - [scalapb/scalapb](https://github.com/scalapb/scalapb)
