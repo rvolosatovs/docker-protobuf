@@ -430,11 +430,13 @@ RUN apk add --no-cache \
         grpc-plugins \
         protobuf \
         protobuf-dev \
-        protobuf-c-compiler
+        protobuf-c-compiler \
+        python3
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
+RUN python3 -m ensurepip && pip3 install --no-cache nanopb
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
@@ -468,6 +470,7 @@ RUN protoc-wrapper \
         --java_out=/test \
         --jsonschema_out=/test \
         --lint_out=/test \
+        --nanopb_out=/test \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
