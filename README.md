@@ -26,6 +26,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [mwitkow/go-proto-validators](https://github.com/mwitkow/go-proto-validators)
 - [nanopb/nanopb](https://github.com/nanopb/nanopb)
 - [protobuf-c/protobuf-c](https://github.com/protobuf-c/protobuf-c)
+- [protocolbuffers/protobuf-javascript](https://github.com/protocolbuffers/protobuf-javascript) (not on `arm64`, tracking issue: https://github.com/rvolosatovs/docker-protobuf/issues/179)
 - [pseudomuto/protoc-gen-doc](https://github.com/pseudomuto/protoc-gen-doc)
 - [scalapb/scalapb](https://github.com/scalapb/scalapb)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
