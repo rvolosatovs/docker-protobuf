@@ -415,9 +415,9 @@ COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 ARG TARGETARCH
 RUN find /out/usr/bin/ -type f \
-            -name 'protoc-gen-*' | \
-            xargs -P $(nproc) -I{} \
-            upx --lzma {}
+        -name 'protoc-gen-*' | \
+        xargs -P $(nproc) -I{} \
+        upx --lzma {}
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
@@ -438,18 +438,18 @@ COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
 RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
-RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
-RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
-RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js
-RUN ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc
-RUN ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php
-RUN ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python
-RUN ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby
-RUN ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go
-RUN ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
+RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
+    ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
+    ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
+    ln -s /usr/bin/grpc_objective_c_plugin /usr/bin/protoc-gen-grpc-objc && \
+    ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php && \
+    ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
+    ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
+    ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go && \
+    ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
 COPY protoc-wrapper /usr/bin/protoc-wrapper
-RUN mkdir -p /test
-RUN protoc-wrapper \
+RUN mkdir -p /test && \
+    protoc-wrapper \
         --c_out=/test \
         --dart_out=/test \
         --go_out=/test \
@@ -484,8 +484,12 @@ RUN protoc-wrapper \
         --gogo_out=/test \
         google/protobuf/any.proto
 ARG TARGETARCH
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift; fi
-RUN if ! [ "${TARGETARCH}" = "arm64" ]; then ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift; fi
+RUN <<EOF
+    if ! [ "${TARGETARCH}" = "arm64" ]; then 
+        ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift
+        ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift
+    fi
+EOF
 RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then
         protoc-wrapper \
