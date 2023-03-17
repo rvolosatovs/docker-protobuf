@@ -423,6 +423,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM alpine:${ALPINE_IMAGE_VERSION}
 LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
+ARG PROTOC_GEN_NANOPB_VERSION
 RUN apk add --no-cache \
         bash \
         grpc \
@@ -436,7 +437,7 @@ COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
-RUN python3 -m ensurepip && pip3 install --no-cache nanopb
+RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp
 RUN ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp
 RUN ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js

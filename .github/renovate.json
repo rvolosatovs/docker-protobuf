@@ -141,6 +141,12 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["PROTOC_GEN_NANOPB_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "nanopb",
+      "datasourceTemplate": "pypi"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_RUST_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "stepancheg/rust-protobuf",
       "datasourceTemplate": "github-tags"
