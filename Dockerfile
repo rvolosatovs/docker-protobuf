@@ -422,7 +422,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
 FROM alpine:${ALPINE_IMAGE_VERSION}
-LABEL maintainer="Roman Volosatovs <rvolosatovs@riseup.net>"
+LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 ARG PROTOC_GEN_NANOPB_VERSION
 RUN apk add --no-cache \
         bash \
