@@ -31,7 +31,6 @@ jobs:
     - name: Move Docker data root to work directory
       run: |
         sudo systemctl stop docker
-        sudo mkdir -p /home/runner/work/docker-protobuf/docker-protobuf/docker
         sudo sh -c 'printf "{\n  \"exec-opts\": [\n    \"native.cgroupdriver=cgroupfs\"\n  ],\n  \"cgroup-parent\": \"/actions_job\",\n  \"data-root\": \"/home/runner/work/_temp/docker\"\n}\n" > /etc/docker/daemon.json'
         sudo systemctl start docker
 
