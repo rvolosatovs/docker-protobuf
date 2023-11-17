@@ -433,11 +433,11 @@ RUN apk add --no-cache \
         protobuf-dev \
         protobuf-c-compiler \
         python3
+RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
-RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
