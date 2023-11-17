@@ -20,12 +20,20 @@ jobs:
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 81920
+        build-mount-path: /home/runner/work/_temp/docker
+        root-reserve-mb: 10240
         remove-dotnet: true
         remove-android: true
         remove-haskell: true
         remove-codeql: true
         remove-docker-images: true
+
+    - name: Move Docker data root to work directory
+      run: |
+        sudo systemctl stop docker
+        sudo mkdir -p /home/runner/work/docker-protobuf/docker-protobuf/docker
+        sudo sh -c 'printf "{\n  \"exec-opts\": [\n    \"native.cgroupdriver=cgroupfs\"\n  ],\n  \"cgroup-parent\": \"/actions_job\",\n  \"data-root\": \"/home/runner/work/_temp/docker\"\n}\n" > /etc/docker/daemon.json'
+        sudo systemctl start docker
 
     - uses: actions/checkout@v4
 
