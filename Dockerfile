@@ -198,8 +198,8 @@ RUN mkdir -p /grpc-web
 ARG GRPC_WEB_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
 WORKDIR /grpc-web
-RUN make -j$(nproc) install-plugin
-RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
+# RUN make -j$(nproc) install-plugin
+# RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
 FROM --platform=$BUILDPLATFORM rust:${RUST_IMAGE_VERSION} as rust_target
@@ -370,6 +370,8 @@ WORKDIR /scala-protobuf
 RUN gu install native-image
 # Make sbt use the version of native-image installed by gu instead of downloading a separate version
 ARG NATIVE_IMAGE_INSTALLED=true
+# Fix "Failed to exec spawn helper" error in arm64 emulator build
+ARG JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
 RUN ./make_reflect_config.sh
 RUN sbt protocGenScalaNativeImage/nativeImage
 RUN install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
@@ -398,7 +400,7 @@ COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
 COPY --from=grpc_rust /out/ /out/
 COPY --from=grpc_swift /protoc-gen-swift /out/protoc-gen-swift
-COPY --from=grpc_web /out/ /out/
+# COPY --from=grpc_web /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
@@ -427,17 +429,20 @@ ARG PROTOC_GEN_NANOPB_VERSION
 RUN apk add --no-cache \
         bash \
         grpc \
-        grpc-java \
+        # grpc-java \
         grpc-plugins \
+        pipx \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler \
-        python3
+        python3 \
+        rm -rf ~/.cache/* /usr/local/share/man /tmp/*   
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
-RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
+ENV PATH="${PATH}:/root/.local/bin"
+RUN pipx install nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
@@ -460,14 +465,14 @@ RUN mkdir -p /test && \
         --grpc-cpp_out=/test \
         --grpc-csharp_out=/test \
         --grpc-go_out=/test \
-        --grpc-java_out=/test \
+        # --grpc-java_out=/test \
         --grpc-js_out=/test \
         --grpc-objc_out=/test \
         --grpc-php_out=/test \
         --grpc-python_out=/test \
         --grpc-ruby_out=/test \
         --grpc-rust_out=/test \
-        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
+        # --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
         --java_out=/test \
         --jsonschema_out=/test \
         --lint_out=/test \
@@ -475,7 +480,7 @@ RUN mkdir -p /test && \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
-        --rust_out=/test \
+        # --rust_out=/test \
         --scala_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
