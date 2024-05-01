@@ -363,18 +363,25 @@ RUN pkg \
 RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
 
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} as protoc_gen_scala
-RUN mkdir -p /scala-protobuf
-ARG PROTOC_GEN_SCALA_VERSION
-RUN curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
-WORKDIR /scala-protobuf
-RUN gu install native-image
-# Make sbt use the version of native-image installed by gu instead of downloading a separate version
-ARG NATIVE_IMAGE_INSTALLED=true
-# Fix "Failed to exec spawn helper" error in arm64 emulator build
+ARG TARGETARCH 
+ARG PROTOC_GEN_SCALA_VERSION 
+ARG NATIVE_IMAGE_INSTALLED=true 
 ARG JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
-RUN ./make_reflect_config.sh
-RUN sbt protocGenScalaNativeImage/nativeImage
-RUN install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
+# Skip arm64 build due to https://github.com/spring-projects/spring-boot/issues/33429
+RUN <<EOF
+    mkdir -p /scala-protobuf
+    mkdir -p /out
+    if [ "${TARGETARCH}" = "arm64" ]; then
+      echo "Skipping arm64 build due to error in Native Image toolchain"
+      exit 0
+    fi
+    curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
+    cd /scala-protobuf
+    gu install native-image
+    ./make_reflect_config.sh
+    sbt protocGenScalaNativeImage/nativeImage
+    install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
+EOF
 
 FROM dart:${DART_IMAGE_VERSION} as protoc_gen_dart
 RUN apt-get update
@@ -481,7 +488,6 @@ RUN mkdir -p /test && \
         --python_out=/test \
         --ruby_out=/test \
         # --rust_out=/test \
-        --scala_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
@@ -500,6 +506,7 @@ RUN <<EOF
         protoc-wrapper \
             --grpc-swift_out=/test \
             --js_out=import_style=commonjs:/test \
+            --scala_out=/test \
             --swift_out=/test \
             google/protobuf/any.proto
     fi
