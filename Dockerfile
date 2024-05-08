@@ -487,7 +487,7 @@ RUN mkdir -p /test && \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
-        # --rust_out=/test \
+        --rust_out=experimental-codegen=enabled,kernel=cpp:/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
