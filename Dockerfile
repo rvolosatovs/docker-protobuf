@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1
 
 ARG ALPINE_IMAGE_VERSION
 ARG DART_IMAGE_VERSION
@@ -191,12 +191,18 @@ RUN xx-verify /out/usr/bin/protoc-gen-jsonschema
 
 FROM alpine:${ALPINE_IMAGE_VERSION} as grpc_web
 RUN apk add --no-cache \
+        autoconf \ 
+        automake \
         build-base \
-        curl \
-        protobuf-dev
-RUN mkdir -p /grpc-web
+        git \
+        libtool
 ARG GRPC_WEB_VERSION
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
+RUN git clone --recurse-submodules --branch=$GRPC_WEB_VERSION https://github.com/grpc/grpc-web.git
+WORKDIR /grpc-web/third_party/protobuf
+RUN ./autogen.sh && \
+    ./configure && \
+    make -j$(nproc) && \
+    make install
 WORKDIR /grpc-web
 RUN make -j$(nproc) install-plugin
 RUN install -Ds /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
@@ -244,15 +250,6 @@ RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
 FROM swift:${SWIFT_IMAGE_VERSION} as grpc_swift
-RUN apt-get update
-RUN apt-get install -y \
-        build-essential \
-        curl \
-        libnghttp2-dev \
-        libssl-dev \
-        patchelf \
-        unzip \
-        zlib1g-dev
 ARG TARGETOS TARGETARCH GRPC_SWIFT_VERSION
 RUN <<EOF
     mkdir -p /protoc-gen-swift
@@ -262,6 +259,15 @@ RUN <<EOF
       echo "Skipping arm64 build due to error in Swift toolchain"
       exit 0
     fi
+    apt-get update
+    apt-get install -y \
+        build-essential \
+        curl \
+        libnghttp2-dev \
+        libssl-dev \
+        patchelf \
+        unzip \
+        zlib1g-dev
     case ${TARGETARCH} in
       "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-${TARGETOS}-x86-64.so.2  ;;
       "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-${TARGETOS}-aarch64.so.1 ;;
@@ -330,7 +336,8 @@ RUN apk add --no-cache \
 
 ARG TARGETARCH
 ARG PROTOC_GEN_JS_VERSION
-ARG BAZEL_VERSION=6.1.0
+ARG CPPFLAGS=-std=c++17
+ARG BAZEL_CXXOPTS="-std=c++17"
 RUN <<EOF
     # Skip arm64 build due to https://github.com/bazelbuild/bazel/issues/17220
     # TODO: Remove this conditional once fixed
@@ -345,41 +352,38 @@ RUN <<EOF
     mkdir -p /protoc_gen_js
     cd /protoc_gen_js
     curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
-    bazel build plugin_files
+    bazel build --verbose_failures plugin_files
     install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
     xx-verify /out/usr/bin/protoc-gen-js
 EOF
 
 
-FROM node:${NODE_IMAGE_VERSION} as protoc_gen_ts
-ARG NODE_IMAGE_VERSION
-ARG PROTOC_GEN_TS_VERSION
-RUN npm install -g pkg ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
-RUN pkg \
-        --compress Brotli \
-        --targets node${NODE_IMAGE_VERSION%%.*}-alpine \
-        -o protoc-gen-ts \
-        /usr/local/lib/node_modules/ts-protoc-gen
-RUN install -D protoc-gen-ts /out/usr/bin/protoc-gen-ts
-
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} as protoc_gen_scala
-RUN mkdir -p /scala-protobuf
-ARG PROTOC_GEN_SCALA_VERSION
-RUN curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
-WORKDIR /scala-protobuf
-RUN gu install native-image
-# Make sbt use the version of native-image installed by gu instead of downloading a separate version
-ARG NATIVE_IMAGE_INSTALLED=true
-RUN ./make_reflect_config.sh
-RUN sbt protocGenScalaNativeImage/nativeImage
-RUN install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
+ARG TARGETARCH 
+ARG PROTOC_GEN_SCALA_VERSION 
+ARG NATIVE_IMAGE_INSTALLED=true 
+ARG JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
+# Skip arm64 build due to https://github.com/spring-projects/spring-boot/issues/33429
+RUN <<EOF
+    mkdir -p /scala-protobuf
+    mkdir -p /out
+    if [ "${TARGETARCH}" = "arm64" ]; then
+      echo "Skipping arm64 build due to error in Native Image toolchain"
+      exit 0
+    fi
+    curl -sS --retry 5 --retry-delay 10 --retry-connrefused -L https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
+    cd /scala-protobuf
+    gu install native-image
+    ./make_reflect_config.sh
+    sbt protocGenScalaNativeImage/nativeImage
+    install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
+EOF
+
 
 FROM dart:${DART_IMAGE_VERSION} as protoc_gen_dart
-RUN apt-get update
-RUN apt-get install -y curl
 RUN mkdir -p /dart-protobuf
 ARG PROTOC_GEN_DART_VERSION
-RUN curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
+RUN curl -sS --retry 5 --retry-delay 10 --retry-connrefused -L https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
 WORKDIR /dart-protobuf/protoc_plugin
 # Use Dart mirror to work around connectivity problems to default host when building in QEMU
 # https://stackoverflow.com/questions/70729747
@@ -413,7 +417,6 @@ COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
-ARG TARGETARCH
 RUN find /out/usr/bin/ -type f \
         -name 'protoc-gen-*' | \
         xargs -P $(nproc) -I{} \
@@ -421,23 +424,25 @@ RUN find /out/usr/bin/ -type f \
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
-FROM alpine:${ALPINE_IMAGE_VERSION}
+FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
-ARG PROTOC_GEN_NANOPB_VERSION
+ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION
 RUN apk add --no-cache \
         bash \
         grpc \
-        grpc-java \
+        # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
+        # grpc-java \
         grpc-plugins \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler \
         python3
 COPY --from=upx /out/ /
-COPY --from=protoc_gen_ts /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
-RUN python3 -m ensurepip && pip3 install --no-cache nanopb==${PROTOC_GEN_NANOPB_VERSION}
+RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
+RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
+    python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
@@ -447,6 +452,8 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go && \
     ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
+    # ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift && \
+    # ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test && \
     protoc-wrapper \
@@ -460,13 +467,14 @@ RUN mkdir -p /test && \
         --grpc-cpp_out=/test \
         --grpc-csharp_out=/test \
         --grpc-go_out=/test \
-        --grpc-java_out=/test \
+        # --grpc-java_out=/test \
         --grpc-js_out=/test \
         --grpc-objc_out=/test \
         --grpc-php_out=/test \
         --grpc-python_out=/test \
         --grpc-ruby_out=/test \
         --grpc-rust_out=/test \
+        # --grpc-swift_out=/test \
         --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
         --java_out=/test \
         --jsonschema_out=/test \
@@ -475,8 +483,8 @@ RUN mkdir -p /test && \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
-        --rust_out=/test \
-        --scala_out=/test \
+        --rust_out=experimental-codegen=enabled,kernel=cpp:/test \
+        # --swift_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
@@ -495,6 +503,7 @@ RUN <<EOF
         protoc-wrapper \
             --grpc-swift_out=/test \
             --js_out=import_style=commonjs:/test \
+            --scala_out=/test \
             --swift_out=/test \
             google/protobuf/any.proto
     fi
