@@ -338,24 +338,16 @@ ARG TARGETARCH
 ARG PROTOC_GEN_JS_VERSION
 ARG CPPFLAGS=-std=c++17
 ARG BAZEL_CXXOPTS="-std=c++17"
-RUN <<EOF
-    # Skip arm64 build due to https://github.com/bazelbuild/bazel/issues/17220
-    # TODO: Remove this conditional once fixed
-    if [ "${TARGETARCH}" = "arm64" ]; then
-      echo "Skipping arm64 build due to error in Bazel toolchain"
-      exit 0
-    fi
-    apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/ bazel7
-    # Build protoc-gen-js
-    # TODO: Remove when protoc-gen-js is available in Alpine
-    # https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
-    mkdir -p /protoc_gen_js
-    cd /protoc_gen_js
-    curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
-    bazel build --verbose_failures plugin_files
-    install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
-    xx-verify /out/usr/bin/protoc-gen-js
-EOF
+RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/ bazel7
+# Build protoc-gen-js
+# TODO: Remove when protoc-gen-js is available in Alpine
+# https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
+RUN mkdir -p /protoc_gen_js
+WORKDIR /protoc_gen_js
+RUN curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
+RUN bazel build --verbose_failures plugin_files
+RUN install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
+RUN xx-verify /out/usr/bin/protoc-gen-js
 
 
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
