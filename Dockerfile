@@ -316,34 +316,6 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
-FROM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_js
-COPY --from=xx / /
-RUN mkdir -p /out
-RUN apk add --no-cache \
-    bash \
-    build-base \
-    curl \
-    linux-headers \
-    openjdk11-jdk \
-    python3 \
-    unzip \
-    zip
-ARG TARGETARCH
-ARG PROTOC_GEN_JS_VERSION
-ARG CPPFLAGS=-std=c++17
-ARG BAZEL_CXXOPTS="-std=c++17"
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/ bazel7
-# Build protoc-gen-js
-# TODO: Remove when protoc-gen-js is available in Alpine
-# https://gitlab.alpinelinux.org/alpine/aports/-/issues/14399
-RUN mkdir -p /protoc_gen_js
-WORKDIR /protoc_gen_js
-RUN curl -sSL https://api.github.com/repos/protocolbuffers/protobuf-javascript/tarball/${PROTOC_GEN_JS_VERSION} | tar xz --strip 1 -C /protoc_gen_js
-RUN bazel build --verbose_failures plugin_files
-RUN install -D /protoc_gen_js/bazel-bin/generator/protoc-gen-js /out/usr/bin/protoc-gen-js
-RUN xx-verify /out/usr/bin/protoc-gen-js
-
-
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
 ARG TARGETARCH 
 ARG PROTOC_GEN_SCALA_VERSION 
@@ -397,7 +369,6 @@ COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
-COPY --from=protoc_gen_js /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
@@ -413,7 +384,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION
-RUN apk add --no-cache \
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
         bash \
         grpc \
         # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
@@ -422,6 +393,7 @@ RUN apk add --no-cache \
         protobuf \
         protobuf-dev \
         protobuf-c-compiler \
+        protoc-gen-js \
         python3
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
