@@ -248,13 +248,18 @@ RUN xx-cargo --config profile.release.strip=true build --release
 RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
-
+# Skip arm64 build due to https://forums.swift.org/t/build-crash-when-building-in-qemu-using-new-swift-5-6-arm64-image/56090/
+# TODO: Set up cross compile https://swiftinit.org/articles/cross-compiling-x86_64-linux-to-aarch64-linux
 FROM swift:${SWIFT_IMAGE_VERSION} AS grpc_swift
 ARG TARGETOS TARGETARCH GRPC_SWIFT_VERSION
-RUN mkdir -p /protoc-gen-swift && \
-    mkdir -p /grpc-swift
-RUN rm /var/lib/dpkg/info/libc-bin.* && \
-    apt-get update && \
+RUN <<EOF
+    mkdir -p /protoc-gen-swift
+    if [ "${TARGETARCH}" = "arm64" ]; then
+      echo "Skipping arm64 build due to error in Swift toolchain"
+      exit 0
+    fi
+    rm /var/lib/dpkg/info/libc-bin.*
+    apt-get update
     apt-get install -y \
         build-essential \
         curl \
@@ -263,14 +268,14 @@ RUN rm /var/lib/dpkg/info/libc-bin.* && \
         patchelf \
         unzip \
         zlib1g-dev
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
-WORKDIR /grpc-swift
-RUN <<EOF
     case ${TARGETARCH} in
       "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-${TARGETOS}-x86-64.so.2  ;;
       "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-${TARGETOS}-aarch64.so.1 ;;
       *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
     esac
+    mkdir -p /grpc-swift
+    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
+    cd /grpc-swift
     swift build -c release --product protoc-gen-swift
     swift build -c release --product protoc-gen-grpc-swift
     install -Ds /grpc-swift/.build/release/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift
@@ -409,9 +414,7 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go && \
-    ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust && \
-    ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift && \
-    ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift
+    ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test && \
     protoc-wrapper \
@@ -432,7 +435,6 @@ RUN mkdir -p /test && \
         --grpc-python_out=/test \
         --grpc-ruby_out=/test \
         --grpc-rust_out=/test \
-        --grpc-swift_out=/test \
         --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
         --java_out=/test \
         --js_out=import_style=commonjs:/test \
@@ -443,7 +445,6 @@ RUN mkdir -p /test && \
         --python_out=/test \
         --ruby_out=/test \
         --rust_out=experimental-codegen=enabled,kernel=cpp:/test \
-        --swift_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
@@ -452,9 +453,17 @@ RUN protoc-wrapper \
         google/protobuf/any.proto
 ARG TARGETARCH
 RUN <<EOF
+    if ! [ "${TARGETARCH}" = "arm64" ]; then 
+        ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift
+        ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift
+    fi
+EOF
+RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then
         protoc-wrapper \
+            --grpc-swift_out=/test \
             --scala_out=/test \
+            --swift_out=/test \
             google/protobuf/any.proto
     fi
 EOF
