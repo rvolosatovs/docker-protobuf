@@ -326,6 +326,22 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_pbandk
+RUN apk add --no-cache \
+        curl \
+        git \
+        openjdk8 \
+        openjdk11
+ARG PROTOC_GEN_PBANDK_VERSION
+RUN mkdir -p /pbandk
+# We need to use my fork of the repo and this version increment hack until https://github.com/streem/pbandk/pull/248 is merged
+RUN git clone https://github.com/strophy/pbandk.git
+WORKDIR /pbandk
+RUN echo ${PROTOC_GEN_PBANDK_VERSION} | awk -F. '{print $1 "." $2 "." $3+1}' > next-version.txt
+RUN ./gradlew :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
+RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(cat next-version.txt)-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
+
+
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
 ARG TARGETARCH 
 ARG PROTOC_GEN_SCALA_VERSION 
@@ -404,10 +420,12 @@ RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/t
         protobuf-dev \
         protobuf-c-compiler \
         protoc-gen-js \
+        openjdk8-jre \
         python3
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
+COPY --from=protoc_gen_pbandk /out/ /
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
@@ -446,6 +464,7 @@ RUN mkdir -p /test && \
         --jsonschema_out=/test \
         --lint_out=/test \
         --nanopb_out=/test \
+        --pbandk_out=/test \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
