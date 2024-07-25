@@ -444,12 +444,14 @@ RUN mkdir -p /test && \
         --c_out=/test \
         --dart_out=/test \
         --go_out=/test \
+        --go-grpc_out=/test \
         --gorm_out=/test \
         --gotemplate_out=/test \
         --govalidators_out=/test \
         --gql_out=/test \
         --grpc-cpp_out=/test \
         --grpc-csharp_out=/test \
+        --grpc-gateway_out=/test \
         --grpc-go_out=/test \
         # --grpc-java_out=/test \
         --grpc-js_out=/test \
@@ -464,6 +466,7 @@ RUN mkdir -p /test && \
         --jsonschema_out=/test \
         --lint_out=/test \
         --nanopb_out=/test \
+        --openapiv2_out=/test \
         --pbandk_out=/test \
         --php_out=/test \
         --python_out=/test \
@@ -474,6 +477,7 @@ RUN mkdir -p /test && \
         google/protobuf/any.proto
 RUN protoc-wrapper \
         --gogo_out=/test \
+        --openapiv2_out=/test \
         google/protobuf/any.proto
 ARG TARGETARCH
 RUN <<EOF
