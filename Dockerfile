@@ -235,8 +235,8 @@ RUN --mount=type=cache,target=/root/.cargo/git/db \
     cargo fetch
 ARG TARGETPLATFORM
 RUN xx-cargo --config profile.release.strip=true build --release
-RUN install -D /rust-protobuf/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust /out/usr/bin/protoc-gen-rust
-RUN xx-verify /out/usr/bin/protoc-gen-rust
+RUN install -D /rust-protobuf/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rs /out/usr/bin/protoc-gen-rs
+RUN xx-verify /out/usr/bin/protoc-gen-rs
 
 
 FROM --platform=$BUILDPLATFORM rust_target AS grpc_rust
@@ -471,7 +471,7 @@ RUN mkdir -p /test && \
         --php_out=/test \
         --python_out=/test \
         --ruby_out=/test \
-        --rust_out=experimental-codegen=enabled,kernel=cpp:/test \
+        --rs_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
