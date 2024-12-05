@@ -189,6 +189,21 @@ RUN install -D ./options.proto /out/usr/include/github.com/chrusty/protoc-gen-js
 RUN xx-verify /out/usr/bin/protoc-gen-jsonschema
 
 
+FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_bq_schema
+RUN mkdir -p ${GOPATH}/src/github.com/googlecloudplatform/protoc-gen-bq-schema
+ARG PROTOC_GEN_BQ_SCHEMA_VERSION
+RUN curl -sSL https://api.github.com/repos/googlecloudplatform/protoc-gen-bq-schema/tarball/${PROTOC_GEN_BQ_SCHEMA_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/googlecloudplatform/protoc-gen-bq-schema
+WORKDIR ${GOPATH}/src/github.com/googlecloudplatform/protoc-gen-bq-schema
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /protoc-gen-bq-schema/protoc-gen-bq-schema .
+RUN install -D /protoc-gen-bq-schema/protoc-gen-bq-schema /out/usr/bin/protoc-gen-bq-schema
+RUN install -D ./bq_field.proto /out/usr/include/github.com/googlecloudplatform/protoc-gen-bq-schema/bq_field.proto
+RUN install -D ./bq_table.proto /out/usr/include/github.com/googlecloudplatform/protoc-gen-bq-schema/bq_table.proto
+RUN xx-verify /out/usr/bin/protoc-gen-bq-schema
+
+
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
 RUN apk add --no-cache \
         autoconf \ 
@@ -396,6 +411,7 @@ COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
+COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
@@ -464,6 +480,7 @@ RUN mkdir -p /test && \
         --java_out=/test \
         --js_out=import_style=commonjs:/test \
         --jsonschema_out=/test \
+        --bq-schema_out=/test \
         --lint_out=/test \
         --nanopb_out=/test \
         --openapiv2_out=/test \
