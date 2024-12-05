@@ -7,6 +7,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 ## What's included:
 - [bufbuild/protoc-gen-validate](https://github.com/bufbuild/protoc-gen-validate)
 - [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
+- [googlecloudplatform/protoc-gen-bq-schema] (https://github.com/googlecloudplatform/protoc-gen-bq-schema)
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
 - [dart-lang/protobuf](https://github.com/dart-lang/protobuf)
