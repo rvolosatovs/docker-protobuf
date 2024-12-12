@@ -357,9 +357,9 @@ RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(
 
 
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
-ARG TARGETARCH 
-ARG PROTOC_GEN_SCALA_VERSION 
-ARG NATIVE_IMAGE_INSTALLED=true 
+ARG TARGETARCH
+ARG PROTOC_GEN_SCALA_VERSION
+ARG NATIVE_IMAGE_INSTALLED=true
 ARG JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
 # Skip arm64 build due to https://github.com/spring-projects/spring-boot/issues/33429
 RUN <<EOF
@@ -437,13 +437,13 @@ RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/t
         protoc-gen-js \
         openjdk8-jre \
         python3
+RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
+RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
+    python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
 COPY --from=protoc_gen_pbandk /out/ /
-RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
-RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
-    python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_csharp_plugin /usr/bin/protoc-gen-grpc-csharp && \
     ln -s /usr/bin/grpc_node_plugin /usr/bin/protoc-gen-grpc-js && \
