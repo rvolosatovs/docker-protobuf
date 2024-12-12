@@ -68,6 +68,12 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["PROTOC_GEN_BQ_SCHEMA_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "googlecloudplatform/protoc-gen-bq-schema",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_DART_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "google/protobuf.dart",
       "datasourceTemplate": "github-tags",
