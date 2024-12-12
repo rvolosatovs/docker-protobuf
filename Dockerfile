@@ -345,8 +345,7 @@ FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_pban
 RUN apk add --no-cache \
         curl \
         git \
-        openjdk8 \
-        openjdk11
+        openjdk17
 ARG PROTOC_GEN_PBANDK_VERSION
 RUN mkdir -p /pbandk
 # We need to use my fork of the repo and this version increment hack until https://github.com/streem/pbandk/pull/248 is merged
