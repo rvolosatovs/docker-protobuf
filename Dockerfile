@@ -356,9 +356,9 @@ RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_pbandk
 RUN apk add --no-cache \
-    curl \
-    git \
-    openjdk17
+        curl \
+        git \
+        openjdk17
 ARG PROTOC_GEN_PBANDK_VERSION
 RUN mkdir -p /pbandk
 # We need to use my fork of the repo and this version increment hack until https://github.com/streem/pbandk/pull/248 is merged
