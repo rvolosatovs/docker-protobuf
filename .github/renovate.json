@@ -178,7 +178,7 @@
     {
       "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_OPENAPI_VERSION=(?<currentValue>.*?)\\n"],
-      "depNameTemplate": "bufbuild/protoc-gen-openapi",
+      "depNameTemplate": "solo-io/protoc-gen-openapi",
       "datasourceTemplate": "github-releases"
     },
     {
