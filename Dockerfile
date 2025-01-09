@@ -18,8 +18,8 @@ COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
 RUN apk add --no-cache \
-        build-base \
-        curl
+    build-base \
+    curl
 
 
 FROM --platform=$BUILDPLATFORM go_host AS grpc_gateway
@@ -51,6 +51,19 @@ RUN xx-go --wrap
 RUN go build -ldflags '-w -s' -o /protoc-gen-doc-out/protoc-gen-doc ./cmd/protoc-gen-doc
 RUN install -D /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
 RUN xx-verify /out/usr/bin/protoc-gen-doc
+
+
+FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_openapi
+RUN mkdir -p ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+ARG PROTOC_GEN_OPENAPI_VERSION
+RUN curl -sSL https://api.github.com/repos/solo-io/protoc-gen-openapi/tarball/${PROTOC_GEN_OPENAPI_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+WORKDIR ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /protoc-gen-openapi-out/protoc-gen-openapi ./cmd/protoc-gen-openapi
+RUN install -D /protoc-gen-openapi-out/protoc-gen-openapi /out/usr/bin/protoc-gen-openapi
+RUN xx-verify /out/usr/bin/protoc-gen-openapi
 
 
 FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_go_grpc
@@ -206,13 +219,13 @@ RUN xx-verify /out/usr/bin/protoc-gen-bq-schema
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
 RUN apk add --no-cache \
-        autoconf \ 
-        automake \
-        build-base \
-        clang \
-        git \
-        libtool \
-        zlib-dev
+    autoconf \ 
+    automake \
+    build-base \
+    clang \
+    git \
+    libtool \
+    zlib-dev
 ARG GRPC_WEB_VERSION
 RUN git clone --recurse-submodules --branch=$GRPC_WEB_VERSION https://github.com/grpc/grpc-web.git
 WORKDIR /grpc-web/third_party/protobuf
@@ -233,10 +246,10 @@ COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
 RUN apk add --no-cache \
-        build-base \
-        clang \
-        curl \
-        lld
+    build-base \
+    clang \
+    curl \
+    lld
 
 
 FROM --platform=$BUILDPLATFORM rust_target AS protoc_gen_rust
@@ -315,8 +328,8 @@ COPY --from=xx / /
 WORKDIR /
 RUN mkdir -p /out
 RUN apk add --no-cache \
-        curl \
-        unzip
+    curl \
+    unzip
 
 
 FROM --platform=$BUILDPLATFORM alpine_host AS googleapis
@@ -343,9 +356,9 @@ RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_pbandk
 RUN apk add --no-cache \
-        curl \
-        git \
-        openjdk17
+    curl \
+    git \
+    openjdk17
 ARG PROTOC_GEN_PBANDK_VERSION
 RUN mkdir -p /pbandk
 # We need to use my fork of the repo and this version increment hack until https://github.com/streem/pbandk/pull/248 is merged
@@ -416,9 +429,9 @@ COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 RUN find /out/usr/bin/ -type f \
-        -name 'protoc-gen-*' | \
-        xargs -P $(nproc) -I{} \
-        upx --lzma {}
+    -name 'protoc-gen-*' | \
+    xargs -P $(nproc) -I{} \
+    upx --lzma {}
 RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 
@@ -426,17 +439,17 @@ FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-        bash \
-        grpc \
-        # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
-        # grpc-java \
-        grpc-plugins \
-        protobuf \
-        protobuf-dev \
-        protobuf-c-compiler \
-        protoc-gen-js \
-        openjdk8-jre \
-        python3
+    bash \
+    grpc \
+    # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
+    # grpc-java \
+    grpc-plugins \
+    protobuf \
+    protobuf-dev \
+    protobuf-c-compiler \
+    protoc-gen-js \
+    openjdk8-jre \
+    python3
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
@@ -456,45 +469,47 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test && \
     protoc-wrapper \
-        --c_out=/test \
-        --dart_out=/test \
-        --go_out=/test \
-        --go-grpc_out=/test \
-        --gorm_out=/test \
-        --gotemplate_out=/test \
-        --govalidators_out=/test \
-        --gql_out=/test \
-        --grpc-cpp_out=/test \
-        --grpc-csharp_out=/test \
-        --grpc-gateway_out=/test \
-        --grpc-go_out=/test \
-        # --grpc-java_out=/test \
-        --grpc-js_out=/test \
-        --grpc-objc_out=/test \
-        --grpc-php_out=/test \
-        --grpc-python_out=/test \
-        --grpc-ruby_out=/test \
-        --grpc-rust_out=/test \
-        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
-        --java_out=/test \
-        --js_out=import_style=commonjs:/test \
-        --jsonschema_out=/test \
-        --bq-schema_out=/test \
-        --lint_out=/test \
-        --nanopb_out=/test \
-        --openapiv2_out=/test \
-        --pbandk_out=/test \
-        --php_out=/test \
-        --python_out=/test \
-        --ruby_out=/test \
-        --rs_out=/test \
-        --ts_out=/test \
-        --validate_out=lang=go:/test \
-        google/protobuf/any.proto
+    --c_out=/test \
+    --dart_out=/test \
+    --go_out=/test \
+    --go-grpc_out=/test \
+    --gorm_out=/test \
+    --gotemplate_out=/test \
+    --govalidators_out=/test \
+    --gql_out=/test \
+    --grpc-cpp_out=/test \
+    --grpc-csharp_out=/test \
+    --grpc-gateway_out=/test \
+    --grpc-go_out=/test \
+    # --grpc-java_out=/test \
+    --grpc-js_out=/test \
+    --grpc-objc_out=/test \
+    --grpc-php_out=/test \
+    --grpc-python_out=/test \
+    --grpc-ruby_out=/test \
+    --grpc-rust_out=/test \
+    --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
+    --java_out=/test \
+    --js_out=import_style=commonjs:/test \
+    --jsonschema_out=/test \
+    --bq-schema_out=/test \
+    --lint_out=/test \
+    --nanopb_out=/test \
+    --openapiv2_out=/test \
+    --openapi_out=/test \
+    --pbandk_out=/test \
+    --php_out=/test \
+    --python_out=/test \
+    --ruby_out=/test \
+    --rs_out=/test \
+    --ts_out=/test \
+    --validate_out=lang=go:/test \
+    google/protobuf/any.proto
 RUN protoc-wrapper \
-        --gogo_out=/test \
-        --openapiv2_out=/test \
-        google/protobuf/any.proto
+    --gogo_out=/test \
+    --openapiv2_out=/test \
+    --openapi_out=/test \
+    google/protobuf/any.proto
 ARG TARGETARCH
 RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then 
