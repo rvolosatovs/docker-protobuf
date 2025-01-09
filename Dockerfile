@@ -61,8 +61,8 @@ WORKDIR ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
 RUN go mod download
 ARG TARGETPLATFORM
 RUN xx-go --wrap
-RUN go build -ldflags '-w -s' -o /protoc-gen-openapi-out/protoc-gen-openapi ./cmd/protoc-gen-openapi
-RUN install -D /protoc-gen-openapi-out/protoc-gen-openapi /out/usr/bin/protoc-gen-openapi
+RUN make build
+RUN install -D _output/.bin/protoc-gen-openapi /out/usr/bin/protoc-gen-openapi
 RUN xx-verify /out/usr/bin/protoc-gen-openapi
 
 
@@ -428,6 +428,7 @@ COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
+COPY --from=protoc_gen_openapi /out/ /out/
 RUN find /out/usr/bin/ -type f \
     -name 'protoc-gen-*' | \
     xargs -P $(nproc) -I{} \
