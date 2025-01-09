@@ -57,6 +57,7 @@ func main() {
 		{"danielvladco", "go-proto-gql"},
 		{"ckaznocha", "protoc-gen-lint"},
 		{"envoyproxy", "protoc-gen-validate"},
+		{"solo-io", "protoc-gen-openapi"},
 		{"stepancheg", "rust-protobuf"},
 		{"rust-lang", "rust"},
 		{"apple", "swift"},
