@@ -32,6 +32,7 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [scalapb/scalapb](https://github.com/scalapb/scalapb)
 - [stepancheg/grpc-rust](https://github.com/stepancheg/grpc-rust)
 - [stepancheg/rust-protobuf](https://github.com/stepancheg/rust-protobuf)
+- [solo-io/protoc-gen-openapi](https://github.com/solo-io/protoc-gen-openapi)
 
 ## Supported languages
 - C
