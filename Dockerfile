@@ -53,6 +53,18 @@ RUN install -D /protoc-gen-doc-out/protoc-gen-doc /out/usr/bin/protoc-gen-doc
 RUN xx-verify /out/usr/bin/protoc-gen-doc
 
 
+FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_openapi
+RUN mkdir -p ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+ARG PROTOC_GEN_OPENAPI_VERSION
+RUN curl -sSL https://api.github.com/repos/solo-io/protoc-gen-openapi/tarball/${PROTOC_GEN_OPENAPI_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+WORKDIR ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
+RUN go mod download
+ARG TARGETPLATFORM
+RUN make build
+RUN install -D _output/.bin/protoc-gen-openapi /out/usr/bin/protoc-gen-openapi
+RUN xx-verify /out/usr/bin/protoc-gen-openapi
+
+
 FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_go_grpc
 RUN mkdir -p ${GOPATH}/src/github.com/grpc/grpc-go
 ARG PROTOC_GEN_GO_GRPC_VERSION
@@ -415,6 +427,7 @@ COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
+COPY --from=protoc_gen_openapi /out/ /out/
 RUN find /out/usr/bin/ -type f \
         -name 'protoc-gen-*' | \
         xargs -P $(nproc) -I{} \
@@ -483,6 +496,7 @@ RUN mkdir -p /test && \
         --lint_out=/test \
         --nanopb_out=/test \
         --openapiv2_out=/test \
+        --openapi_out=/test \
         --pbandk_out=/test \
         --php_out=/test \
         --python_out=/test \
@@ -494,6 +508,7 @@ RUN mkdir -p /test && \
 RUN protoc-wrapper \
         --gogo_out=/test \
         --openapiv2_out=/test \
+        --openapi_out=/test \
         google/protobuf/any.proto
 ARG TARGETARCH
 RUN <<EOF
