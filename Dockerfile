@@ -60,7 +60,8 @@ RUN curl -sSL https://api.github.com/repos/solo-io/protoc-gen-openapi/tarball/${
 WORKDIR ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
 RUN go mod download
 ARG TARGETPLATFORM
-RUN make build
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o _output/.bin/protoc-gen-openapi .
 RUN install -D _output/.bin/protoc-gen-openapi /out/usr/bin/protoc-gen-openapi
 RUN xx-verify /out/usr/bin/protoc-gen-openapi
 
