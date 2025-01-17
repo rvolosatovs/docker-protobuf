@@ -281,45 +281,28 @@ RUN xx-cargo --config profile.release.strip=true build --release
 RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
-# Skip arm64 build due to https://forums.swift.org/t/build-crash-when-building-in-qemu-using-new-swift-5-6-arm64-image/56090/
-# TODO: Set up cross compile https://swiftinit.org/articles/cross-compiling-x86_64-linux-to-aarch64-linux
-FROM swift:${SWIFT_IMAGE_VERSION} AS grpc_swift
-ARG TARGETOS TARGETARCH GRPC_SWIFT_VERSION
+
+FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION}-noble AS grpc_swift
+ARG GRPC_SWIFT_VERSION SWIFT_IMAGE_VERSION
+RUN apt-get update && \
+    apt-get install -y curl
+RUN swift sdk install \
+    https://download.swift.org/swift-${SWIFT_IMAGE_VERSION}-release/static-sdk/swift-${SWIFT_IMAGE_VERSION}-RELEASE/swift-${SWIFT_IMAGE_VERSION}-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
+    --checksum 67f765e0030e661a7450f7e4877cfe008db4f57f177d5a08a6e26fd661cdd0bd
+RUN mkdir -p /grpc-swift
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
+WORKDIR /grpc-swift
+ARG TARGETOS TARGETARCH
 RUN <<EOF
-    mkdir -p /protoc-gen-swift
-    if [ "${TARGETARCH}" = "arm64" ]; then
-      echo "Skipping arm64 build due to error in Swift toolchain"
-      exit 0
-    fi
-    rm /var/lib/dpkg/info/libc-bin.*
-    apt-get update
-    apt-get install -y \
-        build-essential \
-        curl \
-        libnghttp2-dev \
-        libssl-dev \
-        patchelf \
-        unzip \
-        zlib1g-dev
     case ${TARGETARCH} in
-      "amd64")  SWIFT_LIB_DIR=/lib64 && SWIFT_LINKER=ld-${TARGETOS}-x86-64.so.2  ;;
-      "arm64")  SWIFT_LIB_DIR=/lib   && SWIFT_LINKER=ld-${TARGETOS}-aarch64.so.1 ;;
+      "amd64")  SWIFTARCH=x86_64  ;;
+      "arm64")  SWIFTARCH=aarch64 ;;
       *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
     esac
-    mkdir -p /grpc-swift
-    curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
-    cd /grpc-swift
-    swift build -c release --product protoc-gen-swift
-    swift build -c release --product protoc-gen-grpc-swift
-    install -Ds /grpc-swift/.build/release/protoc-gen-swift /protoc-gen-swift/protoc-gen-swift
-    install -Ds /grpc-swift/.build/release/protoc-gen-grpc-swift /protoc-gen-swift/protoc-gen-grpc-swift
-    cp ${SWIFT_LIB_DIR}/${SWIFT_LINKER} \
-      $(ldd /protoc-gen-swift/protoc-gen-swift /protoc-gen-swift/protoc-gen-grpc-swift | awk '{print $3}' | grep /lib | sort | uniq) \
-      /protoc-gen-swift/
-    find /protoc-gen-swift/ -name 'lib*.so*' -exec patchelf --set-rpath /protoc-gen-swift {} \;
-    for p in protoc-gen-swift protoc-gen-grpc-swift; do
-      patchelf --set-interpreter /protoc-gen-swift/${SWIFT_LINKER} /protoc-gen-swift/${p}
-    done
+    swift build -c release --product protoc-gen-swift --swift-sdk $SWIFTARCH-swift-linux-musl
+    swift build -c release --product protoc-gen-grpc-swift --swift-sdk $SWIFTARCH-swift-linux-musl
+    install -D /grpc-swift/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift && \
+    install -D /grpc-swift/.build/release/protoc-gen-grpc-swift /out/usr/bin/protoc-gen-grpc-swift
 EOF
 
 
@@ -412,8 +395,9 @@ RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
 COPY --from=grpc_rust /out/ /out/
-COPY --from=grpc_swift /protoc-gen-swift /out/protoc-gen-swift
+COPY --from=grpc_swift /out/ /out/
 COPY --from=grpc_web /out/ /out/
+COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
@@ -423,12 +407,11 @@ COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
-COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
+COPY --from=protoc_gen_openapi /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
-COPY --from=protoc_gen_openapi /out/ /out/
 RUN find /out/usr/bin/ -type f \
         -name 'protoc-gen-*' | \
         xargs -P $(nproc) -I{} \
@@ -470,6 +453,7 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
 COPY protoc-wrapper /usr/bin/protoc-wrapper
 RUN mkdir -p /test && \
     protoc-wrapper \
+        --bq-schema_out=/test \
         --c_out=/test \
         --dart_out=/test \
         --go_out=/test \
@@ -489,41 +473,32 @@ RUN mkdir -p /test && \
         --grpc-python_out=/test \
         --grpc-ruby_out=/test \
         --grpc-rust_out=/test \
+        --grpc-swift_out=/test \
         --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
         --java_out=/test \
         --js_out=import_style=commonjs:/test \
         --jsonschema_out=/test \
-        --bq-schema_out=/test \
         --lint_out=/test \
         --nanopb_out=/test \
-        --openapiv2_out=/test \
         --openapi_out=/test \
+        --openapiv2_out=/test \
         --pbandk_out=/test \
         --php_out=/test \
         --python_out=/test \
-        --ruby_out=/test \
         --rs_out=/test \
+        --ruby_out=/test \
+        --swift_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
         google/protobuf/any.proto
 RUN protoc-wrapper \
         --gogo_out=/test \
-        --openapiv2_out=/test \
-        --openapi_out=/test \
         google/protobuf/any.proto
 ARG TARGETARCH
 RUN <<EOF
-    if ! [ "${TARGETARCH}" = "arm64" ]; then 
-        ln -s /protoc-gen-swift/protoc-gen-grpc-swift /usr/bin/protoc-gen-grpc-swift
-        ln -s /protoc-gen-swift/protoc-gen-swift /usr/bin/protoc-gen-swift
-    fi
-EOF
-RUN <<EOF
     if ! [ "${TARGETARCH}" = "arm64" ]; then
         protoc-wrapper \
-            --grpc-swift_out=/test \
             --scala_out=/test \
-            --swift_out=/test \
             google/protobuf/any.proto
     fi
 EOF
