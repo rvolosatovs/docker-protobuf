@@ -282,15 +282,19 @@ RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/proto
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
-FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION}-noble AS grpc_swift
-ARG GRPC_SWIFT_VERSION SWIFT_IMAGE_VERSION
+FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION}-noble AS swift_target
+ARG SWIFT_IMAGE_VERSION
 RUN apt-get update && \
     apt-get install -y curl
 RUN swift sdk install \
     https://download.swift.org/swift-${SWIFT_IMAGE_VERSION}-release/static-sdk/swift-${SWIFT_IMAGE_VERSION}-RELEASE/swift-${SWIFT_IMAGE_VERSION}-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
     --checksum 67f765e0030e661a7450f7e4877cfe008db4f57f177d5a08a6e26fd661cdd0bd
+
+
+FROM --platform=$BUILDPLATFORM swift_target AS grpc_gen_swift
+ARG PROTOC_GEN_SWIFT_VERSION
 RUN mkdir -p /grpc-swift
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${PROTOC_GEN_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
 WORKDIR /grpc-swift
 ARG TARGETOS TARGETARCH
 RUN <<EOF
@@ -300,11 +304,24 @@ RUN <<EOF
       *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
     esac
     swift build -c release --product protoc-gen-swift --swift-sdk $SWIFTARCH-swift-linux-musl
-    swift build -c release --product protoc-gen-grpc-swift --swift-sdk $SWIFTARCH-swift-linux-musl
-    install -D /grpc-swift/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift && \
-    install -D /grpc-swift/.build/release/protoc-gen-grpc-swift /out/usr/bin/protoc-gen-grpc-swift
+    install -D /grpc-swift/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift
 EOF
 
+FROM --platform=$BUILDPLATFORM swift_target AS grpc_swift
+ARG GRPC_SWIFT_VERSION
+RUN mkdir -p /grpc-swift-protobuf
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
+WORKDIR /grpc-swift-protobuf
+ARG TARGETOS TARGETARCH
+RUN <<EOF
+    case ${TARGETARCH} in
+      "amd64")  SWIFTARCH=x86_64  ;;
+      "arm64")  SWIFTARCH=aarch64 ;;
+      *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
+    esac
+    swift build -c release --product protoc-gen-grpc-swift --swift-sdk $SWIFTARCH-swift-linux-musl
+    install -D /grpc-swift-protobuf/.build/release/protoc-gen-grpc-swift /out/usr/bin/protoc-gen-grpc-swift
+EOF
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS alpine_host
 COPY --from=xx / /
@@ -394,6 +411,7 @@ RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-$
 RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
+COPY --from=grpc_gen_swift /out/ /out/
 COPY --from=grpc_rust /out/ /out/
 COPY --from=grpc_swift /out/ /out/
 COPY --from=grpc_web /out/ /out/
