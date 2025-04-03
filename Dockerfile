@@ -284,12 +284,13 @@ RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION}-noble AS swift_target
 ARG SWIFT_IMAGE_VERSION
+ARG SWIFT_SDK_CHECKSUM
 RUN apt-get update && \
     apt-get install -y curl
-RUN swift sdk install \
-    https://download.swift.org/swift-${SWIFT_IMAGE_VERSION}-release/static-sdk/swift-${SWIFT_IMAGE_VERSION}-RELEASE/swift-${SWIFT_IMAGE_VERSION}-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
-    --checksum 67f765e0030e661a7450f7e4877cfe008db4f57f177d5a08a6e26fd661cdd0bd
-
+RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | sed -E 's/([0-9]+\.[0-9]+)\.0/\1/') && \
+    swift sdk install \
+    https://download.swift.org/swift-$SWIFT_SDK_VERSION-release/static-sdk/swift-$SWIFT_SDK_VERSION-RELEASE/swift-$SWIFT_SDK_VERSION-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
+    --checksum ${SWIFT_SDK_CHECKSUM}
 
 FROM --platform=$BUILDPLATFORM swift_target AS grpc_gen_swift
 ARG PROTOC_GEN_SWIFT_VERSION
