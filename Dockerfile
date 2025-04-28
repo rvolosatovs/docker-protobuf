@@ -92,6 +92,19 @@ RUN install -D /golang-protobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go
 RUN xx-verify /out/usr/bin/protoc-gen-go
 
 
+FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_go_vtproto
+RUN mkdir -p ${GOPATH}/src/github.com/planetscale/vtprotobuf
+ARG PROTOC_GEN_GO_VTPROTO_VERSION
+RUN curl -sSL https://api.github.com/repos/planetscale/vtprotobuf/tarball/${PROTOC_GEN_GO_VTPROTO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/planetscale/vtprotobuf
+WORKDIR ${GOPATH}/src/github.com/planetscale/vtprotobuf
+RUN go mod download
+ARG TARGETPLATFORM
+RUN xx-go --wrap
+RUN go build -ldflags '-w -s' -o /planetscale-vtprotobuf-out/ ./cmd/protoc-gen-go-vtproto
+RUN install -D /planetscale-vtprotobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go-vtproto
+RUN xx-verify /out/usr/bin/protoc-gen-go-vtproto
+
+
 FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_gogo
 RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf
 ARG PROTOC_GEN_GOGO_VERSION
@@ -420,6 +433,7 @@ COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
+COPY --from=protoc_gen_go_vtproto /out/ /out/
 COPY --from=protoc_gen_gogo /out/ /out/
 COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
@@ -485,6 +499,7 @@ RUN mkdir -p /test && \
         --grpc-csharp_out=/test \
         --grpc-gateway_out=/test \
         --grpc-go_out=/test \
+        --go-vtproto_out=/test \
         # --grpc-java_out=/test \
         --grpc-js_out=/test \
         --grpc-objc_out=/test \
