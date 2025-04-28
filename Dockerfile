@@ -101,7 +101,7 @@ RUN go mod download
 ARG TARGETPLATFORM
 RUN xx-go --wrap
 RUN go build -ldflags '-w -s' -o /planetscale-vtprotobuf-out/ ./cmd/protoc-gen-go-vtproto
-RUN install -D /planetscale-vtprotobuf-out/protoc-gen-go /out/usr/bin/protoc-gen-go-vtproto
+RUN install -D /planetscale-vtprotobuf-out/protoc-gen-go-vtproto /out/usr/bin/protoc-gen-go-vtproto
 RUN xx-verify /out/usr/bin/protoc-gen-go-vtproto
 
 
