@@ -455,7 +455,10 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION
-RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+RUN apk add --no-cache \
+      --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+      --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
+      --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main/ \
         bash \
         grpc \
         # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
@@ -465,7 +468,7 @@ RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/t
         protobuf-dev \
         protobuf-c-compiler \
         protoc-gen-js \
-        openjdk8-jre \
+        openjdk21-jre \
         python3
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
