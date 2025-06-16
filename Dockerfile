@@ -454,7 +454,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
-ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION
+ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
@@ -527,17 +527,14 @@ RUN mkdir -p /test && \
         --swift_out=/test \
         --ts_out=/test \
         --validate_out=lang=go:/test \
-        google/protobuf/any.proto
-RUN protoc-wrapper \
+        google/protobuf/any.proto && \
+    protoc-wrapper \
         --gogo_out=/test \
-        google/protobuf/any.proto
-ARG TARGETARCH
-RUN <<EOF
-    if ! [ "${TARGETARCH}" = "arm64" ]; then
+        google/protobuf/any.proto && \
+    if ! [ "${TARGETARCH}" = "arm64" ]; then \
         protoc-wrapper \
             --scala_out=/test \
-            google/protobuf/any.proto
-    fi
-EOF
-RUN rm -rf /test
+            google/protobuf/any.proto ; \
+    fi && \
+    rm -rf /test
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
