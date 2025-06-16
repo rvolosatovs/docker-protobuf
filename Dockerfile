@@ -230,29 +230,19 @@ RUN install -D ./bq_table.proto /out/usr/include/github.com/googlecloudplatform/
 RUN xx-verify /out/usr/bin/protoc-gen-bq-schema
 
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
-RUN apk add --no-cache \
-        autoconf \ 
-        automake \
+FROM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
+# Use Bazel 7 until grpc-web is updated to support Bazel 8+ with v1.6.0+
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+        bazel7 \
         build-base \
-        clang \
-        git \
-        libtool \
-        zlib-dev
+        curl 
 ARG GRPC_WEB_VERSION
-RUN git clone --recurse-submodules --branch=$GRPC_WEB_VERSION https://github.com/grpc/grpc-web.git
-WORKDIR /grpc-web/third_party/protobuf
-COPY --from=xx / /
-ARG TARGETPLATFORM
-RUN xx-apk add --no-cache g++
-RUN ./autogen.sh && \
-    ./configure --host=$(xx-clang --print-target-triple) && \
-    make -j$(nproc) && \
-    make install
+RUN mkdir -p /grpc-web
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
 WORKDIR /grpc-web
-RUN CXX=$(xx-info)-clang++ make -j$(nproc) install-plugin
-RUN install -D /usr/local/bin/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
-RUN xx-verify /out/usr/bin/protoc-gen-grpc-web
+RUN bazel build //javascript/net/grpc/web/generator:all
+RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
+
 
 FROM --platform=$BUILDPLATFORM rust:${RUST_IMAGE_VERSION} AS rust_target
 COPY --from=xx / /
