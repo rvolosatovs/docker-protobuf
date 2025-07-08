@@ -240,7 +240,7 @@ ARG GRPC_WEB_VERSION
 RUN mkdir -p /grpc-web
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
 WORKDIR /grpc-web
-RUN bazel build //javascript/net/grpc/web/generator:all
+RUN bazel --batch build //javascript/net/grpc/web/generator:all
 RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
