@@ -50,7 +50,7 @@
     {
       "fileMatch": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
-      "depNameTemplate": "grpc/grpc-swift",
+      "depNameTemplate": "grpc/grpc-swift-2",
       "datasourceTemplate": "github-releases"
     },
     {
