@@ -451,8 +451,7 @@ RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main/ \
         bash \
         grpc \
-        # Disabled due to https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/46676
-        # grpc-java \
+        grpc-java \
         grpc-plugins \
         protobuf \
         protobuf-dev \
@@ -493,7 +492,7 @@ RUN mkdir -p /test && \
         --grpc-gateway_out=/test \
         --grpc-go_out=/test \
         --go-vtproto_out=/test \
-        # --grpc-java_out=/test \
+        --grpc-java_out=/test \
         --grpc-js_out=/test \
         --grpc-objc_out=/test \
         --grpc-php_out=/test \
