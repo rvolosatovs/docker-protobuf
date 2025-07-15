@@ -295,11 +295,11 @@ RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | sed -E 's/([0-9]+\.
     https://download.swift.org/swift-$SWIFT_SDK_VERSION-release/static-sdk/swift-$SWIFT_SDK_VERSION-RELEASE/swift-$SWIFT_SDK_VERSION-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
     --checksum ${SWIFT_SDK_CHECKSUM}
 
-FROM --platform=$BUILDPLATFORM swift_target AS grpc_gen_swift
+FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_swift
 ARG PROTOC_GEN_SWIFT_VERSION
-RUN mkdir -p /grpc-swift
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift/tarball/${PROTOC_GEN_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift
-WORKDIR /grpc-swift
+RUN mkdir -p /swift-protobuf
+RUN curl -sSL https://api.github.com/repos/apple/swift-protobuf/tarball/${PROTOC_GEN_SWIFT_VERSION} | tar xz --strip 1 -C /swift-protobuf
+WORKDIR /swift-protobuf
 ARG TARGETOS TARGETARCH
 RUN <<EOF
     case ${TARGETARCH} in
@@ -308,13 +308,14 @@ RUN <<EOF
       *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
     esac
     swift build -c release --product protoc-gen-swift --swift-sdk $SWIFTARCH-swift-linux-musl
-    install -D /grpc-swift/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift
+    install -D /swift-protobuf/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift
 EOF
 
-FROM --platform=$BUILDPLATFORM swift_target AS grpc_swift
-ARG GRPC_SWIFT_VERSION
+FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift
+ARG PROTOC_GEN_GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift-protobuf
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
+RUN echo ${PROTOC_GEN_GRPC_SWIFT_VERSION}
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
 WORKDIR /grpc-swift-protobuf
 ARG TARGETOS TARGETARCH
 RUN <<EOF
@@ -326,6 +327,24 @@ RUN <<EOF
     swift build -c release --product protoc-gen-grpc-swift --swift-sdk $SWIFTARCH-swift-linux-musl
     install -D /grpc-swift-protobuf/.build/release/protoc-gen-grpc-swift /out/usr/bin/protoc-gen-grpc-swift
 EOF
+
+FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift_2
+ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION
+RUN mkdir -p /grpc-swift-protobuf
+RUN echo ${PROTOC_GEN_GRPC_SWIFT_2_VERSION}
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_2_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
+WORKDIR /grpc-swift-protobuf
+ARG TARGETOS TARGETARCH
+RUN <<EOF
+    case ${TARGETARCH} in
+      "amd64")  SWIFTARCH=x86_64  ;;
+      "arm64")  SWIFTARCH=aarch64 ;;
+      *)        echo "ERROR: Machine arch ${TARGETARCH} not supported." ;;
+    esac
+    swift build -c release --product protoc-gen-grpc-swift-2 --swift-sdk $SWIFTARCH-swift-linux-musl
+    install -D /grpc-swift-protobuf/.build/release/protoc-gen-grpc-swift-2 /out/usr/bin/protoc-gen-grpc-swift-2
+EOF
+
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS alpine_host
 COPY --from=xx / /
@@ -415,9 +434,7 @@ RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-$
 RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
-COPY --from=grpc_gen_swift /out/ /out/
 COPY --from=grpc_rust /out/ /out/
-COPY --from=grpc_swift /out/ /out/
 COPY --from=grpc_web /out/ /out/
 COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
@@ -429,11 +446,14 @@ COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
+COPY --from=protoc_gen_grpc_swift /out/ /out/
+COPY --from=protoc_gen_grpc_swift_2 /out/ /out/
 COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_openapi /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
 COPY --from=protoc_gen_scala /out/ /out/
+COPY --from=protoc_gen_swift /out/ /out/
 COPY --from=protoc_gen_validate /out/ /out/
 RUN find /out/usr/bin/ -type f \
         -name 'protoc-gen-*' | \
@@ -519,6 +539,7 @@ RUN mkdir -p /test && \
         google/protobuf/any.proto && \
     protoc-wrapper \
         --gogo_out=/test \
+        --grpc-swift-2_out=/test \
         google/protobuf/any.proto && \
     if ! [ "${TARGETARCH}" = "arm64" ]; then \
         protoc-wrapper \
