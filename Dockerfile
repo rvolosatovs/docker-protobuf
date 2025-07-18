@@ -495,56 +495,6 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
     ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go && \
     ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
-COPY protoc-wrapper /usr/bin/protoc-wrapper
-RUN mkdir -p /test && \
-    protoc-wrapper \
-        --bq-schema_out=/test \
-        --c_out=/test \
-        --dart_out=/test \
-        --go_out=/test \
-        --go-grpc_out=/test \
-        --gorm_out=/test \
-        --gotemplate_out=/test \
-        --govalidators_out=/test \
-        --gql_out=/test \
-        --grpc-cpp_out=/test \
-        --grpc-csharp_out=/test \
-        --grpc-gateway_out=/test \
-        --grpc-go_out=/test \
-        --go-vtproto_out=/test \
-        --grpc-java_out=/test \
-        --grpc-js_out=/test \
-        --grpc-objc_out=/test \
-        --grpc-php_out=/test \
-        --grpc-python_out=/test \
-        --grpc-ruby_out=/test \
-        --grpc-rust_out=/test \
-        --grpc-swift_out=/test \
-        --grpc-web_out=import_style=commonjs,mode=grpcwebtext:/test \
-        --java_out=/test \
-        --js_out=import_style=commonjs:/test \
-        --jsonschema_out=/test \
-        --lint_out=/test \
-        --nanopb_out=/test \
-        --openapi_out=/test \
-        --openapiv2_out=/test \
-        --pbandk_out=/test \
-        --php_out=/test \
-        --python_out=/test \
-        --rs_out=/test \
-        --ruby_out=/test \
-        --swift_out=/test \
-        --ts_out=/test \
-        --validate_out=lang=go:/test \
-        google/protobuf/any.proto && \
-    protoc-wrapper \
-        --gogo_out=/test \
-        --grpc-swift-2_out=/test \
-        google/protobuf/any.proto && \
-    if ! [ "${TARGETARCH}" = "arm64" ]; then \
-        protoc-wrapper \
-            --scala_out=/test \
-            google/protobuf/any.proto ; \
-    fi && \
-    rm -rf /test
+COPY protoc-* /usr/bin
+RUN protoc-test
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]
