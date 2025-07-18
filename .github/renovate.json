@@ -49,14 +49,22 @@
     },
     {
       "fileMatch": ["^deps\\.list$"],
-      "matchStrings": ["PROTOC_GEN_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
-      "depNameTemplate": "grpc/grpc-swift",
-      "datasourceTemplate": "github-releases"
+      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "grpc/grpc-swift-protobuf",
+      "datasourceTemplate": "github-releases",
+      "allowedVersions": "/^1\\./"
     },
     {
       "fileMatch": ["^deps\\.list$"],
-      "matchStrings": ["GRPC_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
+      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_2_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-swift-protobuf",
+      "datasourceTemplate": "github-releases",
+      "allowedVersions": "/^2\\./"
+    },
+    {
+      "fileMatch": ["^deps\\.list$"],
+      "matchStrings": ["PROTOC_GEN_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "apple/swift-protobuf",
       "datasourceTemplate": "github-releases"
     },
     {
