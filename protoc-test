@@ -85,6 +85,12 @@ GO_PKG_PLUGINS="go_out go-grpc_out go-vtproto_out gorm_out gotemplate_out gql_ou
 
 # Run and check each plugin
 for plugin in "${!PLUGINS[@]}"; do
+  # Skip unsupported plugins on aarch64
+  if [[ $(uname -m) == "aarch64" && "$plugin" == "scala_out" ]]; then
+    echo "SKIP: scala_out not supported on aarch64"
+    continue
+  fi
+
   mkdir -p "$OUTDIR"
 
   printf "%s" "$base_proto_content" > "$proto"
