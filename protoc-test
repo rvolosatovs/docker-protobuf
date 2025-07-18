@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+# Directory for generated files
+WORKDIR=/tmp/test
+OUTDIR="$WORKDIR/out"
+
+# Write base proto
+proto="$WORKDIR"/test_message.proto
+base_proto_content='syntax = "proto3";
+package test;
+// IMPORTS
+// OPTIONS
+message TestMessage {
+  // MESSAGEOPTIONS
+  string type_url = 1;
+}
+service TestService {
+  rpc TestMethod(TestMessage) returns (TestMessage) {
+    // SERVICEOPTIONS
+  };
+}
+'
+
+gotemplate_content='package {{.File.Package}}
+
+// Methods
+// -------
+{{- range .Service.Method}}
+// * {{.Name}}
+{{- end}}
+//
+// Message types
+// -------------
+{{- range .File.MessageType}}
+// * {{.Name}}
+{{- end}}
+'
+
+# List of plugins to be tested, their call arguments and expected output files
+declare -A PLUGINS
+PLUGINS=(
+  [bq-schema_out]="--bq-schema_out=$OUTDIR test/test_message.schema"
+  [c_out]="--c_out=$OUTDIR test_message.pb-c.c"
+  [dart_out]="--dart_out=$OUTDIR test_message.pb.dart"
+  [go_out]="--go_out=$OUTDIR test/protobuf/test_message.pb.go"
+  [go-grpc_out]="--go-grpc_out=$OUTDIR test/protobuf/test_message_grpc.pb.go"
+  [go-vtproto_out]="--go-vtproto_out=$OUTDIR test/protobuf/test_message_vtproto.pb.go"
+  [gogo_out]="--gogo_out=$OUTDIR test_message.pb.go"
+  [gorm_out]="--gorm_out=$OUTDIR test/protobuf/test_message.pb.gorm.go"
+  [gotemplate_out]="--gotemplate_out=template_dir=$WORKDIR/templates:$OUTDIR message.go"
+  [govalidators_out]="--govalidators_out=$OUTDIR test_message.validator.pb.go"
+  [gql_out]="--gql_out=$OUTDIR test_message.graphql"
+  [grpc-cpp_out]="--grpc-cpp_out=$OUTDIR test_message.grpc.pb.cc"
+  [grpc-csharp_out]="--grpc-csharp_out=$OUTDIR TestMessageGrpc.cs"
+  [grpc-gateway_out]="--grpc-gateway_out=$OUTDIR test/protobuf/test_message.pb.gw.go"
+  [grpc-go_out]="--grpc-go_out=$OUTDIR test/protobuf/test_message_grpc.pb.go"
+  [grpc-java_out]="--grpc-java_out=$OUTDIR test/TestServiceGrpc.java"
+  [grpc-js_out]="--grpc-js_out=$OUTDIR test_message_grpc_pb.js"
+  [grpc-objc_out]="--grpc-objc_out=$OUTDIR TestMessage.pbrpc.h"
+  [grpc-php_out]="--grpc-php_out=$OUTDIR Test/TestServiceClient.php"
+  [grpc-python_out]="--grpc-python_out=$OUTDIR test_message_pb2_grpc.py"
+  [grpc-ruby_out]="--grpc-ruby_out=$OUTDIR test_message_services_pb.rb"
+  [grpc-rust_out]="--grpc-rust_out=$OUTDIR test_message_grpc.rs"
+  [grpc-swift_out]="--grpc-swift_out=$OUTDIR test_message.grpc.swift"
+  [grpc-web_out]="--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$OUTDIR test_message_grpc_web_pb.js"
+  [java_out]="--java_out=$OUTDIR test/TestMessageOuterClass.java"
+  [js_out]="--js_out=import_style=commonjs:$OUTDIR test_message_pb.js"
+  [jsonschema_out]="--jsonschema_out=$OUTDIR TestMessage.json"
+  [lint_out]="--lint_out=$OUTDIR " # No output file, just runs lint checks
+  [nanopb_out]="--nanopb_out=$OUTDIR test_message.pb.h"
+  [openapi_out]="--openapi_out=$OUTDIR test.json"
+  [openapiv2_out]="--openapiv2_out=$OUTDIR test_message.swagger.json"
+  [pbandk_out]="--pbandk_out=$OUTDIR test/test_message.kt"
+  [php_out]="--php_out=$OUTDIR Test/TestMessage.php"
+  [python_out]="--python_out=$OUTDIR test_message_pb2.py"
+  [rs_out]="--rs_out=$OUTDIR test_message.rs"
+  [ruby_out]="--ruby_out=$OUTDIR test_message_pb.rb"
+  [scala_out]="--scala_out=$OUTDIR test/test_message/TestMessage.scala"
+  [swift_out]="--swift_out=$OUTDIR test_message.pb.swift"
+  [ts_out]="--ts_out=$OUTDIR test_message_pb.d.ts"
+  [validate_out]="--validate_out=lang=go:$OUTDIR test_message.pb.validate.go"
+)
+
+GO_PKG_PLUGINS="go_out go-grpc_out go-vtproto_out gorm_out gotemplate_out gql_out grpc-gateway_out grpc-go_out lint_out openapiv2_out"
+
+# Run and check each plugin
+for plugin in "${!PLUGINS[@]}"; do
+  mkdir -p "$OUTDIR"
+
+  printf "%s" "$base_proto_content" > "$proto"
+
+  # Modify proto file if needed for the specific plugin
+  if [[ " $GO_PKG_PLUGINS " == *" $plugin "* ]]; then
+    sed -i 's|// OPTIONS|option go_package = "test/protobuf";|' "$proto"
+  fi
+  if [[ "$plugin" == "bq-schema_out" ]]; then
+    sed -i 's|// IMPORTS|import "bq_table.proto";|' "$proto"
+    sed -i 's|// MESSAGEOPTIONS|option (gen_bq_schema.bigquery_opts).table_name = "test_message";|' "$proto"
+  elif [[ "$plugin" == "gorm_out" ]]; then
+    sed -i 's|// IMPORTS|import "options/gorm.proto";|' "$proto"
+    sed -i 's|// MESSAGEOPTIONS|option (gorm.opts).ormable = true;|' "$proto"
+  elif [[ "$plugin" == "grpc-gateway_out" ]]; then
+    sed -i 's|// IMPORTS|import "google/api/annotations.proto";|' "$proto"
+    sed -i 's|// SERVICEOPTIONS|option (google.api.http) = {\n      get: "/v1/test"\n    };|' "$proto"
+  elif [[ "$plugin" == "gotemplate_out" ]]; then
+    mkdir -p "$WORKDIR/templates"
+    printf "%s" "$gotemplate_content" > "$WORKDIR/templates/message.go.tmpl"
+  fi
+
+  # Parse plugin arguments and expected output file
+  plugin_args_and_file=(${PLUGINS[$plugin]})
+  plugin_arg="${plugin_args_and_file[0]}"
+  out_file="$WORKDIR/out/${plugin_args_and_file[1]}"
+
+  cd "$WORKDIR"
+  protoc-wrapper -I"$WORKDIR" "$plugin_arg" "$proto"
+  
+  if [[ ! -s "$out_file" ]]; then
+    echo "FAIL: $plugin did not generate expected output ($out_file)"
+    exit 1
+  else
+    echo "PASS: $plugin generated $out_file"
+  fi
+  rm -rf "$WORKDIR"
+done
