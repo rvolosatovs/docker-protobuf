@@ -41,6 +41,7 @@ declare -A PLUGINS
 PLUGINS=(
   [bq-schema_out]="--bq-schema_out=$OUTDIR test/test_message.schema"
   [c_out]="--c_out=$OUTDIR test_message.pb-c.c"
+  [csharp_out]="--csharp_out=$OUTDIR TestMessage.cs"
   [dart_out]="--dart_out=$OUTDIR test_message.pb.dart"
   [go_out]="--go_out=$OUTDIR test/protobuf/test_message.pb.go"
   [go-grpc_out]="--go-grpc_out=$OUTDIR test/protobuf/test_message_grpc.pb.go"
@@ -64,10 +65,12 @@ PLUGINS=(
   [grpc-swift_out]="--grpc-swift_out=$OUTDIR test_message.grpc.swift"
   [grpc-web_out]="--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$OUTDIR test_message_grpc_web_pb.js"
   [java_out]="--java_out=$OUTDIR test/TestMessageOuterClass.java"
+  [javalite_out]="--java_out=lite:$OUTDIR test/TestMessageOuterClass.java"
   [js_out]="--js_out=import_style=commonjs:$OUTDIR test_message_pb.js"
   [jsonschema_out]="--jsonschema_out=$OUTDIR TestMessage.json"
   [lint_out]="--lint_out=$OUTDIR " # No output file, just runs lint checks
   [nanopb_out]="--nanopb_out=$OUTDIR test_message.pb.h"
+  [objc_out]="--objc_out=$OUTDIR TestMessage.pbobjc.h"
   [openapi_out]="--openapi_out=$OUTDIR test.json"
   [openapiv2_out]="--openapiv2_out=$OUTDIR test_message.swagger.json"
   [pbandk_out]="--pbandk_out=$OUTDIR test/test_message.kt"
