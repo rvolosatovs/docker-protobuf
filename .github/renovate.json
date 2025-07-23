@@ -1,227 +1,274 @@
 {
   "branchPrefix": "renovate/",
-  "dryRun": null,
   "username": "renovate-release",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "onboarding": false,
   "platform": "github",
   "includeForks": true,
   "repositories": ["rvolosatovs/docker-protobuf"],
-  "enabledManagers": ["regex"],
-  "regexManagers": [
+  "enabledManagers": ["custom.regex"],
+  "customManagers": [
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["ALPINE_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "alpine",
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["DART_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "dart",
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["GO_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "golang",
       "datasourceTemplate": "docker",
       "extractVersionTemplate": "^(?<version>.*)-alpine$"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["GOOGLE_API_VERSION=(?<currentDigest>.*?)\\n"],
       "depNameTemplate": "https://github.com/googleapis/googleapis",
       "datasourceTemplate": "git-refs",
       "currentValueTemplate": "master"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["GRPC_GATEWAY_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc-ecosystem/grpc-gateway",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["GRPC_RUST_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "stepancheg/grpc-rust",
       "datasourceTemplate": "github-tags"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-swift-protobuf",
-      "datasourceTemplate": "github-releases",
-      "allowedVersions": "/^1\\./"
+      "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_2_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-swift-protobuf",
-      "datasourceTemplate": "github-releases",
-      "allowedVersions": "/^2\\./"
+      "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "apple/swift-protobuf",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["GRPC_WEB_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-web",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine3.17\\n"],
       "depNameTemplate": "node",
       "datasourceTemplate": "node",
       "versioningTemplate": "node"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_BQ_SCHEMA_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "googlecloudplatform/protoc-gen-bq-schema",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_DART_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "google/protobuf.dart",
       "datasourceTemplate": "github-tags",
       "extractVersionTemplate": "^protoc_plugin-(?<version>.*)$"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_DOC_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "pseudomuto/protoc-gen-doc",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GO_GRPC_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-go",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GO_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "protocolbuffers/protobuf-go",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GOGO_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "gogo/protobuf",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GORM_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "infobloxopen/protoc-gen-gorm",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GOTEMPLATE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "moul/protoc-gen-gotemplate",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GOVALIDATORS_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "mwitkow/go-proto-validators",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GQL_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "danielvladco/go-proto-gql",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_JS_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "protocolbuffers/protobuf-javascript",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_JSONSCHEMA_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "chrusty/protoc-gen-jsonschema",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_LINT_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "ckaznocha/protoc-gen-lint",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_NANOPB_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "nanopb",
       "datasourceTemplate": "pypi"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_RUST_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "stepancheg/rust-protobuf",
       "datasourceTemplate": "github-tags"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_SCALA_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "scalapb/ScalaPB",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_TS_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "ts-protoc-gen",
       "datasourceTemplate": "npm"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_VALIDATE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "bufbuild/protoc-gen-validate",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_OPENAPI_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "solo-io/protoc-gen-openapi",
       "datasourceTemplate": "github-releases"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["RUST_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "rust",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["SWIFT_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "swift",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["UPX_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "upx/upx",
       "datasourceTemplate": "github-releases",
       "extractVersionTemplate": "^v(?<version>.*)$"
     },
     {
-      "fileMatch": ["^deps\\.list$"],
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["XX_IMAGE_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "tonistiigi/xx",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["grpc/grpc-swift-protobuf"],
+      "matchFileNames": ["deps.list"],
+      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_VERSION="],
+      "allowedVersions": "/^1\\./"
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["grpc/grpc-swift-protobuf"],
+      "matchFileNames": ["deps.list"],
+      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_2_VERSION="],
+      "allowedVersions": "/^2\\./"
     }
   ]
 }
