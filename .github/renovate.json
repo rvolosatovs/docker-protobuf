@@ -83,7 +83,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["^deps\\.list$"],
-      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine3.17\\n"],
+      "matchStrings": ["NODE_IMAGE_VERSION=(?<currentValue>.*?)-alpine\\d+\\.\\d+\\n"],
       "depNameTemplate": "node",
       "datasourceTemplate": "node",
       "versioningTemplate": "node"
