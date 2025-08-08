@@ -3,7 +3,7 @@ includes=()
 outs=()
 args=()
 
-for arg in "$@"; do
+for arg in $@; do
     case $arg in
         -I*|--proto_path=*)
             includes+=("$arg")
