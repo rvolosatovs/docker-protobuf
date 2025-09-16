@@ -464,7 +464,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
-ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH
+ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
@@ -482,6 +482,9 @@ RUN apk add --no-cache \
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
+RUN wget -qO /usr/bin/buf \
+    "https://github.com/bufbuild/buf/releases/download/${BUF_CLI_VERSION}/buf-$(uname -s)-$(uname -m)"
+RUN chmod +x /usr/bin/buf
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /

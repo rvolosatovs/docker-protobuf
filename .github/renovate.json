@@ -253,6 +253,13 @@
       "depNameTemplate": "tonistiigi/xx",
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^deps\\.list$"],
+      "matchStrings": ["BUF_CLI_VERSION=(?<currentValue>.*?)\\n"],
+      "depNameTemplate": "bufbuild/buf",
+      "datasourceTemplate": "github-releases"
     }
   ],
   "packageRules": [
