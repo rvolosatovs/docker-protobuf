@@ -82,6 +82,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
         build-args: |
           ALPINE_IMAGE_VERSION=${{ env.ALPINE_IMAGE_VERSION }}
+          BUF_CLI_VERSION=${{ env.BUF_CLI_VERSION }}
           DART_IMAGE_VERSION=${{ env.DART_IMAGE_VERSION }}
           GO_IMAGE_VERSION=${{ env.GO_IMAGE_VERSION }}
           GOOGLE_API_VERSION=${{ env.GOOGLE_API_VERSION }}
