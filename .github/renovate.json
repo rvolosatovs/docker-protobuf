@@ -54,14 +54,16 @@
       "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-swift-protobuf",
-      "datasourceTemplate": "github-releases"
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^(?<version>1\\..*)$"
     },
     {
       "customType": "regex",
       "managerFilePatterns": ["^deps\\.list$"],
       "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_2_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "grpc/grpc-swift-protobuf",
-      "datasourceTemplate": "github-releases"
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^(?<version>2\\..*)$"
     },
     {
       "customType": "regex",
@@ -257,22 +259,6 @@
       "matchStrings": ["BUF_CLI_VERSION=(?<currentValue>.*?)\\n"],
       "depNameTemplate": "bufbuild/buf",
       "datasourceTemplate": "github-releases"
-    }
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": ["github-releases"],
-      "matchPackageNames": ["grpc/grpc-swift-protobuf"],
-      "matchFileNames": ["deps.list"],
-      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_VERSION="],
-      "allowedVersions": "/^1\\./"
-    },
-    {
-      "matchDatasources": ["github-releases"],
-      "matchPackageNames": ["grpc/grpc-swift-protobuf"],
-      "matchFileNames": ["deps.list"],
-      "matchStrings": ["PROTOC_GEN_GRPC_SWIFT_2_VERSION="],
-      "allowedVersions": "/^2\\./"
     }
   ]
 }
