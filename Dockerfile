@@ -2,7 +2,7 @@
 
 ARG ALPINE_IMAGE_VERSION=3.22
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
-ARG BUF_CLI_VERSION=v1.57.1
+ARG BUF_CLI_VERSION=v1.59.0
 ARG DART_IMAGE_VERSION=3.8.2
 ARG GO_IMAGE_VERSION=1.24.4-alpine3.22
 ARG GOOGLE_API_REV=8b80b1498e7016be58f6c09d0a86ddf0ea37feae
