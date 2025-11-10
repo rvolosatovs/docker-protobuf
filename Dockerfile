@@ -57,7 +57,7 @@ ARG PROTOC_GEN_TS_VERSION=0.15.0
 ARG PROTOC_GEN_VALIDATE_VERSION=v1.2.1
 ARG RUST_IMAGE_VERSION=1.91.0-alpine3.22@sha256:a3e3d30122c08c0ed85dcd8867d956f066be23c32ed67a0453bc04ce478ad69b
 ARG SCALA_SBT_IMAGE_VERSION=graalvm-ce-22.3.3-b1-java17_1.9.9_2.12.18
-ARG SWIFT_IMAGE_VERSION=6.1.2
+ARG SWIFT_IMAGE_VERSION=6.1.2-noble
 ARG SWIFT_SDK_CHECKSUM=df0b40b9b582598e7e3d70c82ab503fd6fbfdff71fd17e7f1ab37115a0665b3b
 ARG UPX_VERSION=5.0.2
 ARG XX_IMAGE_VERSION=1.8.0@sha256:add602d55daca18914838a78221f6bbe4284114b452c86a48f96d59aeb00f5c6
@@ -324,12 +324,12 @@ RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/proto
 RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 
-FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION}-noble AS swift_target
-ARG SWIFT_IMAGE_VERSION
-ARG SWIFT_SDK_CHECKSUM
+FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION} AS swift_target
 RUN apt-get update && \
     apt-get install -y curl
-RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | sed -E 's/([0-9]+\.[0-9]+)\.0/\1/') && \
+ARG SWIFT_IMAGE_VERSION
+ARG SWIFT_SDK_CHECKSUM
+RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | cut -d'-' -f1) && \
     swift sdk install \
     https://download.swift.org/swift-$SWIFT_SDK_VERSION-release/static-sdk/swift-$SWIFT_SDK_VERSION-RELEASE/swift-$SWIFT_SDK_VERSION-RELEASE_static-linux-0.0.1.artifactbundle.tar.gz \
     --checksum ${SWIFT_SDK_CHECKSUM}
