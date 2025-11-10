@@ -27,7 +27,7 @@ ARG PROTOC_GEN_GO_VTPROTO_VERSION=v0.6.0
 # renovate: datasource=github-releases depName=protoc-gen-gogo packageName=gogo/protobuf
 ARG PROTOC_GEN_GOGO_VERSION=v1.3.2
 # renovate: datasource=github-releases depName=protoc-gen-gorm packageName=infobloxopen/protoc-gen-gorm
-ARG PROTOC_GEN_GORM_VERSION=v1.1.4
+ARG PROTOC_GEN_GORM_VERSION=v1.1.5
 # renovate: datasource=github-releases depName=protoc-gen-gotemplate packageName=moul/protoc-gen-gotemplate
 ARG PROTOC_GEN_GOTEMPLATE_VERSION=v1.11.3
 # renovate: datasource=github-releases depName=protoc-gen-govalidators packageName=mwitkow/go-proto-validators
