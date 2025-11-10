@@ -1,13 +1,72 @@
 # syntax=docker/dockerfile:1
 
-ARG ALPINE_IMAGE_VERSION=latest
-ARG DART_IMAGE_VERSION=latest
-ARG GO_IMAGE_VERSION=latest
-ARG NODE_IMAGE_VERSION=latest
-ARG RUST_IMAGE_VERSION=latest
+# renovate: datasource=docker packageName=alpine
+ARG ALPINE_IMAGE_VERSION=3.22
+# renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
+ARG BUF_CLI_VERSION=v1.57.1
+# renovate: datasource=docker packageName=dart
+ARG DART_IMAGE_VERSION=3.8.2
+# renovate: datasource=docker packageName=go
+ARG GO_IMAGE_VERSION=1.24.4-alpine3.22
+ARG GOOGLE_API_REV=2a2ea87fcad7327e0afcfeaa84ec4d4b014f11a3
+# renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
+ARG GRPC_GATEWAY_VERSION=v2.27.1
+# renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
+ARG GRPC_RUST_VERSION=v0.8.3
+# renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
+ARG GRPC_WEB_VERSION=1.5.0
+ARG NODE_IMAGE_VERSION=22.16.0-alpine3.22
+# renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
+ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
+# renovate: datasource=github-tags depName=protoc-gen-dart packageName=google/protobuf.dart
+ARG PROTOC_GEN_DART_VERSION=v22.5.0
+# renovate: datasource=github-releases depName=protoc-gen-doc packageName=pseudomuto/protoc-gen-doc
+ARG PROTOC_GEN_DOC_VERSION=v1.5.1
+# renovate: datasource=github-releases depName=protoc-gen-go-grpc packageName=grpc/grpc-go
+ARG PROTOC_GEN_GO_GRPC_VERSION=v1.74.2
+# renovate: datasource=github-releases depName=protoc-gen-go packageName=protocolbuffers/protobuf-go
+ARG PROTOC_GEN_GO_VERSION=v1.36.6
+ARG PROTOC_GEN_GO_VTPROTO_VERSION=v0.6.0
+# renovate: datasource=github-releases depName=protoc-gen-gogo packageName=gogo/protobuf
+ARG PROTOC_GEN_GOGO_VERSION=v1.3.2
+# renovate: datasource=github-releases depName=protoc-gen-gorm packageName=infobloxopen/protoc-gen-gorm
+ARG PROTOC_GEN_GORM_VERSION=v1.1.4
+# renovate: datasource=github-releases depName=protoc-gen-gotemplate packageName=moul/protoc-gen-gotemplate
+ARG PROTOC_GEN_GOTEMPLATE_VERSION=v1.11.3
+# renovate: datasource=github-releases depName=protoc-gen-govalidators packageName=mwitkow/go-proto-validators
+ARG PROTOC_GEN_GOVALIDATORS_VERSION=v0.3.2
+# renovate: datasource=github-releases depName=protoc-gen-gql packageName=danielvladco/go-proto-gql
+ARG PROTOC_GEN_GQL_VERSION=v0.10.0
+ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION=2.0.0
+ARG PROTOC_GEN_GRPC_SWIFT_VERSION=1.3.1
+# renovate: datasource=github-releases depName=protoc-gen-jsonschema packageName=chrusty/protoc-gen-jsonschema
+ARG PROTOC_GEN_JSONSCHEMA_VERSION=1.4.1
+# renovate: datasource=github-releases depName=protoc-gen-lint packageName=ckaznocha/protoc-gen-lint
+ARG PROTOC_GEN_LINT_VERSION=v0.3.0
+# renovate: datasource=pypi packageName=nanopb
+ARG PROTOC_GEN_NANOPB_VERSION=0.4.9.1
+# renovate: datasource=github-releases depName=protoc-gen-openapi packageName=solo-io/protoc-gen-openapi
+ARG PROTOC_GEN_OPENAPI_VERSION=v0.3.1
+ARG PROTOC_GEN_PBANDK_VERSION=0.16.0
+# renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/rust-protobuf
+ARG PROTOC_GEN_RUST_VERSION=v3.7.2
+# renovate: datasource=github-releases depName=protoc-gen-scala packageName=scalapb/ScalaPB
+ARG PROTOC_GEN_SCALA_VERSION=v0.11.17
+# renovate: datasource=github-releases depName=protoc-gen-swift packageName=apple/swift-protobuf
+ARG PROTOC_GEN_SWIFT_VERSION=1.30.0
+# renovate: datasource=npm packageName=ts-protoc-gen
+ARG PROTOC_GEN_TS_VERSION=0.15.0
+# renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
+ARG PROTOC_GEN_VALIDATE_VERSION=v1.2.1
+# renovate: datasource=docker packageName=rust
+ARG RUST_IMAGE_VERSION=1.88.0-alpine3.22
 ARG SCALA_SBT_IMAGE_VERSION=graalvm-ce-22.3.3-b1-java17_1.9.9_2.12.18
-ARG SWIFT_IMAGE_VERSION=latest
-ARG XX_IMAGE_VERSION=latest
+# renovate: datasource=docker packageName=swift
+ARG SWIFT_IMAGE_VERSION=6.1.2
+ARG SWIFT_SDK_CHECKSUM=df0b40b9b582598e7e3d70c82ab503fd6fbfdff71fd17e7f1ab37115a0665b3b
+ARG UPX_VERSION=5.0.2
+# renovate: datasource=docker packageName=tonistiigi/xx
+ARG XX_IMAGE_VERSION=1.6.1
 
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_IMAGE_VERSION} AS xx
@@ -357,8 +416,8 @@ RUN apk add --no-cache \
 
 FROM --platform=$BUILDPLATFORM alpine_host AS googleapis
 RUN mkdir -p /googleapis
-ARG GOOGLE_API_VERSION
-RUN curl -sSL https://api.github.com/repos/googleapis/googleapis/tarball/${GOOGLE_API_VERSION} | tar xz --strip 1 -C /googleapis
+ARG GOOGLE_API_REV
+RUN curl -sSL https://api.github.com/repos/googleapis/googleapis/tarball/${GOOGLE_API_REV} | tar xz --strip 1 -C /googleapis
 WORKDIR /googleapis
 RUN install -D ./google/api/annotations.proto /out/usr/include/google/api/annotations.proto
 RUN install -D ./google/api/field_behavior.proto /out/usr/include/google/api/field_behavior.proto
@@ -464,6 +523,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
+LABEL org.opencontainers.image.source="https://github.com/rvolosatovs/docker-protobuf"
 ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
