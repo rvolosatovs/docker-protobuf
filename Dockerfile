@@ -351,9 +351,8 @@ RUN <<EOF
 EOF
 
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift
-ARG PROTOC_GEN_GRPC_SWIFT_VERSION
 RUN mkdir -p /grpc-swift-protobuf
-RUN echo ${PROTOC_GEN_GRPC_SWIFT_VERSION}
+ARG PROTOC_GEN_GRPC_SWIFT_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
 WORKDIR /grpc-swift-protobuf
 ARG TARGETOS TARGETARCH
@@ -368,9 +367,8 @@ RUN <<EOF
 EOF
 
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift_2
-ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION
 RUN mkdir -p /grpc-swift-protobuf
-RUN echo ${PROTOC_GEN_GRPC_SWIFT_2_VERSION}
+ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_2_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
 WORKDIR /grpc-swift-protobuf
 ARG TARGETOS TARGETARCH
