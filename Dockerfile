@@ -6,7 +6,7 @@ ARG ALPINE_IMAGE_VERSION=3.22
 ARG BUF_CLI_VERSION=v1.57.1
 # renovate: datasource=docker packageName=dart
 ARG DART_IMAGE_VERSION=3.8.2
-# renovate: datasource=docker packageName=go
+# renovate: datasource=docker packageName=golang
 ARG GO_IMAGE_VERSION=1.24.4-alpine3.22
 ARG GOOGLE_API_REV=2a2ea87fcad7327e0afcfeaa84ec4d4b014f11a3
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
