@@ -283,20 +283,6 @@ RUN install -D ./bq_table.proto /out/usr/include/github.com/googlecloudplatform/
 RUN xx-verify /out/usr/bin/protoc-gen-bq-schema
 
 
-FROM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
-# Use Bazel 7 until grpc-web is updated to support Bazel 8+ with v1.6.0+
-RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-        bazel7 \
-        build-base \
-        curl 
-ARG GRPC_WEB_VERSION
-RUN mkdir -p /grpc-web
-RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
-WORKDIR /grpc-web
-RUN bazel --batch build //javascript/net/grpc/web/generator:all
-RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
-
-
 FROM --platform=$BUILDPLATFORM rust:${RUST_IMAGE_VERSION} AS rust_target
 COPY --from=xx / /
 WORKDIR /
@@ -430,9 +416,8 @@ ARG TARGETPLATFORM
 RUN xx-verify /out/usr/bin/protoc-gen-lint
 
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_pbandk
+FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_pbandk
 RUN apk add --no-cache \
-        curl \
         git \
         openjdk17
 ARG PROTOC_GEN_PBANDK_VERSION
@@ -444,9 +429,8 @@ RUN echo ${PROTOC_GEN_PBANDK_VERSION} | awk -F. '{print $1 "." $2 "." $3+1}' > n
 RUN ./gradlew :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
 RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(cat next-version.txt)-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_scala_src
+FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_scala_src
 ARG PROTOC_GEN_SCALA_VERSION
-RUN apk add --no-cache curl
 RUN <<EOF
     mkdir -p /scala-protobuf
     curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
@@ -471,23 +455,39 @@ RUN <<EOF
     install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
 EOF
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_dart_src
+FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_dart_src
 ARG PROTOC_GEN_DART_VERSION
-RUN apk add --no-cache curl
 RUN <<EOF
     mkdir -p /dart-protobuf
     curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
 EOF
 
 FROM dart:${DART_IMAGE_VERSION} AS protoc_gen_dart
-COPY --from=protoc_gen_dart_src /dart-protobuf/ /dart-protobuf/
-WORKDIR /dart-protobuf/protoc_plugin
 # Use Dart mirror to work around connectivity problems to default host when building in QEMU
 # https://stackoverflow.com/questions/70729747
 ARG PUB_HOSTED_URL=https://pub.flutter-io.cn
+COPY --from=protoc_gen_dart_src /dart-protobuf/ /dart-protobuf/
+WORKDIR /dart-protobuf/protoc_plugin
 RUN dart pub get
 RUN dart compile exe --verbose bin/protoc_plugin.dart -o protoc_plugin
 RUN install -D /dart-protobuf/protoc_plugin/protoc_plugin /out/usr/bin/protoc-gen-dart
+
+
+FROM --platform=$BUILDPLATFORM alpine_host AS grpc_web_src
+RUN mkdir -p /grpc-web
+ARG GRPC_WEB_VERSION
+RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
+
+FROM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
+# Use Bazel 7 until grpc-web is updated to support Bazel 8+ with v1.6.0+
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
+        bazel7 \
+        build-base \
+        curl
+COPY --from=grpc_web_src /grpc-web/ /grpc-web/
+WORKDIR /grpc-web
+RUN bazel --batch build //javascript/net/grpc/web/generator:all
+RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
 FROM --platform=$BUILDPLATFORM alpine_host AS upx
