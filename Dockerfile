@@ -1,12 +1,9 @@
 # syntax=docker/dockerfile:1
 
-# renovate: datasource=docker packageName=alpine
 ARG ALPINE_IMAGE_VERSION=3.22
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
 ARG BUF_CLI_VERSION=v1.57.1
-# renovate: datasource=docker packageName=dart
 ARG DART_IMAGE_VERSION=3.8.2
-# renovate: datasource=docker packageName=golang
 ARG GO_IMAGE_VERSION=1.24.4-alpine3.22
 ARG GOOGLE_API_REV=2a2ea87fcad7327e0afcfeaa84ec4d4b014f11a3
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
@@ -58,14 +55,11 @@ ARG PROTOC_GEN_SWIFT_VERSION=1.30.0
 ARG PROTOC_GEN_TS_VERSION=0.15.0
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
 ARG PROTOC_GEN_VALIDATE_VERSION=v1.2.1
-# renovate: datasource=docker packageName=rust
 ARG RUST_IMAGE_VERSION=1.88.0-alpine3.22
 ARG SCALA_SBT_IMAGE_VERSION=graalvm-ce-22.3.3-b1-java17_1.9.9_2.12.18
-# renovate: datasource=docker packageName=swift
 ARG SWIFT_IMAGE_VERSION=6.1.2
 ARG SWIFT_SDK_CHECKSUM=df0b40b9b582598e7e3d70c82ab503fd6fbfdff71fd17e7f1ab37115a0665b3b
 ARG UPX_VERSION=5.0.2
-# renovate: datasource=docker packageName=tonistiigi/xx
 ARG XX_IMAGE_VERSION=1.6.1
 
 
