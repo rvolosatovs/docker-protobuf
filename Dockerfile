@@ -339,7 +339,7 @@ ARG PROTOC_GEN_SWIFT_VERSION
 RUN mkdir -p /swift-protobuf
 RUN curl -sSL https://api.github.com/repos/apple/swift-protobuf/tarball/${PROTOC_GEN_SWIFT_VERSION} | tar xz --strip 1 -C /swift-protobuf
 WORKDIR /swift-protobuf
-ARG TARGETOS TARGETARCH
+ARG TARGETARCH
 RUN <<EOF
     case ${TARGETARCH} in
       "amd64")  SWIFTARCH=x86_64  ;;
@@ -355,7 +355,7 @@ RUN mkdir -p /grpc-swift-protobuf
 ARG PROTOC_GEN_GRPC_SWIFT_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
 WORKDIR /grpc-swift-protobuf
-ARG TARGETOS TARGETARCH
+ARG TARGETARCH
 RUN <<EOF
     case ${TARGETARCH} in
       "amd64")  SWIFTARCH=x86_64  ;;
@@ -371,7 +371,7 @@ RUN mkdir -p /grpc-swift-protobuf
 ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-swift-protobuf/tarball/${PROTOC_GEN_GRPC_SWIFT_2_VERSION} | tar xz --strip 1 -C /grpc-swift-protobuf
 WORKDIR /grpc-swift-protobuf
-ARG TARGETOS TARGETARCH
+ARG TARGETARCH
 RUN <<EOF
     case ${TARGETARCH} in
       "amd64")  SWIFTARCH=x86_64  ;;
