@@ -31,9 +31,6 @@ jobs:
         sudo rm -rf /opt/az
         sudo rm -rf /usr/local/share/powershell
         sudo rm -rf /opt/hostedtoolcache
-        docker system prune -af || true
-        docker builder prune -af || true
-        df -h
 
     - name: Move Docker data root to work directory
       run: |
