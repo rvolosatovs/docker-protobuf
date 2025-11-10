@@ -10,7 +10,6 @@ It started out as https://github.com/znly/docker-protobuf fork, but grew into a 
 - [chrusty/protoc-gen-jsonschema](https://github.com/chrusty/protoc-gen-jsonschema)
 - [ckaznocha/protoc-gen-lint](https://github.com/ckaznocha/protoc-gen-lint)
 - [danielvladco/go-proto-gql](https://github.com/danielvladco/go-proto-gql)
-- [gogo/protobuf](https://github.com/gogo/protobuf)
 - [google/protobuf.dart](https://github.com/google/protobuf.dart)
 - [googleapis/googleapis](https://github.com/googleapis/googleapis)
 - [googlecloudplatform/protoc-gen-bq-schema](https://github.com/googlecloudplatform/protoc-gen-bq-schema)
