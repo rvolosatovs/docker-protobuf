@@ -24,8 +24,6 @@ ARG PROTOC_GEN_GO_GRPC_VERSION=v1.74.2
 # renovate: datasource=github-releases depName=protoc-gen-go packageName=protocolbuffers/protobuf-go
 ARG PROTOC_GEN_GO_VERSION=v1.36.6
 ARG PROTOC_GEN_GO_VTPROTO_VERSION=v0.6.0
-# renovate: datasource=github-releases depName=protoc-gen-gogo packageName=gogo/protobuf
-ARG PROTOC_GEN_GOGO_VERSION=v1.3.2
 # renovate: datasource=github-releases depName=protoc-gen-gorm packageName=infobloxopen/protoc-gen-gorm
 ARG PROTOC_GEN_GORM_VERSION=v1.1.5
 # renovate: datasource=github-releases depName=protoc-gen-gotemplate packageName=moul/protoc-gen-gotemplate
@@ -156,28 +154,6 @@ RUN xx-go --wrap
 RUN go build -ldflags '-w -s' -o /planetscale-vtprotobuf-out/ ./cmd/protoc-gen-go-vtproto
 RUN install -D /planetscale-vtprotobuf-out/protoc-gen-go-vtproto /out/usr/bin/protoc-gen-go-vtproto
 RUN xx-verify /out/usr/bin/protoc-gen-go-vtproto
-
-
-FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_gogo
-RUN mkdir -p ${GOPATH}/src/github.com/gogo/protobuf
-ARG PROTOC_GEN_GOGO_VERSION
-RUN curl -sSL https://api.github.com/repos/gogo/protobuf/tarball/${PROTOC_GEN_GOGO_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/gogo/protobuf
-WORKDIR ${GOPATH}/src/github.com/gogo/protobuf
-RUN go mod download
-ARG TARGETPLATFORM
-RUN xx-go --wrap
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gofast ./protoc-gen-gofast
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogo ./protoc-gen-gogo
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogofast ./protoc-gen-gogofast
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogofaster ./protoc-gen-gogofaster
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogoslick ./protoc-gen-gogoslick
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gogotypes ./protoc-gen-gogotypes
-RUN go build -ldflags '-w -s' -o /gogo-protobuf-out/protoc-gen-gostring ./protoc-gen-gostring
-RUN install -D $(find /gogo-protobuf-out -name 'protoc-gen-*') -t /out/usr/bin
-RUN mkdir -p /out/usr/include/github.com/gogo/protobuf/protobuf/google/protobuf
-RUN install -D $(find ./protobuf/google/protobuf -name '*.proto') -t /out/usr/include/github.com/gogo/protobuf/protobuf/google/protobuf
-RUN install -D ./gogoproto/gogo.proto /out/usr/include/github.com/gogo/protobuf/gogoproto/gogo.proto
-RUN xx-verify /out/usr/bin/protoc-gen-gogo
 
 
 FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_gotemplate
@@ -502,7 +478,6 @@ COPY --from=protoc_gen_doc /out/ /out/
 COPY --from=protoc_gen_go /out/ /out/
 COPY --from=protoc_gen_go_grpc /out/ /out/
 COPY --from=protoc_gen_go_vtproto /out/ /out/
-COPY --from=protoc_gen_gogo /out/ /out/
 COPY --from=protoc_gen_gorm /out/ /out/
 COPY --from=protoc_gen_gotemplate /out/ /out/
 COPY --from=protoc_gen_govalidators /out/ /out/

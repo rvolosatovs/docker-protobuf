@@ -46,7 +46,6 @@ PLUGINS=(
   [go_out]="--go_out=$OUTDIR test/protobuf/test_message.pb.go"
   [go-grpc_out]="--go-grpc_out=$OUTDIR test/protobuf/test_message_grpc.pb.go"
   [go-vtproto_out]="--go-vtproto_out=$OUTDIR test/protobuf/test_message_vtproto.pb.go"
-  [gogo_out]="--gogo_out=$OUTDIR test_message.pb.go"
   [gorm_out]="--gorm_out=$OUTDIR test/protobuf/test_message.pb.gorm.go"
   [gotemplate_out]="--gotemplate_out=template_dir=$WORKDIR/templates:$OUTDIR message.go"
   [govalidators_out]="--govalidators_out=$OUTDIR test_message.validator.pb.go"
