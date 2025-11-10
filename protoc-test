@@ -66,7 +66,6 @@ PLUGINS=(
   [java_out]="--java_out=$OUTDIR test/TestMessageOuterClass.java"
   [javalite_out]="--java_out=lite:$OUTDIR test/TestMessageOuterClass.java"
   [js_out]="--js_out=import_style=commonjs:$OUTDIR test_message_pb.js"
-  [jsonschema_out]="--jsonschema_out=$OUTDIR TestMessage.json"
   [lint_out]="--lint_out=$OUTDIR " # No output file, just runs lint checks
   [nanopb_out]="--nanopb_out=$OUTDIR test_message.pb.h"
   [objc_out]="--objc_out=$OUTDIR TestMessage.pbobjc.h"

@@ -34,8 +34,6 @@ ARG PROTOC_GEN_GOVALIDATORS_VERSION=v0.3.2
 ARG PROTOC_GEN_GQL_VERSION=v0.10.0
 ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION=2.0.0
 ARG PROTOC_GEN_GRPC_SWIFT_VERSION=1.3.1
-# renovate: datasource=github-releases depName=protoc-gen-jsonschema packageName=chrusty/protoc-gen-jsonschema
-ARG PROTOC_GEN_JSONSCHEMA_VERSION=1.4.1
 # renovate: datasource=github-releases depName=protoc-gen-lint packageName=ckaznocha/protoc-gen-lint
 ARG PROTOC_GEN_LINT_VERSION=v0.3.0
 # renovate: datasource=pypi packageName=nanopb
@@ -228,20 +226,6 @@ RUN go build -ldflags '-w -s' -o /protoc-gen-validate-out/protoc-gen-validate .
 RUN install -D /protoc-gen-validate-out/protoc-gen-validate /out/usr/bin/protoc-gen-validate
 RUN install -D ./validate/validate.proto /out/usr/include/github.com/bufbuild/protoc-gen-validate/validate/validate.proto
 RUN xx-verify /out/usr/bin/protoc-gen-validate
-
-
-FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_jsonschema
-RUN mkdir -p ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema
-ARG PROTOC_GEN_JSONSCHEMA_VERSION
-RUN curl -sSL https://api.github.com/repos/chrusty/protoc-gen-jsonschema/tarball/${PROTOC_GEN_JSONSCHEMA_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema
-WORKDIR ${GOPATH}/src/github.com/chrusty/protoc-gen-jsonschema
-RUN go mod download
-ARG TARGETPLATFORM
-RUN xx-go --wrap
-RUN go build -ldflags '-w -s' -o /protoc-gen-jsonschema/protoc-gen-jsonschema ./cmd/protoc-gen-jsonschema
-RUN install -D /protoc-gen-jsonschema/protoc-gen-jsonschema /out/usr/bin/protoc-gen-jsonschema
-RUN install -D ./options.proto /out/usr/include/github.com/chrusty/protoc-gen-jsonschema/options.proto
-RUN xx-verify /out/usr/bin/protoc-gen-jsonschema
 
 
 FROM --platform=$BUILDPLATFORM go_host AS protoc_gen_bq_schema
@@ -484,7 +468,6 @@ COPY --from=protoc_gen_govalidators /out/ /out/
 COPY --from=protoc_gen_gql /out/ /out/
 COPY --from=protoc_gen_grpc_swift /out/ /out/
 COPY --from=protoc_gen_grpc_swift_2 /out/ /out/
-COPY --from=protoc_gen_jsonschema /out/ /out/
 COPY --from=protoc_gen_lint /out/ /out/
 COPY --from=protoc_gen_openapi /out/ /out/
 COPY --from=protoc_gen_rust /out/ /out/
