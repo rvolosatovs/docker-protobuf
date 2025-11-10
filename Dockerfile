@@ -3,7 +3,7 @@
 ARG ALPINE_IMAGE_VERSION=3.22
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
 ARG BUF_CLI_VERSION=v1.59.0
-ARG DART_IMAGE_VERSION=3.8.2
+ARG DART_IMAGE_VERSION=3.9.4@sha256:9db24325a8df958f4aa64e0880d8254ba304602c1d85ecee326b2c576883cc3a
 ARG GO_IMAGE_VERSION=1.24.4-alpine3.22
 ARG GOOGLE_API_REV=8b80b1498e7016be58f6c09d0a86ddf0ea37feae
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
