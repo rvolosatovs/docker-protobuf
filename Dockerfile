@@ -45,7 +45,7 @@ ARG PROTOC_GEN_NANOPB_VERSION=0.4.9.1
 # renovate: datasource=github-releases depName=protoc-gen-openapi packageName=solo-io/protoc-gen-openapi
 ARG PROTOC_GEN_OPENAPI_VERSION=v0.3.1
 ARG PROTOC_GEN_PBANDK_VERSION=0.16.0
-# renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/rust-protobuf
+# renovate: datasource=github-tags depName=rust-protobuf packageName=stepancheg/rust-protobuf
 ARG PROTOC_GEN_RUST_VERSION=v3.7.2
 # renovate: datasource=github-releases depName=protoc-gen-scala packageName=scalapb/ScalaPB
 ARG PROTOC_GEN_SCALA_VERSION=v0.11.17
