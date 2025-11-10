@@ -444,21 +444,26 @@ RUN echo ${PROTOC_GEN_PBANDK_VERSION} | awk -F. '{print $1 "." $2 "." $3+1}' > n
 RUN ./gradlew :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
 RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(cat next-version.txt)-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
 
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_scala_src
+ARG PROTOC_GEN_SCALA_VERSION
+RUN apk add --no-cache curl
+RUN <<EOF
+    mkdir -p /scala-protobuf
+    curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
+EOF
 
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
 ARG TARGETARCH
-ARG PROTOC_GEN_SCALA_VERSION
 ARG NATIVE_IMAGE_INSTALLED=true
 ARG JAVA_OPTS="-Djdk.lang.Process.launchMechanism=vfork"
 # Skip arm64 build due to https://github.com/spring-projects/spring-boot/issues/33429
+COPY --from=protoc_gen_scala_src /scala-protobuf/ /scala-protobuf/
 RUN <<EOF
-    mkdir -p /scala-protobuf
     mkdir -p /out
     if [ "${TARGETARCH}" = "arm64" ]; then
       echo "Skipping arm64 build due to error in Native Image toolchain"
       exit 0
     fi
-    curl -sS --retry 5 --retry-delay 10 --retry-connrefused -L https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
     cd /scala-protobuf
     gu install native-image
     ./make_reflect_config.sh
@@ -466,11 +471,16 @@ RUN <<EOF
     install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
 EOF
 
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_IMAGE_VERSION} AS protoc_gen_dart_src
+ARG PROTOC_GEN_DART_VERSION
+RUN apk add --no-cache curl
+RUN <<EOF
+    mkdir -p /dart-protobuf
+    curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
+EOF
 
 FROM dart:${DART_IMAGE_VERSION} AS protoc_gen_dart
-RUN mkdir -p /dart-protobuf
-ARG PROTOC_GEN_DART_VERSION
-RUN curl -sS --retry 5 --retry-delay 10 --retry-connrefused -L https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
+COPY --from=protoc_gen_dart_src /dart-protobuf/ /dart-protobuf/
 WORKDIR /dart-protobuf/protoc_plugin
 # Use Dart mirror to work around connectivity problems to default host when building in QEMU
 # https://stackoverflow.com/questions/70729747
