@@ -2,7 +2,6 @@
 
 # Protocol Buffers + Docker
 An all-inclusive `protoc` Docker image.
-It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
 
 ## What's included:
 - [apple/swift-protobuf](https://github.com/apple/swift-protobuf)
@@ -63,3 +62,7 @@ For help try:
 ```
 $ docker run --rm rvolosatovs/protoc --help
 ```
+
+## Acknowledgements
+
+It started out as https://github.com/znly/docker-protobuf fork, but grew into a stand-alone project.
