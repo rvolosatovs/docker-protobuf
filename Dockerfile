@@ -5,7 +5,7 @@ ARG ALPINE_IMAGE_VERSION=3.22@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c
 ARG BUF_CLI_VERSION=v1.59.0
 ARG DART_IMAGE_VERSION=3.9.4@sha256:9db24325a8df958f4aa64e0880d8254ba304602c1d85ecee326b2c576883cc3a
 ARG GO_IMAGE_VERSION=1.24.4-alpine3.22@sha256:68932fa6d4d4059845c8f40ad7e654e626f3ebd3706eef7846f319293ab5cb7a
-ARG GOOGLE_API_REV=ba80e9b5251c974d18c3c25fa905e2d0ae4a0f02
+ARG GOOGLE_API_REV=659ea6e98acc7d58661ce2aa7b4cf76a7ef3fd42
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
 ARG GRPC_GATEWAY_VERSION=v2.27.3
 # renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
