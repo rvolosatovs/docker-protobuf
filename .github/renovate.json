@@ -6,6 +6,12 @@
     ":automergeAll",
     ":gomod",
   ],
+  "packageRules": [
+    {
+      "matchDepNames": ["googleapis"],
+      "schedule": ["* * * * 1"]
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
