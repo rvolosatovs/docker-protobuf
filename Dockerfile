@@ -357,10 +357,7 @@ RUN mkdir -p /googleapis
 ARG GOOGLE_API_REV
 RUN curl -sSL https://api.github.com/repos/googleapis/googleapis/tarball/${GOOGLE_API_REV} | tar xz --strip 1 -C /googleapis
 WORKDIR /googleapis
-RUN install -D ./google/api/annotations.proto /out/usr/include/google/api/annotations.proto
-RUN install -D ./google/api/field_behavior.proto /out/usr/include/google/api/field_behavior.proto
-RUN install -D ./google/api/http.proto /out/usr/include/google/api/http.proto
-RUN install -D ./google/api/httpbody.proto /out/usr/include/google/api/httpbody.proto
+RUN for p in $(find ./google/api -name '*.proto'); do install -D "${p}" "/out/usr/include${p#.}"; done
 
 
 FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_lint
