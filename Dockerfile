@@ -46,7 +46,7 @@ ARG PROTOC_GEN_RUST_VERSION=v3.7.2
 # renovate: datasource=github-releases depName=protoc-gen-scala packageName=scalapb/ScalaPB
 ARG PROTOC_GEN_SCALA_VERSION=v0.11.17
 # renovate: datasource=github-releases depName=protoc-gen-swift packageName=apple/swift-protobuf
-ARG PROTOC_GEN_SWIFT_VERSION=1.30.0
+ARG PROTOC_GEN_SWIFT_VERSION=1.33.3
 # renovate: datasource=npm packageName=ts-protoc-gen
 ARG PROTOC_GEN_TS_VERSION=0.15.0
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
