@@ -107,7 +107,10 @@ RUN mkdir -p ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
 ARG PROTOC_GEN_OPENAPI_VERSION
 RUN curl -sSL https://api.github.com/repos/solo-io/protoc-gen-openapi/tarball/${PROTOC_GEN_OPENAPI_VERSION} | tar xz --strip 1 -C ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
 WORKDIR ${GOPATH}/src/github.com/solo-io/protoc-gen-openapi
-RUN go mod download
+# Temporary fix to update golang.org/x/tools to a version compatible with Go 1.23+
+RUN go get golang.org/x/tools@latest && \
+    go mod tidy && \
+    go mod download
 ARG TARGETPLATFORM
 RUN xx-go --wrap
 RUN go build -ldflags '-w -s' -o _output/.bin/protoc-gen-openapi .
@@ -381,7 +384,9 @@ RUN mkdir -p /pbandk
 RUN git clone https://github.com/strophy/pbandk.git
 WORKDIR /pbandk
 RUN echo ${PROTOC_GEN_PBANDK_VERSION} | awk -F. '{print $1 "." $2 "." $3+1}' > next-version.txt
-RUN ./gradlew :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
+# Configure Gradle with longer timeouts and retry settings to handle network issues
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.network.timeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Dorg.gradle.internal.http.socketTimeout=60000"
+RUN ./gradlew --no-daemon --stacktrace :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
 RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(cat next-version.txt)-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
 
 FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_scala_src
