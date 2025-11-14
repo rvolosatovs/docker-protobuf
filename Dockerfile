@@ -8,8 +8,6 @@ ARG GO_IMAGE_VERSION=1.25.4-alpine3.22@sha256:d3f0cf7723f3429e3f9ed846243970b20a
 ARG GOOGLE_API_REV=659ea6e98acc7d58661ce2aa7b4cf76a7ef3fd42
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
 ARG GRPC_GATEWAY_VERSION=v2.27.3
-# renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
-ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
 ARG GRPC_WEB_VERSION=1.5.0
 ARG NODE_IMAGE_VERSION=24.11.1-alpine3.22@sha256:2867d550cf9d8bb50059a0fff528741f11a84d985c732e60e19e8e75c7239c43
@@ -272,21 +270,6 @@ RUN install -D /rust-protobuf/target/$(xx-cargo --print-target-triple)/release/p
 RUN xx-verify /out/usr/bin/protoc-gen-rs
 
 
-FROM --platform=$BUILDPLATFORM rust_target AS grpc_rust
-RUN mkdir -p /grpc-rust
-ARG GRPC_RUST_VERSION
-RUN curl -sSL https://api.github.com/repos/stepancheg/grpc-rust/tarball/${GRPC_RUST_VERSION} | tar xz --strip 1 -C /grpc-rust
-WORKDIR /grpc-rust/grpc-compiler
-RUN --mount=type=cache,target=/root/.cargo/git/db \
-    --mount=type=cache,target=/root/.cargo/registry/cache \
-    --mount=type=cache,target=/root/.cargo/registry/index \
-    cargo fetch
-ARG TARGETPLATFORM
-RUN xx-cargo --config profile.release.strip=true build --release
-RUN install -D /grpc-rust/target/$(xx-cargo --print-target-triple)/release/protoc-gen-rust-grpc /out/usr/bin/protoc-gen-rust-grpc
-RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
-
-
 FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION} AS swift_target
 RUN apt-get update && \
     apt-get install -y curl
@@ -457,7 +440,6 @@ RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-$
 RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
-COPY --from=grpc_rust /out/ /out/
 COPY --from=grpc_web /out/ /out/
 COPY --from=protoc_gen_bq_schema /out/ /out/
 COPY --from=protoc_gen_doc /out/ /out/
@@ -518,8 +500,7 @@ RUN ln -s /usr/bin/grpc_cpp_plugin /usr/bin/protoc-gen-grpc-cpp && \
     ln -s /usr/bin/grpc_php_plugin /usr/bin/protoc-gen-grpc-php && \
     ln -s /usr/bin/grpc_python_plugin /usr/bin/protoc-gen-grpc-python && \
     ln -s /usr/bin/grpc_ruby_plugin /usr/bin/protoc-gen-grpc-ruby && \
-    ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go && \
-    ln -s /usr/bin/protoc-gen-rust-grpc /usr/bin/protoc-gen-grpc-rust
+    ln -s /usr/bin/protoc-gen-go-grpc /usr/bin/protoc-gen-grpc-go
 COPY protoc-* /usr/bin
 RUN protoc-test
 ENTRYPOINT ["protoc-wrapper", "-I/usr/include"]

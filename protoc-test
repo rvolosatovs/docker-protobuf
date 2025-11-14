@@ -60,7 +60,6 @@ PLUGINS=(
   [grpc-php_out]="--grpc-php_out=$OUTDIR Test/TestServiceClient.php"
   [grpc-python_out]="--grpc-python_out=$OUTDIR test_message_pb2_grpc.py"
   [grpc-ruby_out]="--grpc-ruby_out=$OUTDIR test_message_services_pb.rb"
-  [grpc-rust_out]="--grpc-rust_out=$OUTDIR test_message_grpc.rs"
   [grpc-swift_out]="--grpc-swift_out=$OUTDIR test_message.grpc.swift"
   [grpc-web_out]="--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$OUTDIR test_message_grpc_web_pb.js"
   [java_out]="--java_out=$OUTDIR test/TestMessageOuterClass.java"
