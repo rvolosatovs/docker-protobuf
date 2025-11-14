@@ -12,7 +12,7 @@ ARG GRPC_GATEWAY_VERSION=v2.27.3
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
 ARG GRPC_WEB_VERSION=1.5.0
-ARG NODE_IMAGE_VERSION=24.11.1-alpine3.22@sha256:54dfcc1bdf72fdd7f52499abfe58278b4ed7384124aef03707c5e36a94830562
+ARG NODE_IMAGE_VERSION=24.11.1-alpine3.22@sha256:2867d550cf9d8bb50059a0fff528741f11a84d985c732e60e19e8e75c7239c43
 # renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
 ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
 # renovate: datasource=github-tags depName=protoc-gen-dart packageName=google/protobuf.dart
