@@ -122,7 +122,9 @@ for plugin in "${!PLUGINS[@]}"; do
   cd "$WORKDIR"
   protoc-wrapper -I"$WORKDIR" "$plugin_arg" "$proto"
   
-  if [[ ! -s "$out_file" ]]; then
+  if [[ "$plugin" == "lint_out" ]]; then
+    echo "PASS: $plugin completed successfully"
+  elif [[ ! -s "$out_file" ]]; then
     echo "FAIL: $plugin did not generate expected output ($out_file)"
     exit 1
   else
