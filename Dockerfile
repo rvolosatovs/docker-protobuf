@@ -286,7 +286,7 @@ RUN xx-verify /out/usr/bin/protoc-gen-rust-grpc
 
 FROM --platform=$BUILDPLATFORM swift:${SWIFT_IMAGE_VERSION} AS swift_target
 RUN apt-get update && \
-    apt-get install -y curl
+    apt-get install -y curl git
 ARG SWIFT_IMAGE_VERSION
 ARG SWIFT_SDK_CHECKSUM
 RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | cut -d'-' -f1) && \
@@ -296,8 +296,7 @@ RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | cut -d'-' -f1) && \
 
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_swift
 ARG PROTOC_GEN_SWIFT_VERSION
-RUN mkdir -p /swift-protobuf
-RUN curl -sSL https://api.github.com/repos/apple/swift-protobuf/tarball/${PROTOC_GEN_SWIFT_VERSION} | tar xz --strip 1 -C /swift-protobuf
+RUN git clone --depth 1 --branch ${PROTOC_GEN_SWIFT_VERSION} --recurse-submodules --shallow-submodules https://github.com/apple/swift-protobuf.git /swift-protobuf
 WORKDIR /swift-protobuf
 ARG TARGETARCH
 RUN <<EOF
