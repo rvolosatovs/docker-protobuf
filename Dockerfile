@@ -20,7 +20,7 @@ ARG PROTOC_GEN_DART_VERSION=v24.0.0
 # renovate: datasource=github-releases depName=protoc-gen-doc packageName=pseudomuto/protoc-gen-doc
 ARG PROTOC_GEN_DOC_VERSION=v1.5.1
 # renovate: datasource=github-releases depName=protoc-gen-go-grpc packageName=grpc/grpc-go
-ARG PROTOC_GEN_GO_GRPC_VERSION=v1.76.0
+ARG PROTOC_GEN_GO_GRPC_VERSION=v1.77.0
 # renovate: datasource=github-releases depName=protoc-gen-go packageName=protocolbuffers/protobuf-go
 ARG PROTOC_GEN_GO_VERSION=v1.36.10
 ARG PROTOC_GEN_GO_VTPROTO_VERSION=v0.6.0
