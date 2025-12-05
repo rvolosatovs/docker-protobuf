@@ -3,7 +3,7 @@ module github.com/rvolosatovs/docker-protobuf
 go 1.24.0
 
 require (
-	github.com/google/go-github/v78 v78.0.0
+	github.com/google/go-github/v80 v80.0.0
 	github.com/google/go-github/v80 v80.0.0
 	golang.org/x/oauth2 v0.33.0
 )
