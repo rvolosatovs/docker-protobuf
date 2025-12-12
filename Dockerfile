@@ -39,7 +39,7 @@ ARG PROTOC_GEN_LINT_VERSION=v0.3.0
 # renovate: datasource=pypi packageName=nanopb
 ARG PROTOC_GEN_NANOPB_VERSION=0.4.9.1
 # renovate: datasource=github-releases depName=protoc-gen-openapi packageName=solo-io/protoc-gen-openapi
-ARG PROTOC_GEN_OPENAPI_VERSION=v0.3.1
+ARG PROTOC_GEN_OPENAPI_VERSION=v0.4.0
 ARG PROTOC_GEN_PBANDK_VERSION=0.16.0
 # renovate: datasource=github-tags depName=rust-protobuf packageName=stepancheg/rust-protobuf
 ARG PROTOC_GEN_RUST_VERSION=v3.7.2
