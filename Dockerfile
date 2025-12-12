@@ -22,7 +22,7 @@ ARG PROTOC_GEN_DOC_VERSION=v1.5.1
 # renovate: datasource=github-releases depName=protoc-gen-go-grpc packageName=grpc/grpc-go
 ARG PROTOC_GEN_GO_GRPC_VERSION=v1.77.0
 # renovate: datasource=github-releases depName=protoc-gen-go packageName=protocolbuffers/protobuf-go
-ARG PROTOC_GEN_GO_VERSION=v1.36.10
+ARG PROTOC_GEN_GO_VERSION=v1.36.11
 ARG PROTOC_GEN_GO_VTPROTO_VERSION=v0.6.0
 # renovate: datasource=github-releases depName=protoc-gen-gorm packageName=infobloxopen/protoc-gen-gorm
 ARG PROTOC_GEN_GORM_VERSION=v1.1.5
