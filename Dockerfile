@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1@sha256:b6afd42430b15f2d2a4c5a02b919e98a525b785b1aaff16747d2f623364e39b6
 
-ARG ALPINE_IMAGE_VERSION=3.22@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+ARG ALPINE_IMAGE_VERSION=3.23@sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff6da4eb62
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
 ARG BUF_CLI_VERSION=v1.61.0
 ARG DART_IMAGE_VERSION=3.10.6@sha256:c39a40fbca1a42073604c8b08b9b5657837e47605961b0931922413e456e3597
-ARG GO_IMAGE_VERSION=1.25.5-alpine3.22@sha256:3587db7cc96576822c606d119729370dbf581931c5f43ac6d3fa03ab4ed85a10
+ARG GO_IMAGE_VERSION=1.25.5-alpine3.23@sha256:ac09a5f469f307e5da71e766b0bd59c9c49ea460a528cc3e6686513d64a6f1fb
 ARG GOOGLE_API_REV=1496716325adf01af70ffca9161dd62d7bebbd50
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
 ARG GRPC_GATEWAY_VERSION=v2.27.3
@@ -12,7 +12,7 @@ ARG GRPC_GATEWAY_VERSION=v2.27.3
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
 ARG GRPC_WEB_VERSION=1.5.0
-ARG NODE_IMAGE_VERSION=24.12.0-alpine3.22@sha256:4f4a059445c5a6ef2b9d169d9afde176301263178141fc05ba657dab1c84f9a7
+ARG NODE_IMAGE_VERSION=24.12.0-alpine3.23@sha256:c921b97d4b74f51744057454b306b418cf693865e73b8100559189605f6955b8
 # renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
 ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
 # renovate: datasource=github-tags depName=protoc-gen-dart packageName=google/protobuf.dart
@@ -51,7 +51,7 @@ ARG PROTOC_GEN_SWIFT_VERSION=1.33.3
 ARG PROTOC_GEN_TS_VERSION=0.15.0
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
 ARG PROTOC_GEN_VALIDATE_VERSION=v1.3.0
-ARG RUST_IMAGE_VERSION=1.92.0-alpine3.22@sha256:0fe89ba9d67dc20a4ff50206d25c88606919cb611b41dd0285dfe3cbb02d69de
+ARG RUST_IMAGE_VERSION=1.92.0-alpine3.23@sha256:f6c22e0a256c05d44fca23bf530120b5d4a6249a393734884281ca80782329bc
 ARG SCALA_SBT_IMAGE_VERSION=graalvm-ce-22.3.3-b1-java17_1.9.9_2.12.18@sha256:22b381d98942815ba32fdc55b0de0c1464e7187d049b3acb7c21b221c169c932
 ARG SWIFT_IMAGE_VERSION=6.2.3-noble@sha256:ce273f554d653b0dbf84235bb616aee380eb06bbf53873108312cb695036439f
 ARG SWIFT_SDK_CHECKSUM=f30ec724d824ef43b5546e02ca06a8682dafab4b26a99fbb0e858c347e507a2c
