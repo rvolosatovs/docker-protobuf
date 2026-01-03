@@ -11,7 +11,7 @@ ARG GRPC_GATEWAY_VERSION=v2.27.4
 # renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
-ARG GRPC_WEB_VERSION=1.5.0
+ARG GRPC_WEB_VERSION=2.0.2
 ARG NODE_IMAGE_VERSION=24.12.0-alpine3.23@sha256:c921b97d4b74f51744057454b306b418cf693865e73b8100559189605f6955b8
 # renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
 ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
