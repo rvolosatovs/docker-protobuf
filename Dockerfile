@@ -32,7 +32,7 @@ ARG PROTOC_GEN_GOTEMPLATE_VERSION=v1.11.3
 ARG PROTOC_GEN_GOVALIDATORS_VERSION=v0.3.2
 # renovate: datasource=github-releases depName=protoc-gen-gql packageName=danielvladco/go-proto-gql
 ARG PROTOC_GEN_GQL_VERSION=v0.10.0
-ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION=2.1.2
+ARG PROTOC_GEN_GRPC_SWIFT_2_VERSION=2.2.0
 ARG PROTOC_GEN_GRPC_SWIFT_VERSION=1.3.1
 # renovate: datasource=github-releases depName=protoc-gen-lint packageName=ckaznocha/protoc-gen-lint
 ARG PROTOC_GEN_LINT_VERSION=v0.3.0
