@@ -7,7 +7,7 @@ ARG DART_IMAGE_VERSION=3.10.9@sha256:a4961c8c5c389d04f60ffe8b899c3b4b4827b726fa7
 ARG GO_IMAGE_VERSION=1.26.0-alpine3.23@sha256:d4c4845f5d60c6a974c6000ce58ae079328d03ab7f721a0734277e69905473e5
 ARG GOOGLE_API_REV=4ba4d6d3b5e81359f508fb19db492b97bbb01fe6
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
-ARG GRPC_GATEWAY_VERSION=v2.27.7
+ARG GRPC_GATEWAY_VERSION=v2.28.0
 # renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
