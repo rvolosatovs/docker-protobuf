@@ -50,7 +50,7 @@ ARG PROTOC_GEN_SWIFT_VERSION=1.34.1
 # renovate: datasource=npm packageName=ts-protoc-gen
 ARG PROTOC_GEN_TS_VERSION=0.15.0
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
-ARG PROTOC_GEN_VALIDATE_VERSION=v1.3.0
+ARG PROTOC_GEN_VALIDATE_VERSION=v1.3.3
 ARG RUST_IMAGE_VERSION=1.93.1-alpine3.23@sha256:4fec02de605563c297c78a31064c8335bc004fa2b0bf406b1b99441da64e2d2d
 ARG SCALA_SBT_IMAGE_VERSION=graalvm-ce-22.3.3-b1-java17_1.9.9_2.12.18@sha256:22b381d98942815ba32fdc55b0de0c1464e7187d049b3acb7c21b221c169c932
 ARG SWIFT_IMAGE_VERSION=6.2.3-noble@sha256:6dd90eb2359663a2cde8f03e9951f488b23134b3b8fce20e9dcb6cada75dd803
