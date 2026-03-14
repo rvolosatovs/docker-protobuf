@@ -15,6 +15,7 @@ An all-inclusive `protoc` Docker image.
 - [grpc-ecosystem/grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 - [grpc/grpc-go](https://github.com/grpc/grpc-go)
 - [grpc/grpc-java](https://github.com/grpc/grpc-java)
+- [grpc/grpc-node](https://github.com/grpc/grpc-node)
 - [grpc/grpc-swift-protobuf](https://github.com/grpc/grpc-swift-protobuf)
 - [grpc/grpc-web](https://github.com/grpc/grpc-web)
 - [grpc/grpc](https://github.com/grpc/grpc)
