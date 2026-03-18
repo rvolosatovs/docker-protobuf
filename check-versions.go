@@ -1,4 +1,4 @@
-///usr/bin/env true; exec /usr/bin/env go run "$0" "$@"
+// /usr/bin/env true; exec /usr/bin/env go run "$0" "$@"
 
 package main
 
@@ -12,7 +12,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/google/go-github/v78/github"
+	"github.com/google/go-github/v84/github"
 	"golang.org/x/oauth2"
 )
 

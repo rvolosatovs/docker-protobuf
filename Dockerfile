@@ -50,7 +50,7 @@ ARG PROTOC_GEN_SWIFT_VERSION=1.36.1
 # renovate: datasource=npm packageName=ts-protoc-gen
 ARG PROTOC_GEN_TS_VERSION=0.15.0
 # renovate: datasource=npm packageName=grpc-tools
-ARG PROTOC_GEN_JS_TOOLS_VERSION=1.13.1
+ARG PROTOC_GEN_GRPC_JS_VERSION=1.13.1
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
 ARG PROTOC_GEN_VALIDATE_VERSION=v1.3.3
 ARG RUST_IMAGE_VERSION=1.94.0-alpine3.23@sha256:ff0adc35894eb79586ce752a1b5a9eadc88b938c56d8f2b4b537b6258ff3fa10
@@ -487,7 +487,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/rvolosatovs/docker-protobuf"
-ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION PROTOC_GEN_JS_TOOLS_VERSION
+ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION PROTOC_GEN_GRPC_JS_VERSION
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
@@ -506,7 +506,7 @@ RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 # Alpine's grpc-plugins package ships a grpc-node plugin that does not support
 # grpc_js, generate_package_definition, or omit_serialize_instanceof, so install
 # grpc-tools globally to get a compatible plugin version.
-RUN npm install -g grpc-tools@${PROTOC_GEN_JS_TOOLS_VERSION}
+RUN npm install -g grpc-tools@${PROTOC_GEN_GRPC_JS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN wget -qO /usr/bin/buf \
