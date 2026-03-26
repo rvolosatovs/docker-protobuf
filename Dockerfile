@@ -8,6 +8,8 @@ ARG GO_IMAGE_VERSION=1.26.1-alpine3.23@sha256:2389ebfa5b7f43eeafbd6be0c3700cc466
 ARG GOOGLE_API_REV=59d5f2b46924714af627ac29ea6de78641a00835
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
 ARG GRPC_GATEWAY_VERSION=v2.28.0
+# renovate: datasource=npm packageName=grpc-tools
+ARG GRPC_NODE_VERSION=1.13.1
 # renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
@@ -49,8 +51,6 @@ ARG PROTOC_GEN_SCALA_VERSION=v0.11.17
 ARG PROTOC_GEN_SWIFT_VERSION=1.36.1
 # renovate: datasource=npm packageName=ts-protoc-gen
 ARG PROTOC_GEN_TS_VERSION=0.15.0
-# renovate: datasource=npm packageName=grpc-tools
-ARG PROTOC_GEN_GRPC_JS_VERSION=1.13.1
 # renovate: datasource=github-releases depName=protoc-gen-validate packageName=bufbuild/protoc-gen-validate
 ARG PROTOC_GEN_VALIDATE_VERSION=v1.3.3
 ARG RUST_IMAGE_VERSION=1.94.0-alpine3.23@sha256:ff0adc35894eb79586ce752a1b5a9eadc88b938c56d8f2b4b537b6258ff3fa10
@@ -451,6 +451,16 @@ RUN bazel --batch build //javascript/net/grpc/web/generator:all
 RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
+FROM node:${NODE_IMAGE_VERSION} AS grpc_node
+RUN mkdir -p /grpc-node-out
+ARG GRPC_NODE_VERSION
+WORKDIR /grpc-node-out
+RUN npm install grpc-tools@${GRPC_NODE_VERSION}
+RUN install -D /grpc-node-out/node_modules/grpc-tools/bin/grpc_node_plugin /out/usr/bin/grpc_node_plugin
+RUN install -D /grpc-node-out/node_modules/grpc-tools/bin/protoc.js /out/usr/bin/protoc.js
+RUN install -D /grpc-node-out/node_modules/grpc-tools/bin/protoc_plugin.js /out/usr/bin/protoc_plugin.js
+
+
 FROM --platform=$BUILDPLATFORM alpine_host AS upx
 RUN mkdir -p /upx
 ARG BUILDARCH BUILDOS UPX_VERSION
@@ -458,6 +468,7 @@ RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-$
 RUN install -D /upx/upx /usr/local/bin/upx
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
+COPY --from=grpc_node /out/ /out/
 COPY --from=grpc_rust /out/ /out/
 COPY --from=grpc_web /out/ /out/
 COPY --from=protoc_gen_bq_schema /out/ /out/
@@ -487,7 +498,7 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/rvolosatovs/docker-protobuf"
-ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION PROTOC_GEN_GRPC_JS_VERSION
+ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
@@ -503,10 +514,6 @@ RUN apk add --no-cache \
         openjdk21-jre \
         python3
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
-# Alpine's grpc-plugins package ships a grpc-node plugin that does not support
-# grpc_js, generate_package_definition, or omit_serialize_instanceof, so install
-# grpc-tools globally to get a compatible plugin version.
-RUN npm install -g grpc-tools@${PROTOC_GEN_GRPC_JS_VERSION}
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 RUN wget -qO /usr/bin/buf \
