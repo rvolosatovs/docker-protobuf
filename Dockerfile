@@ -2,7 +2,7 @@
 
 ARG ALPINE_IMAGE_VERSION=3.23@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
-ARG BUF_CLI_VERSION=v1.66.1
+ARG BUF_VERSION=v1.66.1
 ARG DART_IMAGE_VERSION=3.11.2@sha256:d2a7e07b3e541587415d1281d4865a809149d723cff5b9a5ed6e8a2126b2b2d9
 ARG GO_IMAGE_VERSION=1.26.1-alpine3.23@sha256:2389ebfa5b7f43eeafbd6be0c3700cc46690ef842ad962f6c5bd6be49ed82039
 ARG GOOGLE_API_REV=59d5f2b46924714af627ac29ea6de78641a00835
@@ -299,6 +299,7 @@ RUN export SWIFT_SDK_VERSION=$(echo ${SWIFT_IMAGE_VERSION} | cut -d'-' -f1) && \
     https://download.swift.org/swift-$SWIFT_SDK_VERSION-release/static-sdk/swift-$SWIFT_SDK_VERSION-RELEASE/swift-$SWIFT_SDK_VERSION-RELEASE_static-linux-0.1.0.artifactbundle.tar.gz \
     --checksum ${SWIFT_SDK_CHECKSUM}
 
+
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_swift
 ARG PROTOC_GEN_SWIFT_VERSION
 RUN git clone --depth 1 --branch ${PROTOC_GEN_SWIFT_VERSION} --recurse-submodules --shallow-submodules https://github.com/apple/swift-protobuf.git /swift-protobuf
@@ -313,6 +314,7 @@ RUN <<EOF
     swift build -c release --product protoc-gen-swift --swift-sdk $SWIFTARCH-swift-linux-musl
     install -D /swift-protobuf/.build/release/protoc-gen-swift /out/usr/bin/protoc-gen-swift
 EOF
+
 
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift
 RUN mkdir -p /grpc-swift-protobuf
@@ -329,6 +331,7 @@ RUN <<EOF
     swift build -c release --product protoc-gen-grpc-swift --swift-sdk $SWIFTARCH-swift-linux-musl
     install -D /grpc-swift-protobuf/.build/release/protoc-gen-grpc-swift /out/usr/bin/protoc-gen-grpc-swift
 EOF
+
 
 FROM --platform=$BUILDPLATFORM swift_target AS protoc_gen_grpc_swift_2
 RUN mkdir -p /grpc-swift-protobuf
@@ -364,6 +367,13 @@ WORKDIR /googleapis
 RUN for p in $(find ./google/api -name '*.proto'); do install -D "${p}" "/out/usr/include${p#.}"; done
 
 
+FROM --platform=$BUILDPLATFORM alpine_host AS buf
+RUN mkdir -p /buf
+ARG BUF_VERSION
+RUN curl -sSLo /buf/buf https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-$(uname -s)-$(uname -m)
+RUN install -D /buf/buf /out/usr/bin/buf
+
+
 FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_lint
 RUN mkdir -p /protoc-gen-lint-out
 ARG TARGETOS TARGETARCH PROTOC_GEN_LINT_VERSION
@@ -390,12 +400,14 @@ ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.network.timeout=60000 -D
 RUN ./gradlew --no-daemon --stacktrace :protoc-gen-pbandk:protoc-gen-pbandk-jvm:bootJar
 RUN install -D /pbandk/protoc-gen-pbandk/jvm/build/libs/protoc-gen-pbandk-jvm-$(cat next-version.txt)-SNAPSHOT-jvm8.jar /out/usr/bin/protoc-gen-pbandk
 
+
 FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_scala_src
 ARG PROTOC_GEN_SCALA_VERSION
 RUN <<EOF
     mkdir -p /scala-protobuf
     curl -sSL https://api.github.com/repos/scalapb/ScalaPB/tarball/${PROTOC_GEN_SCALA_VERSION} | tar xz --strip 1 -C /scala-protobuf
 EOF
+
 
 FROM sbtscala/scala-sbt:${SCALA_SBT_IMAGE_VERSION} AS protoc_gen_scala
 ARG TARGETARCH
@@ -416,12 +428,14 @@ RUN <<EOF
     install -D /scala-protobuf/target/protoc-gen-scala /out/usr/bin/protoc-gen-scala
 EOF
 
+
 FROM --platform=$BUILDPLATFORM alpine_host AS protoc_gen_dart_src
 ARG PROTOC_GEN_DART_VERSION
 RUN <<EOF
     mkdir -p /dart-protobuf
     curl -sSL https://api.github.com/repos/google/protobuf.dart/tarball/protoc_plugin-${PROTOC_GEN_DART_VERSION} | tar xz --strip 1 -C /dart-protobuf
 EOF
+
 
 FROM dart:${DART_IMAGE_VERSION} AS protoc_gen_dart
 # Use Dart mirror to work around connectivity problems to default host when building in QEMU
@@ -439,6 +453,7 @@ RUN mkdir -p /grpc-web
 ARG GRPC_WEB_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
 
+
 FROM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
 # Use Bazel 7 until grpc-web is updated to support Bazel 8+ with v1.6.0+
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
@@ -453,8 +468,8 @@ RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-
 
 FROM node:${NODE_IMAGE_VERSION} AS grpc_node
 RUN mkdir -p /grpc-node-out
-ARG GRPC_NODE_VERSION
 WORKDIR /grpc-node-out
+ARG GRPC_NODE_VERSION
 RUN npm install grpc-tools@${GRPC_NODE_VERSION}
 RUN install -D /grpc-node-out/node_modules/grpc-tools/bin/grpc_node_plugin /out/usr/bin/grpc_node_plugin
 RUN install -D /grpc-node-out/node_modules/grpc-tools/bin/protoc.js /out/usr/bin/protoc.js
@@ -466,6 +481,7 @@ RUN mkdir -p /upx
 ARG BUILDARCH BUILDOS UPX_VERSION
 RUN curl -sSL https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${BUILDARCH}_${BUILDOS}.tar.xz | tar xJ --strip 1 -C /upx
 RUN install -D /upx/upx /usr/local/bin/upx
+COPY --from=buf /out/ /out/
 COPY --from=googleapis /out/ /out/
 COPY --from=grpc_gateway /out/ /out/
 COPY --from=grpc_node /out/ /out/
@@ -498,7 +514,6 @@ RUN find /out -name "*.a" -delete -or -name "*.la" -delete
 FROM node:${NODE_IMAGE_VERSION}
 LABEL org.opencontainers.image.authors="Romāns Volosatovs <rvolosatovs@riseup.net>, Leon White <badfunkstripe@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/rvolosatovs/docker-protobuf"
-ARG PROTOC_GEN_NANOPB_VERSION PROTOC_GEN_TS_VERSION TARGETARCH BUF_CLI_VERSION
 RUN apk add --no-cache \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
       --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community/ \
@@ -513,12 +528,11 @@ RUN apk add --no-cache \
         protoc-gen-js \
         openjdk21-jre \
         python3
+ARG PROTOC_GEN_TS_VERSION
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
+ARG PROTOC_GEN_NANOPB_VERSION
 RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
-RUN wget -qO /usr/bin/buf \
-    "https://github.com/bufbuild/buf/releases/download/${BUF_CLI_VERSION}/buf-$(uname -s)-$(uname -m)"
-RUN chmod +x /usr/bin/buf
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
 COPY --from=protoc_gen_dart /runtime/ /
