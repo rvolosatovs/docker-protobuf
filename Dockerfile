@@ -531,7 +531,7 @@ RUN apk add --no-cache \
 ARG PROTOC_GEN_TS_VERSION
 RUN npm install -g ts-protoc-gen@${PROTOC_GEN_TS_VERSION}
 ARG PROTOC_GEN_NANOPB_VERSION
-RUN rm /usr/lib/python3.12/EXTERNALLY-MANAGED && \
+RUN rm -f /usr/lib/python3*/EXTERNALLY-MANAGED && \
     python3 -m ensurepip && pip3 install --no-cache setuptools nanopb==${PROTOC_GEN_NANOPB_VERSION}
 COPY --from=upx /out/ /
 COPY --from=protoc_gen_dart /out/ /
