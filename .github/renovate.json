@@ -4,8 +4,8 @@
     "config:best-practices",
     ":semanticPrefixChore",
     ":automergeAll",
-    ":gomod",
   ],
+  "enabledManagers": ["dockerfile", "custom.regex"],
   "rebaseWhen": "conflicted",
   "packageRules": [
     {
