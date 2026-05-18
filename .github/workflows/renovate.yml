@@ -1,0 +1,16 @@
+name: renovate
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.event.pull_request.user.login == 'renovate[bot]' && github.event.pull_request.head.ref == 'renovate/googleapis-digest'
+    runs-on: ubuntu-latest
+    steps:
+    - run: gh pr merge --auto --rebase "$PR_URL"
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
