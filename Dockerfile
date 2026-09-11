@@ -18,7 +18,7 @@ ARG NODE_IMAGE_VERSION=24.20.0-alpine3.23@sha256:0388af2af070cd4736a1567cfed0246
 # renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
 ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
 # renovate: datasource=github-tags depName=protoc-gen-dart packageName=google/protobuf.dart
-ARG PROTOC_GEN_DART_VERSION=v25.0.0
+ARG PROTOC_GEN_DART_VERSION=v25.1.0
 # renovate: datasource=github-releases depName=protoc-gen-doc packageName=pseudomuto/protoc-gen-doc
 ARG PROTOC_GEN_DOC_VERSION=v1.5.1
 # renovate: datasource=github-releases depName=protoc-gen-go-grpc packageName=grpc/grpc-go
