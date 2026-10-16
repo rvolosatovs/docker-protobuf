@@ -1,9 +1,12 @@
 # syntax=docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 
 ARG ALPINE_IMAGE_VERSION=3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+# renovate: datasource=github-releases depName=bazelisk packageName=bazelbuild/bazelisk
+ARG BAZELISK_VERSION=v1.29.0
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
 ARG BUF_VERSION=v1.72.0
 ARG DART_IMAGE_VERSION=3.13.3@sha256:17b10d5b632200b3d36c460a3acee9600561f90ee5ee171fec9c31723b074a00
+ARG DEBIAN_IMAGE_VERSION=trixie-slim@sha256:a29215f6a35e51e22adffa17f89e9d2ef06214e64a2bad10d765c46aea49f11f
 ARG GO_IMAGE_VERSION=1.27.1-alpine3.23@sha256:d9e2f2f07b10cc922da3e80e035c3058810b328d5aef82d2c63680967c5e2ec9
 ARG GOOGLE_API_REV=a0cd3979560fe756f652608469ef23a09b3fdb10
 # renovate: datasource=github-releases depName=grpc-gateway packageName=grpc-ecosystem/grpc-gateway
@@ -13,7 +16,7 @@ ARG GRPC_NODE_VERSION=1.13.1
 # renovate: datasource=github-tags depName=grpc-rust packageName=stepancheg/grpc-rust
 ARG GRPC_RUST_VERSION=v0.8.3
 # renovate: datasource=github-releases depName=grpc-web packageName=grpc/grpc-web
-ARG GRPC_WEB_VERSION=1.5.0
+ARG GRPC_WEB_VERSION=2.1.1
 ARG NODE_IMAGE_VERSION=24.20.0-alpine3.23@sha256:0388af2af070cd4736a1567cfed02469ba117848845b4165d87a333edb53d2ca
 # renovate: datasource=github-releases depName=protoc-gen-bq-schema packageName=googlecloudplatform/protoc-gen-bq-schema
 ARG PROTOC_GEN_BQ_SCHEMA_VERSION=v3.1.0
@@ -454,15 +457,23 @@ ARG GRPC_WEB_VERSION
 RUN curl -sSL https://api.github.com/repos/grpc/grpc-web/tarball/${GRPC_WEB_VERSION} | tar xz --strip 1 -C /grpc-web
 
 
-FROM alpine:${ALPINE_IMAGE_VERSION} AS grpc_web
-# Use Bazel 7 until grpc-web is updated to support Bazel 8+ with v1.6.0+
-RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-        bazel7 \
-        build-base \
-        curl
+FROM debian:${DEBIAN_IMAGE_VERSION} AS grpc_web
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        curl \
+        git \
+        python3 \
+        unzip \
+        zip && \
+    rm -rf /var/lib/apt/lists/*
+ARG TARGETARCH BAZELISK_VERSION
+RUN curl -sSL -o /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/${BAZELISK_VERSION}/bazelisk-linux-${TARGETARCH} && \
+    chmod +x /usr/local/bin/bazel
 COPY --from=grpc_web_src /grpc-web/ /grpc-web/
 WORKDIR /grpc-web
-RUN bazel --batch build //javascript/net/grpc/web/generator:all
+RUN bazel --batch build --features=fully_static_link //javascript/net/grpc/web/generator:protoc-gen-grpc-web
 RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
 
