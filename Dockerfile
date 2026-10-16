@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 
 ARG ALPINE_IMAGE_VERSION=3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
-ARG BAZEL_VERSION=7.6.1
 # renovate: datasource=github-releases depName=bazelisk packageName=bazelbuild/bazelisk
 ARG BAZELISK_VERSION=v1.29.0
 # renovate: datasource=github-releases depName=buf packageName=bufbuild/buf
@@ -474,8 +473,6 @@ RUN curl -sSL -o /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/rel
     chmod +x /usr/local/bin/bazel
 COPY --from=grpc_web_src /grpc-web/ /grpc-web/
 WORKDIR /grpc-web
-ARG BAZEL_VERSION
-ENV USE_BAZEL_VERSION=${BAZEL_VERSION}
 RUN bazel --batch build --features=fully_static_link //javascript/net/grpc/web/generator:protoc-gen-grpc-web
 RUN install -D /grpc-web/bazel-bin/javascript/net/grpc/web/generator/protoc-gen-grpc-web /out/usr/bin/protoc-gen-grpc-web
 
